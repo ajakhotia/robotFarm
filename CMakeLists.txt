@@ -59,7 +59,7 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
         SpdLogExternalProject
         VTKExternalProject
     CACHE STRING
-    "Semi-colon seperated list of projects requested by the user. Default includes all")
+    "Semi-colon separated list of projects requested by the user. Default includes all")
 
 set(ROBOT_FARM_BUILD_LIST "")
 
@@ -67,8 +67,21 @@ foreach(ITEM ${ROBOT_FARM_REQUESTED_BUILD_LIST})
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${ITEM}.cmake)
 endforeach()
 
-message(STATUS "User requested the build of ${ROBOT_FARM_REQUESTED_BUILD_LIST}")
-message(STATUS "RobotFarm will build ${ROBOT_FARM_BUILD_LIST}")
+
+function(print_list label)
+  set(_lines "")
+  foreach(_it IN LISTS ARGN)
+    string(APPEND _lines "\t${_it}\n")
+  endforeach()
+  if(label)
+    message(STATUS "${label}:\n${_lines}")
+  else()
+    message(STATUS "${_lines}")
+  endif()
+endfunction()
+
+print_list("User requested the build of" ${ROBOT_FARM_REQUESTED_BUILD_LIST})
+print_list("RobotFarm will build" ${ROBOT_FARM_BUILD_LIST})
 
 set(ROBOT_FARM_SYSTEM_DEPENDENCY_STR "")
 foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
