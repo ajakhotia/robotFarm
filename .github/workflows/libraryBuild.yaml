@@ -26,7 +26,7 @@ jobs:
         run: |
           echo "REPOSITORY_LOWERCASE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build robot-farm library
+      - name: Build external library
         uses: docker/build-push-action@v6
         with:
           context: .

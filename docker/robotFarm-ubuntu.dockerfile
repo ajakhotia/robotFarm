@@ -32,21 +32,21 @@ ARG BUILD_LIST
 
 COPY . /tmp/robotFarm-src
 
-RUN if [[ -z "${BUILD_LIST}" ]]; then                                                       \
-        cmake -G Ninja                                                                      \
-        -S /tmp/robotFarm-src                                                               \
-        -B /tmp/robotFarm-build                                                             \
-        -DCMAKE_BUILD_TYPE:STRING="Release"                                                 \
+RUN if [[ -z "${BUILD_LIST}" ]]; then                                                             \
+        cmake -G Ninja                                                                            \
+        -S /tmp/robotFarm-src                                                                     \
+        -B /tmp/robotFarm-build                                                                   \
+        -DCMAKE_BUILD_TYPE:STRING="Release"                                                       \
         -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake    \
-        -DCMAKE_INSTALL_PREFIX:PATH=/opt/robotFarm;                                         \
-    else                                                                                    \
-        cmake -G Ninja                                                                      \
-        -S /tmp/robotFarm-src                                                               \
-        -B /tmp/robotFarm-build                                                             \
-        -DCMAKE_BUILD_TYPE:STRING="Release"                                                 \
+        -DCMAKE_INSTALL_PREFIX:PATH=/opt/robotFarm;                                               \
+    else                                                                                          \
+        cmake -G Ninja                                                                            \
+        -S /tmp/robotFarm-src                                                                     \
+        -B /tmp/robotFarm-build                                                                   \
+        -DCMAKE_BUILD_TYPE:STRING="Release"                                                       \
         -DCMAKE_TOOLCHAIN_FILE:FILEPATH=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake    \
-        -DCMAKE_INSTALL_PREFIX:PATH=/opt/robotFarm                                          \
-        -DROBOT_FARM_REQUESTED_BUILD_LIST:STRING=${BUILD_LIST};                             \
+        -DCMAKE_INSTALL_PREFIX:PATH=/opt/robotFarm                                                \
+        -DROBOT_FARM_REQUESTED_BUILD_LIST:STRING=${BUILD_LIST};                                   \
     fi
 
 RUN apt-get install -y --no-install-recommends $(cat /tmp/robotFarm-build/systemDependencies.txt)
