@@ -1,11 +1,12 @@
-name: baseImageBuild
+name: libraryBuild
 
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["baseImageBuild"]
+    types: [completed]
 
 jobs:
-  baseImageBuild:
+  libraryBuild:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -25,12 +26,13 @@ jobs:
         run: |
           echo "REPOSITORY_LOWERCASE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build robot-farm-base
+      - name: Build robot-farm library
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/robotFarm-ubuntu.dockerfile
-          target: robot-farm-base
-          push: true
-          tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:base-${{ github.sha }}
-          cache-to: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
+          target: robot-farm
+          push: false
+          cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
+          build-args: |
+            BUILD_LIST="Eigen3ExternalProject"
