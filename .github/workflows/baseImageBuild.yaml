@@ -22,4 +22,4 @@ jobs:
           target: robot-farm-base
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/robot-farm:base-${{ github.sha }}
-          cache-to: type=registry,mode=max,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/${{ github.repository_owner }}/robot-farm:buildcache
