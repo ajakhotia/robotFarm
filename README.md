@@ -1,8 +1,11 @@
+[![infraFilesCongruencyCheck](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml)
+[![baseImageBuild](https://github.com/ajakhotia/robotFarm/actions/workflows/baseImageBuild.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/baseImageBuild.yaml)
+[![External library builds](https://github.com/ajakhotia/robotFarm/actions/workflows/libraryBuild.yaml/badge.svg?branch=main)](https://github.com/ajakhotia/robotFarm/actions/workflows/libraryBuild.yaml)
+
 # robotFarm
 A convenience project to build and install certain open source libraries(and listed dependencies)
 using cmake external projects. See files under the `cmake` directory to learn about available
 options. 
-
 
 # Usage
 Before getting started, come up with paths as listed below. You must have read and write 
