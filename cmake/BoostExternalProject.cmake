@@ -14,7 +14,7 @@ else()
     list(APPEND ROBOT_FARM_BUILD_LIST BoostExternalProject)
 
     set(ROBOT_FARM_BOOST_URL
-        "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.tar.gz"
+        "https://github.com/boostorg/boost/releases/download/boost-1.89.0/boost-1.89.0-b2-nodocs.tar.gz"
         CACHE STRING "URL of the Boost source archive")
 
     # See: https://www.boost.org/doc/libs/1_78_0/more/getting_started/unix-variants.html#identify-your-toolset
