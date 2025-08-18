@@ -50,6 +50,7 @@ RUN if [[ -z "${BUILD_LIST}" ]]; then                                           
     fi
 
 RUN apt-get install -y --no-install-recommends $(cat /tmp/robotFarm-build/systemDependencies.txt)
+RUN cmake -E make_directory /opt/robotFarm
 RUN cmake --build /tmp/robotFarm-build
 
 
