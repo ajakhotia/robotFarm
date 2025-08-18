@@ -35,4 +35,4 @@ jobs:
           push: false
           cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           build-args: |
-            BUILD_LIST="Eigen3ExternalProject"
+            BUILD_LIST=Eigen3ExternalProject
