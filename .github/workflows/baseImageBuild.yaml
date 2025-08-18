@@ -33,4 +33,5 @@ jobs:
           target: robot-farm-base
           push: true
           tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:base-${{ github.sha }}
+          cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           cache-to: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
