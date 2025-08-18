@@ -5,6 +5,7 @@ endif()
 
 include(ExternalProject)
 include(${CMAKE_CURRENT_LIST_DIR}/GFlagsExternalProject.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/GoogleTestExternalProject.cmake)
 
 option(ROBOT_FARM_SKIP_GlogExternalProject "Forcefully skip Glog" OFF)
 
