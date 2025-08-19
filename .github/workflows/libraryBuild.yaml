@@ -1,4 +1,4 @@
-name: External library builds
+name: External library build
 
 on:
   push:

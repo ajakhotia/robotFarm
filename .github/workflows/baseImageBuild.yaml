@@ -1,4 +1,4 @@
-name: Base image builds
+name: Base image build
 
 on:
   push:
