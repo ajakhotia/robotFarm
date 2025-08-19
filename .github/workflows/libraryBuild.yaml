@@ -16,8 +16,8 @@ jobs:
           - ubuntu-20.04
           - ubuntu-22.04
         toolchain:
-          - clang-12
-          - gnu-10
+          - linux-clang-12
+          - linux-gnu-10
         build_list:
         #  - AtlasExternalProject
         #  - BoostExternalProject

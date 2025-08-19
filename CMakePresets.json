@@ -54,25 +54,25 @@
         {
             "name": "gnu-12-static",
             "displayName": "gnu-12-static",
-            "toolchainFile": "${sourceDir}/toolchains/gnu-12.cmake",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",
             "inherits": ["basic", "static"]
         },
         {
             "name": "gnu-12-shared",
             "displayName": "gnu-12-shared",
-            "toolchainFile": "${sourceDir}/toolchains/gnu-12.cmake",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",
             "inherits": ["basic", "shared"]
         },
         {
             "name": "clang-14-static",
             "displayName": "clang-14-static",
-            "toolchainFile": "${sourceDir}/toolchains/clang-14.cmake",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-14.cmake",
             "inherits": ["basic", "static"]
         },
         {
             "name": "clang-14-shared",
             "displayName": "clang-14-shared",
-            "toolchainFile": "${sourceDir}/toolchains/clang-14.cmake",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-14.cmake",
             "inherits": ["basic", "shared"]
         }
     ],
