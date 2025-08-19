@@ -58,6 +58,7 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
         ProtobufExternalProject
         Python3ExternalProject
         SpdLogExternalProject
+        SuiteSparseExternalProject
         VTKExternalProject
     CACHE STRING
     "Semi-colon separated list of projects requested by the user. Default includes all")

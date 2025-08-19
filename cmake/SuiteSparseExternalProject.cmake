@@ -1,33 +1,25 @@
-#[[ Cmake guard.
+#[[ Cmake guard. ]]
 if(TARGET SuiteSparseExternalProject)
-    return()
+  return()
 endif()
 
 include(ExternalProject)
-include(ProcessorCount)
-include(${CMAKE_CURRENT_LIST_DIR}/AtlasExternalProject.cmake)
 
-processorcount(NUM_PROCESSORS)
+option(ROBOT_FARM_SKIP_SuiteSparseExternalProject "Forcefully skip SuiteSparse" OFF)
 
-set(ROBOT_FARM_SUITE_SPARSE_URL
-    "http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
-    CACHE STRING
-    "URL of the Suite Sparse source archive")
+if(ROBOT_FARM_SKIP_SuiteSparseExternalProject)
+  add_custom_target(SuiteSparseExternalProject)
+else()
+  list(APPEND ROBOT_FARM_BUILD_LIST SuiteSparseExternalProject)
 
-externalproject_add(SuiteSparseExternalProject
-                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/suiteSparse
-                    URL ${ROBOT_FARM_SUITE_SPARSE_URL}
-                    DOWNLOAD_NO_PROGRESS ON
-                    CONFIGURE_COMMAND ""
+  set(ROBOT_FARM_SUITE_SPARSE_URL
+      "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.11.0.tar.gz"
+      CACHE STRING
+      "URL of the Suite Sparse source archive")
 
-                    BUILD_COMMAND
-                    JOBS=${NUM_PROCESSORS}
-                    make
-                    LAPACK=${CMAKE_INSTALL_PREFIX}/lib/liblapack.a
-                    BLAS=${CMAKE_INSTALL_PREFIX}/lib/libcblas.a
-                    config library
-
-                    BUILD_IN_SOURCE ON
-                    INSTALL_COMMAND make INSTALL=${CMAKE_INSTALL_PREFIX} install)
-
-add_dependencies(SuiteSparseExternalProject AtlasExternalProject) ]]
+  externalproject_add(SuiteSparseExternalProject
+      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/suiteSparse
+      URL ${ROBOT_FARM_SUITE_SPARSE_URL}
+      DOWNLOAD_NO_PROGRESS ON
+      CMAKE_ARGS ${ROBOT_FARM_FORWARDED_CMAKE_ARGS})
+endif()

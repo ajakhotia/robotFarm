@@ -4,9 +4,10 @@ if(TARGET CeresSolverExternalProject)
 endif()
 
 include(ExternalProject)
+include(${CMAKE_CURRENT_LIST_DIR}/Eigen3ExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/GFlagsExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/GlogExternalProject.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/Eigen3ExternalProject.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/SuiteSparseExternalProject.cmake)
 
 option(ROBOT_FARM_SKIP_CeresSolverExternalProject "Forcefully skip Ceres Solver" OFF)
 
@@ -28,6 +29,7 @@ else()
 endif()
 
 add_dependencies(CeresSolverExternalProject
+    Eigen3ExternalProject
     GFlagsExternalProject
     GlogExternalProject
-    Eigen3ExternalProject)
+    SuiteSparseExternalProject)
