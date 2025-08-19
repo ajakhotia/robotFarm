@@ -27,12 +27,6 @@
       "tag": "all"
     },
     {
-      "group": "CerealExternalProject",
-      "ubuntu:22.04": "gcc-12-multilib g++-12-multilib gcc-multilib g++-multilib linux-libc-dev",
-      "ubuntu:24.04": "gcc-12-multilib g++-12-multilib gcc-multilib g++-multilib linux-libc-dev",
-      "tag": "all"
-    },
-    {
       "group": "OgreExternalProject",
       "ubuntu:22.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype6-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
       "ubuntu:24.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",

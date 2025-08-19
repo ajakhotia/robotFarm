@@ -20,7 +20,6 @@ jobs:
           - AtlasExternalProject
           - BoostExternalProject
           - CapnprotoExternalProject
-          - CerealExternalProject
           - CeresSolverExternalProject
           - Eigen3ExternalProject
           - FlatBuffersExternalProject

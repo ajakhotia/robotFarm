@@ -70,7 +70,6 @@ cmake \
   a consolidated list of the same names:
   * BoostExternalProject
   * CapnprotoExternalProject
-  * CerealExternalProject
   * CeresSolverExternalProject
   * Eigen3ExternalProject
   * FlatBuffersExternalProject

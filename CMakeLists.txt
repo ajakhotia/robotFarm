@@ -43,7 +43,6 @@ list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS "-DBUILD_TESTING:BOOL=${BUILD_TESTIN
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
         BoostExternalProject
         CapnprotoExternalProject
-        CerealExternalProject
         CeresSolverExternalProject
         Eigen3ExternalProject
         FlatBuffersExternalProject
