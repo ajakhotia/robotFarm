@@ -6,11 +6,11 @@ on:
 
 jobs:
   baseImageBuild:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        os:
+        os_base:
           - ubuntu:20.04
           - ubuntu:22.04
     steps:
@@ -38,8 +38,8 @@ jobs:
           file: docker/robotFarm-ubuntu.dockerfile
           target: robot-farm-base
           push: true
-          tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:base-${{ matrix.os }}-${{ github.sha }}
+          tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:base-${{ matrix.os_base }}-${{ github.sha }}
           cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           cache-to: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           build-args: |
-            BASE_IMAGE=${{ matrix.os }}
+            BASE_IMAGE=${{ matrix.os_base }}

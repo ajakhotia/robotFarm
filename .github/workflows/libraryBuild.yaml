@@ -6,11 +6,11 @@ on:
 
 jobs:
   externalLibraryBuild:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        os:
+        os_base:
           - ubuntu:20.04
           - ubuntu:22.04
         toolchain:
@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "REPOSITORY_LOWERCASE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build ${{ matrix.build_list }} on ${{ matrix.os }} with ${{ matrix.toolchain }}
+      - name: Build ${{ matrix.build_list }} on ${{ matrix.os_base }} with ${{ matrix.toolchain }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -50,5 +50,5 @@ jobs:
           cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           build-args: |
             BUILD_LIST=${{ matrix.build_list }}
-            BASE_IMAGE=${{ matrix.os }}
+            BASE_IMAGE=${{ matrix.os_base }}
             TOOLCHAIN=${{ matrix.toolchain }}
