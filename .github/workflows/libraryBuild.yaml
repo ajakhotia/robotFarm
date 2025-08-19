@@ -17,26 +17,8 @@ jobs:
           - linux-clang-12
           - linux-gnu-10
         build_list:
-        #  - AtlasExternalProject
-        #  - BoostExternalProject
-        #  - CapnprotoExternalProject
-        #  - CerealExternalProject
-        #  - CeresSolverExternalProject
-        #  - Eigen3ExternalProject
-        #  - FlatBuffersExternalProject
-        #  - GFlagsExternalProject
-        #  - GlogExternalProject
           - GoogleTestExternalProject
           - NlohmannJsonExternalProject
-        #  - OatppExternalProject
-        #  - OatppWebSocketExternalProject
-        #  - OgreExternalProject
-        #  - OpenCVExternalProject
-        #  - ProtobufExternalProject
-        #  - Python3ExternalProject
-        #  - SpdLogExternalProject
-        #  - SuiteSparseExternalProject
-        #  - VTKExternalProject
 
     steps:
       - name: Checkout
