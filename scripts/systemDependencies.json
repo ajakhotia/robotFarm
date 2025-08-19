@@ -10,8 +10,8 @@
   "groups": [
     {
       "group": "Basics",
-      "ubuntu:22.04": "cmake clang-14 gcc-12 g++-12 git ninja-build",
-      "ubuntu:24.04": "cmake clang-14 gcc-12 g++-12 git ninja-build",
+      "ubuntu:22.04": "clang-14 cmake g++-12 gcc-12 gfortran git ninja-build pkg-config",
+      "ubuntu:24.04": "clang-14 cmake g++-12 gcc-12 git ninja-build pkg-config",
       "tag": "all"
     },
     {
@@ -22,8 +22,8 @@
     },
     {
       "group": "CeresSolverExternalProject",
-      "ubuntu:22.04": "libatlas-base-dev libsuitesparse-dev",
-      "ubuntu:24.04": "libatlas-base-dev libcxsparse4 libsuitesparse-dev",
+      "ubuntu:22.04": "libmetis-dev",
+      "ubuntu:24.04": "libmetis-dev",
       "tag": "all"
     },
     {
@@ -58,8 +58,8 @@
     },
     {
       "group": "SuiteSparseExternalProject",
-      "ubuntu:22.04": "m4",
-      "ubuntu:24.04": "m4",
+      "ubuntu:22.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4",
+      "ubuntu:24.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4",
       "tag": "all"
     },
     {
