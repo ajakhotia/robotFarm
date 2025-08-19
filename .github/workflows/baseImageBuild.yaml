@@ -11,8 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         os_base:
-          - ubuntu:20.04
           - ubuntu:22.04
+          - ubuntu:24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
