@@ -1,13 +1,11 @@
 name: External library builds
 
 on:
-  workflow_run:
-    workflows: ["baseImageBuild"]
-    types: [completed]
+  push:
+    branches: [ main ]
 
 jobs:
-  externalLibraryBuilds:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  externalLibraryBuild:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

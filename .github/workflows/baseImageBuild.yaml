@@ -6,7 +6,13 @@ on:
 
 jobs:
   baseImageBuild:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu:20.04
+          - ubuntu:22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,13 +31,15 @@ jobs:
         run: |
           echo "REPOSITORY_LOWERCASE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build robot-farm-base
+      - name: Build robot-farm-base with ${{ matrix.os }}
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/robotFarm-ubuntu.dockerfile
           target: robot-farm-base
           push: true
-          tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:base-${{ github.sha }}
+          tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:base-${{ matrix.os }}-${{ github.sha }}
           cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           cache-to: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
+          build-args: |
+            BASE_IMAGE=${{ matrix.os }}
