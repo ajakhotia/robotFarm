@@ -10,7 +10,7 @@
   "groups": [
     {
       "group": "Basics",
-      "ubuntu:22.04": "clang-14 cmake g++-12 gcc-12 gfortran git ninja-build pkg-config",
+      "ubuntu:22.04": "clang-14 cmake g++-12 gcc-12 git ninja-build pkg-config",
       "ubuntu:24.04": "clang-14 cmake g++-12 gcc-12 git ninja-build pkg-config",
       "tag": "all"
     },
