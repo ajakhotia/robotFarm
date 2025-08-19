@@ -38,8 +38,8 @@ jobs:
 
       - name: Normalize names
         run: |
-          echo "REPOSITORY_NORMALIZED_NAME=$(echo '${{ github.repository }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g'  | tr '[:upper:]' '[:lower:]'   | tr '[:punct:]' '-')" >> $GITHUB_ENV
-          echo "OS_BASE_NORMALIZED_NAME=$(echo '${{ matrix.os_base }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g'  | tr '[:upper:]' '[:lower:]'   | tr '[:punct:]' '-')" >> $GITHUB_ENV
+          echo "REPOSITORY_NORMALIZED_NAME=$(echo '${{ github.repository }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g'  | tr '[:upper:]' '[:lower:]'  | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_ENV
+          echo "OS_BASE_NORMALIZED_NAME=$(echo '${{ matrix.os_base }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g'  | tr '[:upper:]' '[:lower:]'  | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_ENV
 
       - name: Build ${{ matrix.build_list }} on ${{ matrix.os_base }} with ${{ matrix.toolchain }}
         uses: docker/build-push-action@v6
