@@ -14,8 +14,8 @@ jobs:
           - ubuntu:20.04
           - ubuntu:22.04
         toolchain:
-          - linux-clang-12
-          - linux-gnu-10
+          - linux-clang-14
+          - linux-gnu-12
         build_list:
           - GoogleTestExternalProject
           - NlohmannJsonExternalProject
@@ -36,9 +36,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Normalize repository name
+      - name: Normalize names
         run: |
-          echo "REPOSITORY_LOWERCASE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "REPOSITORY_NORMALIZED_NAME=$(echo '${{ github.repository }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g'  | tr '[:upper:]' '[:lower:]'   | tr '[:punct:]' '-')" >> $GITHUB_ENV
+          echo "OS_BASE_NORMALIZED_NAME=$(echo '${{ matrix.os_base }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g'  | tr '[:upper:]' '[:lower:]'   | tr '[:punct:]' '-')" >> $GITHUB_ENV
 
       - name: Build ${{ matrix.build_list }} on ${{ matrix.os_base }} with ${{ matrix.toolchain }}
         uses: docker/build-push-action@v6
@@ -47,7 +48,7 @@ jobs:
           file: docker/robotFarm-ubuntu.dockerfile
           target: robot-farm
           push: false
-          cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
+          cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}:buildcache
           build-args: |
             BUILD_LIST=${{ matrix.build_list }}
             BASE_IMAGE=${{ matrix.os_base }}
