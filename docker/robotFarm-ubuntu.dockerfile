@@ -1,6 +1,4 @@
 ARG BASE_IMAGE=ubuntu:22.04
-ARG TOOLCHAIN=linux-gnu-12
-ARG BUILD_LIST
 
 FROM ${BASE_IMAGE} AS robot-farm-base
 
@@ -27,7 +25,7 @@ RUN apt-get install -y --no-install-recommends $(sh /tmp/scripts/extractDependen
 
 
 FROM robot-farm-base AS throwaway-robot-farm-build
-ARG TOOLCHAIN
+ARG TOOLCHAIN=linux-gnu-12
 ARG BUILD_LIST
 
 COPY . /tmp/robotFarm-src

@@ -8,31 +8,37 @@ on:
 jobs:
   externalLibraryBuilds:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04
+        toolchain:
+          - clang-12
+          - gnu-10
         build_list:
-          - AtlasExternalProject
-          - BoostExternalProject
-          - CapnprotoExternalProject
-          - CerealExternalProject
-          - CeresSolverExternalProject
-          - Eigen3ExternalProject
-          - FlatBuffersExternalProject
-          - GFlagsExternalProject
-          - GlogExternalProject
+        #  - AtlasExternalProject
+        #  - BoostExternalProject
+        #  - CapnprotoExternalProject
+        #  - CerealExternalProject
+        #  - CeresSolverExternalProject
+        #  - Eigen3ExternalProject
+        #  - FlatBuffersExternalProject
+        #  - GFlagsExternalProject
+        #  - GlogExternalProject
           - GoogleTestExternalProject
           - NlohmannJsonExternalProject
-          - OatppExternalProject
-          - OatppWebSocketExternalProject
-          - OgreExternalProject
-          - OpenCVExternalProject
-          - ProtobufExternalProject
-          - Python3ExternalProject
-          - SpdLogExternalProject
-          - SuiteSparseExternalProject
-          - VTKExternalProject
+        #  - OatppExternalProject
+        #  - OatppWebSocketExternalProject
+        #  - OgreExternalProject
+        #  - OpenCVExternalProject
+        #  - ProtobufExternalProject
+        #  - Python3ExternalProject
+        #  - SpdLogExternalProject
+        #  - SuiteSparseExternalProject
+        #  - VTKExternalProject
 
     steps:
       - name: Checkout
@@ -54,7 +60,7 @@ jobs:
         run: |
           echo "REPOSITORY_LOWERCASE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build ${{ matrix.build_list }}
+      - name: Build ${{ matrix.build_list }} on ${{ matrix.os }} with ${{ matrix.toolchain }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -64,3 +70,5 @@ jobs:
           cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_LOWERCASE_NAME }}:buildcache
           build-args: |
             BUILD_LIST=${{ matrix.build_list }}
+            BASE_IMAGE=${{ matrix.os }}
+            TOOLCHAIN=${{ matrix.toolchain }}
