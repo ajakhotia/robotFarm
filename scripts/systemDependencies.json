@@ -2,7 +2,7 @@
     "supportedOS":
     [
         "ubuntu:22.04",
-        "ubuntu:20.04"
+        "ubuntu:24.04"
     ],
 
     "groupTags":
@@ -17,7 +17,6 @@
             "group": "Basics",
             "ubuntu:24.04": "cmake clang-14 gcc-12 g++-12 git ninja-build",
             "ubuntu:22.04": "cmake clang-14 gcc-12 g++-12 git ninja-build",
-            "ubuntu:20.04": "cmake clang-12 gcc-10 g++-10 git ninja-build",
             "tag": "all"
         },
 
@@ -25,7 +24,6 @@
             "group": "BoostExternalProject",
             "ubuntu:24.04": "gcc g++ python3-dev python-is-python3",
             "ubuntu:22.04": "gcc g++ python3-dev python-is-python3",
-            "ubuntu:20.04": "gcc g++ python3-dev python-is-python3",
             "tag": "all"
         },
 
@@ -33,7 +31,6 @@
             "group": "CeresSolverExternalProject",
             "ubuntu:24.04": "libatlas-base-dev libsuitesparse-dev",
             "ubuntu:22.04": "libatlas-base-dev libsuitesparse-dev",
-            "ubuntu:20.04": "libatlas-base-dev libsuitesparse-dev",
             "tag": "all"
         },
 
@@ -41,7 +38,6 @@
             "group": "CerealExternalProject",
             "ubuntu:24.04": "gcc-12-multilib g++-12-multilib gcc-multilib g++-multilib linux-libc-dev",
             "ubuntu:22.04": "gcc-12-multilib g++-12-multilib gcc-multilib g++-multilib linux-libc-dev",
-            "ubuntu:20.04": "gcc-10-multilib g++-10-multilib gcc-multilib g++-multilib linux-libc-dev",
             "tag": "all"
         },
 
@@ -49,7 +45,6 @@
             "group": "OgreExternalProject",
             "ubuntu:24.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype6-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
             "ubuntu:22.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype6-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
-            "ubuntu:20.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype6-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
             "tag": "all"
         },
 
@@ -57,7 +52,6 @@
             "group": "OpenCVExternalProject",
             "ubuntu:24.04": "liblapacke-dev libgtk-3-dev ffmpeg libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgstreamer1.0-dev libpng-dev libjpeg-dev libtiff-dev libhdf5-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev",
             "ubuntu:22.04": "liblapacke-dev libgtk-3-dev ffmpeg libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgstreamer1.0-dev libpng-dev libjpeg-dev libtiff-dev libhdf5-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev",
-            "ubuntu:20.04": "liblapacke-dev libgtk-3-dev ffmpeg libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgstreamer1.0-dev libpng-dev libjpeg-dev libtiff-dev libhdf5-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev",
             "tag": "all"
         },
 
@@ -65,7 +59,6 @@
             "group": "ProtobufExternalProject",
             "ubuntu:24.04": "curl",
             "ubuntu:22.04": "curl",
-            "ubuntu:20.04": "curl",
             "tag": "all"
         },
 
@@ -73,7 +66,6 @@
             "group": "Python3ExternalProject",
             "ubuntu:24.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev libmpdec-dev",
             "ubuntu:22.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev libmpdec-dev",
-            "ubuntu:20.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev libmpdec-dev",
             "tag": "skip"
         },
 
@@ -81,7 +73,6 @@
             "group": "SuiteSparseExternalProject",
             "ubuntu:24.04": "m4",
             "ubuntu:22.04": "m4",
-            "ubuntu:20.04": "m4",
             "tag": "all"
         },
 
@@ -89,7 +80,6 @@
             "group": "VTKExternalProject",
             "ubuntu:24.04": "libgl1-mesa-dev libxt-dev",
             "ubuntu:22.04": "libgl1-mesa-dev libxt-dev",
-            "ubuntu:20.04": "libgl1-mesa-dev libxt-dev",
             "tag": "all"
         }
     ]
