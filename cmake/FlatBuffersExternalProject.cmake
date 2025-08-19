@@ -13,7 +13,7 @@ else()
     list(APPEND ROBOT_FARM_BUILD_LIST FlatBuffersExternalProject)
 
     set(ROBOT_FARM_FLAT_BUFFERS_URL
-        "https://github.com/google/flatbuffers/archive/refs/tags/v2.0.0.tar.gz"
+        "https://github.com/google/flatbuffers/archive/refs/tags/v25.2.10.tar.gz"
         CACHE STRING
         "URL of the Flat Buffers source archive")
 
