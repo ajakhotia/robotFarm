@@ -49,9 +49,10 @@ else()
         -DWITH_OPENCL:BOOL=ON
         -DENABLE_FAST_MATH=1)
 
-    find_package(CUDA QUIET)
+    find_package(CUDAToolkit)
 
-    if(CUDA_FOUND AND ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+    if(CUDAToolkit_FOUND AND ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+        message(STATUS "Turning on CUDA options for OpenCV")
         list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
             -DWITH_CUDA:BOOL=ON
             -DWITH_CUBLAS:BOOL=ON
@@ -60,6 +61,7 @@ else()
             -DBUILD_opencv_cudacodec:BOOL=OFF
             -DBUILD_opencv_world:BOOL=OFF)
     else()
+        message(STATUS "Turning off CUDA options for OpenCV")
         list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
             -DWITH_CUDA:BOOL=OFF
             -DWITH_CUBLAS:BOOL=OFF
