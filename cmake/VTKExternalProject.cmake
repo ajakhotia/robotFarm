@@ -13,7 +13,7 @@ else()
     list(APPEND ROBOT_FARM_BUILD_LIST VTKExternalProject)
 
     set(ROBOT_FARM_VTK_URL
-        "https://github.com/Kitware/VTK/archive/refs/tags/v9.1.0.tar.gz"
+        "https://github.com/Kitware/VTK/archive/refs/tags/v9.5.0.tar.gz"
         CACHE STRING
         "URL of the VTK source archive")
 
