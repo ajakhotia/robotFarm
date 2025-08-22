@@ -90,7 +90,7 @@ print_list("RobotFarm will build" ${ROBOT_FARM_BUILD_LIST})
 set(ROBOT_FARM_SYSTEM_DEPENDENCY_STR "")
 foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
     execute_process(
-        COMMAND sh scripts/extractDependencies.sh ${ITEM}
+        COMMAND sh tools/apt/extractDependencies.sh ${ITEM}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         OUTPUT_VARIABLE ITEM_DEPENDENCIES)
 

@@ -10,8 +10,14 @@
   "groups": [
     {
       "group": "Basics",
-      "ubuntu:22.04": "clang-14 cmake g++-12 gcc-12 gfortran-12 git ninja-build pkg-config unzip wget",
-      "ubuntu:24.04": "clang-14 cmake g++-12 gcc-12 gfortran-12 git ninja-build pkg-config unzip wget",
+      "ubuntu:22.04": "cmake curl git grep ninja-build pkg-config sed unzip wget",
+      "ubuntu:24.04": "cmake curl git grep ninja-build pkg-config sed unzip wget",
+      "tag": "all"
+    },
+    {
+      "group": "Compilers",
+      "ubuntu:22.04": "clang-15 g++-12 gcc-12 gfortran-12",
+      "ubuntu:24.04": "clang-15 clang-22 g++-12 g++-14 gcc-12 gcc-14 gfortran-12 gfortran-14",
       "tag": "all"
     },
     {

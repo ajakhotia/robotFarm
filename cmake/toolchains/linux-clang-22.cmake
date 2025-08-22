@@ -1,0 +1,6 @@
+set(CMAKE_SYSTEM_NAME "Linux")
+set(CMAKE_C_COMPILER /usr/bin/clang-22)
+set(CMAKE_CXX_COMPILER /usr/bin/clang++-22)
+set(CMAKE_Fortran_COMPILER /usr/bin/flang-new-22)
+set(CMAKE_CUDA_COMPILER /usr/bin/nvcc)
+set(CMAKE_CUDA_HOST_COMPILER /usr/bin/clang++-22)

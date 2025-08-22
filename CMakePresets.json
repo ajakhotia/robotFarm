@@ -1,85 +1,129 @@
 {
-    "version": 3,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 20,
-        "patch": 0
-    },
-
-    "configurePresets": [
-        {
-            "name": "basic",
-            "displayName": "basic",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "BUILD_TESTING": {
-                    "type": "BOOL",
-                    "value": false
-                },
-                "CMAKE_INSTALL_PREFIX": {
-                    "type": "PATH",
-                    "value": "$env{HOME}/opt/${sourceDirName}/${presetName}"
-                },
-                "CMAKE_BUILD_TYPE": {
-                    "type": "STRING",
-                    "value": "Release"
-                }
-            },
-            "hidden": true,
-            "binaryDir": "${sourceDir}/build/${presetName}"
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "basic",
+      "displayName": "basic",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "BUILD_TESTING": {
+          "type": "BOOL",
+          "value": false
         },
-
-        {
-            "name": "static",
-            "displayName": "static",
-            "cacheVariables": {
-                "BUILD_SHARED_LIBS": {
-                    "type": "BOOL",
-                    "value": false
-                }
-            },
-            "hidden": true
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "PATH",
+          "value": "$env{HOME}/opt/${sourceDirName}/${presetName}"
         },
-        {
-            "name": "shared",
-            "displayName": "shared",
-            "cacheVariables": {
-                "BUILD_SHARED_LIBS": {
-                    "type": "BOOL",
-                    "value": true
-                }
-            },
-            "hidden": true
-        },
-        {
-            "name": "gnu-12-static",
-            "displayName": "gnu-12-static",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",
-            "inherits": ["basic", "static"]
-        },
-        {
-            "name": "gnu-12-shared",
-            "displayName": "gnu-12-shared",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",
-            "inherits": ["basic", "shared"]
-        },
-        {
-            "name": "clang-14-static",
-            "displayName": "clang-14-static",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-14.cmake",
-            "inherits": ["basic", "static"]
-        },
-        {
-            "name": "clang-14-shared",
-            "displayName": "clang-14-shared",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-14.cmake",
-            "inherits": ["basic", "shared"]
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
         }
-    ],
-
-    "buildPresets": [
-    ],
-
-    "testPresets": [
-    ]
+      },
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "static",
+      "displayName": "static",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": {
+          "type": "BOOL",
+          "value": false
+        }
+      },
+      "hidden": true
+    },
+    {
+      "name": "shared",
+      "displayName": "shared",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": {
+          "type": "BOOL",
+          "value": true
+        }
+      },
+      "hidden": true
+    },
+    {
+      "name": "gnu-12-static",
+      "displayName": "gnu-12-static",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",
+      "inherits": [
+        "basic",
+        "static"
+      ]
+    },
+    {
+      "name": "gnu-12-shared",
+      "displayName": "gnu-12-shared",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",
+      "inherits": [
+        "basic",
+        "shared"
+      ]
+    },
+    {
+      "name": "gnu-14-static",
+      "displayName": "gnu-12-static",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-14.cmake",
+      "inherits": [
+        "basic",
+        "static"
+      ]
+    },
+    {
+      "name": "gnu-14-shared",
+      "displayName": "gnu-12-shared",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-14.cmake",
+      "inherits": [
+        "basic",
+        "shared"
+      ]
+    },
+    {
+      "name": "clang-15-static",
+      "displayName": "clang-15-static",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-15.cmake",
+      "inherits": [
+        "basic",
+        "static"
+      ]
+    },
+    {
+      "name": "clang-15-shared",
+      "displayName": "clang-15-shared",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-15.cmake",
+      "inherits": [
+        "basic",
+        "shared"
+      ]
+    },
+    {
+      "name": "clang-22-static",
+      "displayName": "clang-15-static",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-22.cmake",
+      "inherits": [
+        "basic",
+        "static"
+      ]
+    },
+    {
+      "name": "clang-22-shared",
+      "displayName": "clang-15-shared",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-22.cmake",
+      "inherits": [
+        "basic",
+        "shared"
+      ]
+    }
+  ],
+  "buildPresets": [
+  ],
+  "testPresets": [
+  ]
 }

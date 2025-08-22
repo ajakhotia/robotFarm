@@ -19,10 +19,11 @@ RUN apt-get update &&                                   \
     apt-get autoclean -y &&                             \
     apt-get autoremove -y
 
-COPY ./scripts /tmp/scripts
-RUN apt-get install -y --no-install-recommends $(sh /tmp/scripts/extractDependencies.sh Basics) && \
-    rm -rf /tmp/scripts
-
+COPY ./tools/apt /tmp/tools/apt
+RUN apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Basics)
+RUN bash /tmp/tools/apt/addCompilerPPA.sh
+RUN apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Compilers)
+RUN rm -rf /tmp/tools
 
 FROM robot-farm-base AS throwaway-robot-farm-build
 ARG TOOLCHAIN=linux-gnu-12
