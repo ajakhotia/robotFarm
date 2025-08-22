@@ -16,8 +16,8 @@
     },
     {
       "group": "Compilers",
-      "ubuntu:22.04": "clang-15 g++-12 gcc-12 gfortran-12",
-      "ubuntu:24.04": "clang-15 clang-22 g++-12 g++-14 gcc-12 gcc-14 gfortran-12 gfortran-14",
+      "ubuntu:22.04": "clang-16 g++-12 gcc-12 gfortran-12",
+      "ubuntu:24.04": "clang-16 clang-22 g++-12 g++-14 gcc-12 gcc-14 gfortran-12 gfortran-14",
       "tag": "all"
     },
     {
