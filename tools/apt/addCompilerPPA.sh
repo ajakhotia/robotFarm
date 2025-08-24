@@ -2,121 +2,164 @@
 set -euo pipefail
 
 # -------------------------------------------------------------------
-# Helper to check required commands exist
+# Add upstream repos for latest compilers (run as root; no sudo)
+# - LLVM/Clang  : apt.llvm.org
+# - CUDA (nvcc) : NVIDIA CUDA repo
+# - GNU (GCC)   : Ubuntu Toolchain PPA (Ubuntu only)
 # -------------------------------------------------------------------
-require_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "Missing: $1" >&2; exit 1; }; }
 
+require_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "Missing required command: $1" >&2; exit 1; }; }
+require_cmd awk
+require_cmd tr
+require_cmd dpkg
+require_cmd apt-get
+require_cmd gpg
 require_cmd curl
-require_cmd grep
-require_cmd sed
-require_cmd tee
-require_cmd lsb_release || true
+command -v add-apt-repository >/dev/null 2>&1 || true
 
-# -------------------------------------------------------------------
-# Detect operating system and version from /etc/os-release
-# -------------------------------------------------------------------
+# Detect OS
 if [[ -r /etc/os-release ]]; then
   . /etc/os-release
 else
-  echo "Cannot read /etc/os-release to detect OS info." >&2
+  echo "Cannot detect OS: /etc/os-release not readable." >&2
   exit 1
 fi
 
-# Normalize values
-OS_NAME="${ID,,}"                # e.g. "ubuntu" or "debian"
-OS_VERSION="${VERSION_ID:-}"     # e.g. "24.04" or "12"
-OS_VERSION_NO_DOT="$(echo "${OS_VERSION}" | tr -d '.')"
+OS_ID="${ID,,}"                          # ubuntu|debian
+OS_VERSION_ID="${VERSION_ID:-}"          # "24.04" | "12"
 OS_CODENAME="${VERSION_CODENAME:-}"
-
-# Fallback: if codename missing, try lsb_release
-if [[ -z "$OS_CODENAME" ]]; then
-  OS_CODENAME="$(lsb_release -sc 2>/dev/null || true)"
+if [[ -z "${OS_CODENAME}" ]] && command -v lsb_release >/dev/null 2>&1; then
+  OS_CODENAME="$(lsb_release -sc || true)"
 fi
 
-if [[ -z "$OS_CODENAME" || -z "$OS_VERSION_NO_DOT" ]]; then
-  echo "Could not determine codename or version." >&2
+ARCH_DEB="$(dpkg --print-architecture)"  # amd64 | arm64 | ...
+# Map to NVIDIA's directory naming
+case "${ARCH_DEB}" in
+  amd64) NVIDIA_ARCH_DIR="x86_64" ;;
+  arm64) NVIDIA_ARCH_DIR="sbsa" ;;      # NVIDIA uses 'sbsa' for AArch64 servers
+  *)     NVIDIA_ARCH_DIR="${ARCH_DEB}" ;;
+esac
+
+case "${OS_ID}" in
+  ubuntu|debian) ;;
+  *) echo "Supported distros: Ubuntu/Debian. Detected: ${OS_ID}"; exit 1 ;;
+esac
+
+if [[ -z "${OS_CODENAME}" ]]; then
+  echo "Could not determine codename (e.g., noble, jammy, bookworm). Aborting." >&2
   exit 1
 fi
 
-echo "Detected OS: ${OS_NAME} ${OS_VERSION} (${OS_CODENAME})"
-
-# -------------------------------------------------------------------
-# Prepare keyrings directory
-# -------------------------------------------------------------------
-mkdir -p /etc/apt/keyrings
-chmod 0755 /etc/apt/keyrings
-
-# -------------------------------------------------------------------
-# 1) LLVM / Clang
-# -------------------------------------------------------------------
-LLVM_KEY=/etc/apt/keyrings/llvm.asc
-LLVM_LIST=/etc/apt/sources.list.d/llvm-toolchain.list
-
-echo "Adding LLVM repo for ${OS_CODENAME}…"
-curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key > "$LLVM_KEY"
-chmod 0644 "$LLVM_KEY"
-
-cat <<EOF > "$LLVM_LIST"
-deb [signed-by=$LLVM_KEY] http://apt.llvm.org/${OS_CODENAME}/ llvm-toolchain-${OS_CODENAME} main
-# To pin a specific major version, uncomment:
-# deb [signed-by=$LLVM_KEY] http://apt.llvm.org/${OS_CODENAME}/ llvm-toolchain-${OS_CODENAME}-<MAJOR> main
-EOF
-
-# -------------------------------------------------------------------
-# 2) GCC
-# -------------------------------------------------------------------
-if [[ "$OS_NAME" == "ubuntu" ]]; then
-  echo "Adding Ubuntu Toolchain PPA for newer GCC…"
-  apt-get update -qq
-  apt-get install -y --no-install-recommends software-properties-common
-  add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
-elif [[ "$OS_NAME" == "debian" ]]; then
-  echo "Enabling Debian backports for newer GCC…"
-  DEB_LIST=/etc/apt/sources.list.d/debian-backports.list
-  cat <<EOF > "$DEB_LIST"
-deb http://deb.debian.org/debian ${OS_CODENAME}-backports main contrib non-free non-free-firmware
-EOF
+# Numeric for Ubuntu (e.g., 24.04 -> 2404); major for Debian (e.g., 12)
+if [[ "${OS_ID}" == "ubuntu" ]]; then
+  OS_NUMERIC="$(echo "${OS_VERSION_ID}" | tr -d '.')"
+  NVIDIA_REPO_SEG="ubuntu${OS_NUMERIC}"
 else
-  echo "Skipping GCC repo setup (unsupported OS: $OS_NAME)."
+  DEB_MAJOR="$(echo "${OS_VERSION_ID}" | awk -F. '{print $1}')"
+  NVIDIA_REPO_SEG="debian${DEB_MAJOR}"
 fi
 
-# -------------------------------------------------------------------
-# 3) NVIDIA CUDA repo
-# -------------------------------------------------------------------
-DIST_TAG="${OS_NAME}${OS_VERSION_NO_DOT}"
-CUDA_KEY_DEB="cuda-keyring_1.1-1_all.deb"
-CUDA_TMP="/tmp/${CUDA_KEY_DEB}"
+# Plan entries
+declare -a PLAN_LABELS=()
+declare -a PLAN_ACTIONS=()   # repo:<file>:<line> or ppa:<ppa>
+declare -a PLAN_KEYS=()      # key:<dest>:<url>
 
-echo "Adding NVIDIA CUDA repo for ${DIST_TAG}…"
-CUDA_URL="https://developer.download.nvidia.com/compute/cuda/repos/${DIST_TAG}/x86_64/${CUDA_KEY_DEB}"
+# LLVM (apt.llvm.org)
+LLVM_KEY_DST="/usr/share/keyrings/llvm-archive-keyring.gpg"
+LLVM_KEY_URL="https://apt.llvm.org/llvm-snapshot.gpg.key"
+LLVM_LIST_FILE="/etc/apt/sources.list.d/llvm-official.list"
+LLVM_DEB_LINE="deb [signed-by=${LLVM_KEY_DST}] http://apt.llvm.org/${OS_CODENAME}/ llvm-toolchain-${OS_CODENAME} main"
 
-if curl -fsSLI "$CUDA_URL" >/dev/null; then
-  curl -fsSL "$CUDA_URL" -o "$CUDA_TMP"
-  apt-get install -y "$CUDA_TMP" || dpkg -i "$CUDA_TMP"
-  rm -f "$CUDA_TMP"
-else
-  echo "WARN: Could not fetch ${CUDA_URL}. Falling back to manual key setup…"
-  NV_KEY=/etc/apt/keyrings/cuda-archive-keyring.gpg
-  curl -fsSL "https://developer.download.nvidia.com/compute/cuda/repos/${DIST_TAG}/x86_64/cuda-archive-keyring.gpg" > "$NV_KEY"
-  chmod 0644 "$NV_KEY"
-  NV_LIST=/etc/apt/sources.list.d/cuda.list
-  cat <<EOF > "$NV_LIST"
-deb [signed-by=$NV_KEY] https://developer.download.nvidia.com/compute/cuda/repos/${DIST_TAG}/x86_64/ /
-EOF
+PLAN_LABELS+=("LLVM/Clang (apt.llvm.org)")
+PLAN_KEYS+=("key:${LLVM_KEY_DST}:${LLVM_KEY_URL}")
+PLAN_ACTIONS+=("repo:${LLVM_LIST_FILE}:${LLVM_DEB_LINE}")
+
+# NVIDIA CUDA (official)
+NVIDIA_KEY_DST="/usr/share/keyrings/nvidia-cuda-archive-keyring.gpg"
+NVIDIA_REPO_URL="https://developer.download.nvidia.com/compute/cuda/repos/${NVIDIA_REPO_SEG}/${NVIDIA_ARCH_DIR}/"
+NVIDIA_KEY_URL="${NVIDIA_REPO_URL}3bf863cc.pub"
+NVIDIA_LIST_FILE="/etc/apt/sources.list.d/cuda-nvidia-official.list"
+NVIDIA_DEB_LINE="deb [signed-by=${NVIDIA_KEY_DST}] ${NVIDIA_REPO_URL} /"
+
+PLAN_LABELS+=("NVIDIA CUDA (official)")
+PLAN_KEYS+=("key:${NVIDIA_KEY_DST}:${NVIDIA_KEY_URL}")
+PLAN_ACTIONS+=("repo:${NVIDIA_LIST_FILE}:${NVIDIA_DEB_LINE}")
+
+# GNU (GCC) via Ubuntu Toolchain PPA on Ubuntu
+if [[ "${OS_ID}" == "ubuntu" ]]; then
+  PLAN_LABELS+=("GNU (GCC) via Ubuntu Toolchain PPA")
+  PLAN_ACTIONS+=("ppa:ppa:ubuntu-toolchain-r/test")  # placeholder to keep format consistent
 fi
 
-# -------------------------------------------------------------------
-# Finish up
-# -------------------------------------------------------------------
-echo "Updating package lists…"
-apt-get update
+# Show plan
+echo "Detected: ${PRETTY_NAME:-$OS_ID $OS_VERSION_ID} (${OS_CODENAME}), arch: ${ARCH_DEB}"
+echo
+echo "The following sources will be configured:"
+for label in "${PLAN_LABELS[@]}"; do
+  echo "  - ${label}"
+done
+echo
 
-echo "Done. Repositories added:"
-echo "  - LLVM:   $(cat "$LLVM_LIST" | sed 's/^/    /')"
-if [[ "$OS_NAME" == "ubuntu" ]]; then
-  echo "  - GCC:    Ubuntu Toolchain PPA enabled"
-elif [[ "$OS_NAME" == "debian" ]]; then
-  echo "  - GCC:    Debian backports enabled"
+read -r -p "Proceed with adding these sources? [y/N]: " REPLY
+case "${REPLY,,}" in
+  y|yes) ;;
+  *) echo "Aborted. No changes made."; exit 0 ;;
+esac
+
+# Fetch & install keys
+for key_spec in "${PLAN_KEYS[@]}"; do
+  IFS=':' read -r kind dest url <<< "${key_spec}"
+  [[ "${kind}" == "key" ]] || continue
+  echo "Fetching key: ${url}"
+  curl -fsSL "${url}" | gpg --dearmor > "${dest}.tmp"
+  mv "${dest}.tmp" "${dest}"
+  chmod 0644 "${dest}"
+done
+
+# Write repo files / add PPA
+for action in "${PLAN_ACTIONS[@]}"; do
+  IFS=':' read -r kind a b <<< "${action}"
+  case "${kind}" in
+    repo)
+      list_file="${a}"
+      deb_line="${b}"
+      echo "Writing ${list_file}"
+      printf "%s\n" "${deb_line}" > "${list_file}.tmp"
+      mv "${list_file}.tmp" "${list_file}"
+      chmod 0644 "${list_file}"
+      ;;
+    ppa)
+      # FIX: ensure we pass 'ppa:ubuntu-toolchain-r/test' (not 'ubuntu-toolchain-r/test')
+      ppa_name="${b:-$a}"
+      # remove accidental 'ppa:' prefix from 'a' if present, then add exactly one 'ppa:' prefix
+      ppa_name="${ppa_name#ppa:}"
+      ppa_name="ppa:${ppa_name}"
+      if [[ "${OS_ID}" != "ubuntu" ]]; then
+        echo "Skipping PPA (${ppa_name}) on non-Ubuntu."
+      elif ! command -v add-apt-repository >/dev/null 2>&1; then
+        echo "Skipping PPA (${ppa_name}) because add-apt-repository is not available."
+      else
+        echo "Adding PPA: ${ppa_name}"
+        add-apt-repository -y "${ppa_name}"
+      fi
+      ;;
+    *)
+      echo "Unknown action kind: ${kind}" >&2
+      exit 1
+      ;;
+  esac
+done
+
+echo "Updating package lists..."
+apt-get update -y
+
+echo "Done."
+if [[ "${OS_ID}" == "debian" ]]; then
+  cat <<'NOTE'
+
+Note on GNU (GCC) for Debian:
+  There is no official "GNU PPA". Newer GCC versions on Debian typically come
+  from testing/unstable or backports. This script leaves your release lines
+  unchanged to avoid destabilizing your system.
+NOTE
 fi
-echo "  - NVIDIA: CUDA repository added"

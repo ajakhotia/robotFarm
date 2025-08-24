@@ -1,0 +1,7 @@
+set(CMAKE_HOST_SYSTEM_NAME "Linux")
+set(CMAKE_C_COMPILER /usr/bin/clang-19)
+set(CMAKE_CXX_COMPILER /usr/bin/clang++-19)
+set(CMAKE_Fortran_COMPILER /usr/bin/flang-new-19)
+set(CMAKE_EXE_LINKER_FLAGS "-L/usr/lib/llvm-19/lib -Wl,-rpath,/usr/lib/llvm-19/lib")
+set(CMAKE_CUDA_COMPILER /usr/local/cuda-13/bin/nvcc)
+set(CMAKE_CUDA_HOST_COMPILER /usr/bin/clang++-19)

@@ -10,14 +10,14 @@
   "groups": [
     {
       "group": "Basics",
-      "ubuntu:22.04": "cmake curl git grep ninja-build pkg-config sed unzip wget",
-      "ubuntu:24.04": "cmake curl git grep ninja-build pkg-config sed unzip wget",
+      "ubuntu:22.04": "ca-certificates cmake curl git grep lsb-release ninja-build pkg-config sed unzip wget",
+      "ubuntu:24.04": "ca-certificates cmake curl git grep lsb-release ninja-build pkg-config sed unzip wget",
       "tag": "all"
     },
     {
       "group": "Compilers",
-      "ubuntu:22.04": "clang-16 flang-16 g++-12 gcc-12 gfortran-12",
-      "ubuntu:24.04": "clang-16 clang-22 flang-16 flang-22 g++-12 g++-14 gcc-12 gcc-14 gfortran-12 gfortran-14",
+      "ubuntu:22.04": "clang-16 cuda-toolkit-13 flang-16 g++-12 gcc-12 gfortran-12",
+      "ubuntu:24.04": "clang-16 clang-19 clang-22 cuda-toolkit-13 flang-16 flang-22 g++-12 g++-14 gcc-12 gcc-14 gfortran-12 gfortran-14",
       "tag": "all"
     },
     {
@@ -58,8 +58,8 @@
     },
     {
       "group": "SuiteSparseExternalProject",
-      "ubuntu:22.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4 nvidia-cuda-toolkit",
-      "ubuntu:24.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4 nvidia-cuda-toolkit",
+      "ubuntu:22.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4",
+      "ubuntu:24.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4",
       "tag": "all"
     },
     {

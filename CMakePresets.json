@@ -104,18 +104,18 @@
       ]
     },
     {
-      "name": "clang-22-static",
-      "displayName": "clang-22-static",
-      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-22.cmake",
+      "name": "clang-19-static",
+      "displayName": "clang-19-static",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-19.cmake",
       "inherits": [
         "basic",
         "static"
       ]
     },
     {
-      "name": "clang-22-shared",
-      "displayName": "clang-22-shared",
-      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-22.cmake",
+      "name": "clang-19-shared",
+      "displayName": "clang-19-shared",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-19.cmake",
       "inherits": [
         "basic",
         "shared"
