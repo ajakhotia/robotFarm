@@ -22,14 +22,14 @@ jobs:
           - linux-gnu-12
           - linux-gnu-14
         exclude:
-          - os_base: ubuntu:22.04
-            toolchain:
-              - linux-clang-19
-              - linux-gnu-14
-          - os_base: ubuntu:24.04
-            toolchain:
-              - linux-clang-16
-              - linux-gnu-12
+          - os_base: "ubuntu:22.04"
+            toolchain: linux-clang-19
+          - os_base: "ubuntu:22.04"
+            toolchain: linux-gnu-14
+          - os_base: "ubuntu:24.04"
+            toolchain: linux-clang-16
+          - os_base: "ubuntu:24.04"
+            toolchain: linux-gnu-12
         build_list:
           - AtlasExternalProject
           - BoostExternalProject
@@ -79,8 +79,8 @@ jobs:
           file: docker/robotFarm-ubuntu.dockerfile
           target: throwaway-robot-farm-build
           push: false
-          cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}:buildcache
-          cache-to: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}:buildcache
+          cache-from: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}-${{ env.OS_BASE_NORMALIZED_NAME }}:buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}-${{ env.OS_BASE_NORMALIZED_NAME }}:buildcache
           build-args: |
             BUILD_LIST=${{ matrix.build_list }}
             BASE_IMAGE=${{ matrix.os_base }}
