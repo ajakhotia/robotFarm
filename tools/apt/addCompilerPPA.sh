@@ -8,6 +8,38 @@ set -euo pipefail
 # - GNU (GCC)   : Ubuntu Toolchain PPA (Ubuntu only)
 # -------------------------------------------------------------------
 
+# --- Args ---------------------------------------------------------------------
+AUTO_YES=false
+SHOW_HELP=false
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -y|--yes) AUTO_YES=true; shift ;;
+    -h|--help) SHOW_HELP=true; shift ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      echo "Usage: $0 [-y|--yes] [-h|--help]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "$SHOW_HELP" == true ]]; then
+  cat <<'USAGE'
+Usage: setup-repos.sh [-y|--yes]
+
+Options:
+  -y, --yes     Proceed without interactive confirmation.
+  -h, --help    Show this help text.
+
+This script configures package sources for:
+  - LLVM/Clang (apt.llvm.org)
+  - NVIDIA CUDA (official repo)
+  - GNU (GCC) via Ubuntu Toolchain PPA (Ubuntu only)
+USAGE
+  exit 0
+fi
+
+# --- Helpers ------------------------------------------------------------------
 require_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "Missing required command: $1" >&2; exit 1; }; }
 require_cmd awk
 require_cmd tr
@@ -17,7 +49,7 @@ require_cmd gpg
 require_cmd curl
 command -v add-apt-repository >/dev/null 2>&1 || true
 
-# Detect OS
+# --- Detect OS ----------------------------------------------------------------
 if [[ -r /etc/os-release ]]; then
   . /etc/os-release
 else
@@ -59,7 +91,7 @@ else
   NVIDIA_REPO_SEG="debian${DEB_MAJOR}"
 fi
 
-# Plan entries
+# --- Plan entries -------------------------------------------------------------
 declare -a PLAN_LABELS=()
 declare -a PLAN_ACTIONS=()   # repo:<file>:<line> or ppa:<ppa>
 declare -a PLAN_KEYS=()      # key:<dest>:<url>
@@ -91,7 +123,7 @@ if [[ "${OS_ID}" == "ubuntu" ]]; then
   PLAN_ACTIONS+=("ppa:ppa:ubuntu-toolchain-r/test")  # placeholder to keep format consistent
 fi
 
-# Show plan
+# --- Show plan ----------------------------------------------------------------
 echo "Detected: ${PRETTY_NAME:-$OS_ID $OS_VERSION_ID} (${OS_CODENAME}), arch: ${ARCH_DEB}"
 echo
 echo "The following sources will be configured:"
@@ -100,13 +132,19 @@ for label in "${PLAN_LABELS[@]}"; do
 done
 echo
 
-read -r -p "Proceed with adding these sources? [y/N]: " REPLY
+# --- Confirm / Auto-confirm ---------------------------------------------------
+if [[ "$AUTO_YES" == true ]]; then
+  REPLY="y"
+else
+  read -r -p "Proceed with adding these sources? [y/N]: " REPLY
+fi
+
 case "${REPLY,,}" in
   y|yes) ;;
   *) echo "Aborted. No changes made."; exit 0 ;;
 esac
 
-# Fetch & install keys
+# --- Fetch & install keys -----------------------------------------------------
 for key_spec in "${PLAN_KEYS[@]}"; do
   IFS=':' read -r kind dest url <<< "${key_spec}"
   [[ "${kind}" == "key" ]] || continue
@@ -116,7 +154,7 @@ for key_spec in "${PLAN_KEYS[@]}"; do
   chmod 0644 "${dest}"
 done
 
-# Write repo files / add PPA
+# --- Write repo files / add PPA ----------------------------------------------
 for action in "${PLAN_ACTIONS[@]}"; do
   IFS=':' read -r kind a b <<< "${action}"
   case "${kind}" in
@@ -129,9 +167,8 @@ for action in "${PLAN_ACTIONS[@]}"; do
       chmod 0644 "${list_file}"
       ;;
     ppa)
-      # FIX: ensure we pass 'ppa:ubuntu-toolchain-r/test' (not 'ubuntu-toolchain-r/test')
+      # Ensure we pass 'ppa:ubuntu-toolchain-r/test' exactly once
       ppa_name="${b:-$a}"
-      # remove accidental 'ppa:' prefix from 'a' if present, then add exactly one 'ppa:' prefix
       ppa_name="${ppa_name#ppa:}"
       ppa_name="ppa:${ppa_name}"
       if [[ "${OS_ID}" != "ubuntu" ]]; then
@@ -140,7 +177,11 @@ for action in "${PLAN_ACTIONS[@]}"; do
         echo "Skipping PPA (${ppa_name}) because add-apt-repository is not available."
       else
         echo "Adding PPA: ${ppa_name}"
-        add-apt-repository -y "${ppa_name}"
+        if [[ "$AUTO_YES" == true ]]; then
+          add-apt-repository -y "${ppa_name}"
+        else
+          add-apt-repository "${ppa_name}"
+        fi
       fi
       ;;
     *)
@@ -150,8 +191,13 @@ for action in "${PLAN_ACTIONS[@]}"; do
   esac
 done
 
+# --- Update apt ---------------------------------------------------------------
 echo "Updating package lists..."
-apt-get update -y
+if [[ "$AUTO_YES" == true ]]; then
+  apt-get update -y
+else
+  apt-get update
+fi
 
 echo "Done."
 if [[ "${OS_ID}" == "debian" ]]; then
