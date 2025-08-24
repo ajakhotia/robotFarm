@@ -21,7 +21,11 @@ RUN apt-get update &&                                   \
 
 COPY ./tools/apt /tmp/tools/apt
 RUN apt-get update && apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Basics)
-RUN bash /tmp/tools/apt/addCompilerPPA.sh -y
+
+RUN bash /tmp/tools/apt/addGNUSources.sh -y
+RUN bash /tmp/tools/apt/addLLVMSources.sh -y
+RUN bash /tmp/tools/apt/addNvidiaSources.sh -y
+
 RUN apt-get update && apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Compilers)
 RUN rm -rf /tmp/tools
 

@@ -17,6 +17,10 @@ else()
       CACHE STRING
       "URL of the Suite Sparse source archive")
 
+  set(ROBOT_FARM_SUITESPARSE_CUDA_ARCHITECTURES 75;80
+      CACHE STRING
+      "List of CUDA architectures for Suite Sparse")
+
   externalproject_add(SuiteSparseExternalProject
       PREFIX ${CMAKE_CURRENT_BINARY_DIR}/suiteSparse
       URL ${ROBOT_FARM_SUITE_SPARSE_URL}
@@ -39,5 +43,6 @@ else()
         -DSPQR_USE_CUDA:BOOL=ON
         -DSUITESPARSE_USE_CUDA:BOOL=ON
         -DSUITESPARSE_USE_OPENMP:BOOL=ON
-        -DSUITESPARSE_USE_STRICT:BOOL=ON)
+        -DSUITESPARSE_USE_STRICT:BOOL=ON
+        -DSUITESPARSE_CUDA_ARCHITECTURES:STRING=${ROBOT_FARM_SUITESPARSE_CUDA_ARCHITECTURES})
 endif()
