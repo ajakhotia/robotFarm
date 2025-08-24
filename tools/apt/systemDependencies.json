@@ -16,14 +16,14 @@
     },
     {
       "group": "Compilers",
-      "ubuntu:22.04": "clang-16 cuda-toolkit-13 flang-16 g++ g++-12 gcc gcc-12 gfortran gfortran-12",
-      "ubuntu:24.04": "clang-19 cuda-toolkit-13 flang-19 g++ g++-14 gcc gcc-14 gfortran gfortran-14",
+      "ubuntu:22.04": "clang-16 cuda-toolkit-13 flang-16 g++ g++-12 gcc gcc-12 gfortran gfortran-12 libomp-16-dev",
+      "ubuntu:24.04": "clang-19 cuda-toolkit-13 flang-19 g++ g++-14 gcc gcc-14 gfortran gfortran-14 libomp-19-dev",
       "tag": "all"
     },
     {
       "group": "BoostExternalProject",
-      "ubuntu:22.04": "gcc g++ python3-dev python-is-python3",
-      "ubuntu:24.04": "gcc g++ python3-dev python-is-python3",
+      "ubuntu:22.04": "python3-dev python-is-python3",
+      "ubuntu:24.04": "python3-dev python-is-python3",
       "tag": "all"
     },
     {
