@@ -16,8 +16,8 @@
     },
     {
       "group": "Compilers",
-      "ubuntu:22.04": "clang-16 cuda-toolkit-13 flang-16 g++-12 gcc-12 gfortran gfortran-12",
-      "ubuntu:24.04": "clang-19 cuda-toolkit-13 flang-19 g++-14 gcc-14 gfortran gfortran-14",
+      "ubuntu:22.04": "clang-16 cuda-toolkit-13 flang-16 g++ g++-12 gcc gcc-12 gfortran gfortran-12",
+      "ubuntu:24.04": "clang-19 cuda-toolkit-13 flang-19 g++ g++-14 gcc gcc-14 gfortran gfortran-14",
       "tag": "all"
     },
     {

@@ -22,7 +22,7 @@ else()
       URL ${ROBOT_FARM_SUITE_SPARSE_URL}
       DOWNLOAD_NO_PROGRESS ON
       CMAKE_ARGS
-        -DCMAKE_TOOLCHAIN_FILE:PATH=${robotFarm_SOURCE_DIR}/cmake/toolchains/linux-gnu-12.cmake
+        -DCMAKE_TOOLCHAIN_FILE:PATH=${robotFarm_SOURCE_DIR}/cmake/toolchains/linux-gnu-default.cmake
         -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
         -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
         -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
