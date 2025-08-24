@@ -40,6 +40,7 @@ list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS "-DBUILD_SHARED_LIBS:BOOL=${BUILD_SH
 list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS "-DBUILD_TESTING:BOOL=${BUILD_TESTING}")
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
+        AbseilExternalProject
         BoostExternalProject
         CapnprotoExternalProject
         CeresSolverExternalProject
