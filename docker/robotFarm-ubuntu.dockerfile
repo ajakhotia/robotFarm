@@ -20,9 +20,9 @@ RUN apt-get update &&                                   \
     apt-get autoremove -y
 
 COPY ./tools/apt /tmp/tools/apt
-RUN apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Basics)
-RUN bash /tmp/tools/apt/addCompilerPPA.sh
-RUN apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Compilers)
+RUN apt-get update && apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Basics)
+RUN bash /tmp/tools/apt/addCompilerPPA.sh -y
+RUN apt-get update && apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Compilers)
 RUN rm -rf /tmp/tools
 
 FROM robot-farm-base AS throwaway-robot-farm-build
@@ -48,7 +48,7 @@ RUN if [[ -z "${BUILD_LIST}" ]]; then                                           
         -DROBOT_FARM_REQUESTED_BUILD_LIST:STRING=${BUILD_LIST};                                   \
     fi
 
-RUN apt-get install -y --no-install-recommends $(cat /tmp/robotFarm-build/systemDependencies.txt)
+RUN apt-get update && apt-get install -y --no-install-recommends $(cat /tmp/robotFarm-build/systemDependencies.txt)
 RUN cmake -E make_directory /opt/robotFarm
 RUN cmake --build /tmp/robotFarm-build
 
@@ -56,5 +56,5 @@ RUN cmake --build /tmp/robotFarm-build
 FROM robot-farm-base AS robot-farm
 COPY --from=throwaway-robot-farm-build /opt/robotFarm /opt/robotFarm
 COPY --from=throwaway-robot-farm-build /tmp/robotFarm-build/systemDependencies.txt /tmp/systemDependencies.txt
-RUN apt-get install -y --no-install-recommends $(cat /tmp/systemDependencies.txt) && \
+RUN apt-get update && apt-get install -y --no-install-recommends $(cat /tmp/systemDependencies.txt) && \
     rm -rf /tmp/systemDependencies.txt
