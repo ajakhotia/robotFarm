@@ -58,8 +58,8 @@
     },
     {
       "group": "SuiteSparseExternalProject",
-      "ubuntu:22.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4",
-      "ubuntu:24.04": "libatlas-base-dev libgmp-dev libmpfr-dev libomp-dev m4",
+      "ubuntu:22.04": "libgmp-dev libmpfr-dev libopenblas-dev m4",
+      "ubuntu:24.04": "libgmp-dev libmpfr-dev libopenblas-dev m4",
       "tag": "all"
     },
     {
