@@ -22,12 +22,27 @@ else()
         CACHE STRING
         "URL of the Ceres Solver source archive")
 
+    find_package(OpenMP REQUIRED)
+    set(OMP_C_FLAGS        "${OpenMP_C_FLAGS}")
+    set(OMP_CXX_FLAGS      "${OpenMP_CXX_FLAGS}")
+    set(OMP_LINK_LIBS      "${OpenMP_CXX_LIBRARIES}")
+
+    set(CERES_C_FLAGS        "${CMAKE_C_FLAGS} ${OMP_C_FLAGS}")
+    set(CERES_CXX_FLAGS      "${CMAKE_CXX_FLAGS} ${OMP_CXX_FLAGS}")
+    set(CERES_EXE_LDFLAGS    "${CMAKE_EXE_LINKER_FLAGS} ${OMP_LINK_LIBS}")
+    set(CERES_SHARED_LDFLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OMP_LINK_LIBS}")
+
     externalproject_add(CeresSolverExternalProject
         PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ceressolver
         GIT_REPOSITORY ${ROBOT_FARM_CERES_SOLVER_URL}
         GIT_SHALLOW TRUE
         DOWNLOAD_NO_PROGRESS ON
-        CMAKE_ARGS ${ROBOT_FARM_FORWARDED_CMAKE_ARGS})
+        CMAKE_CACHE_ARGS
+          ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
+          -DCMAKE_C_FLAGS:STRING=${CERES_C_FLAGS}
+          -DCMAKE_CXX_FLAGS:STRING=${CERES_CXX_FLAGS}
+          -DCMAKE_EXE_LINKER_FLAGS:STRING=${CERES_EXE_LDFLAGS}
+          -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CERES_SHARED_LDFLAGS})
 endif()
 
 add_dependencies(CeresSolverExternalProject
