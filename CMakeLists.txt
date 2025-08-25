@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(robotFarm VERSION 0.1.0.0 LANGUAGES C CXX CUDA)
+project(robotFarm VERSION 0.1.0.0 LANGUAGES C CXX CUDA Fortran)
 
 # Cmake 3.24.1 improves the behaviour of external project by utilizing the time of
 # extraction of the files from the downloaded source archive to determine the need

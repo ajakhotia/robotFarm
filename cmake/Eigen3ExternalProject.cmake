@@ -5,6 +5,7 @@ endif()
 
 include(ExternalProject)
 include(${CMAKE_CURRENT_LIST_DIR}/BoostExternalProject.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/SuiteSparseExternalProject.cmake)
 
 option(ROBOT_FARM_SKIP_Eigen3ExternalProject "Forcefully skip Eigen3" OFF)
 
@@ -26,4 +27,5 @@ else()
 endif()
 
 add_dependencies(Eigen3ExternalProject
-    BoostExternalProject)
+    BoostExternalProject
+    SuiteSparseExternalProject)

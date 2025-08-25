@@ -1,7 +1,0 @@
-set(CMAKE_SYSTEM_NAME "Linux")
-set(CMAKE_C_COMPILER /usr/bin/clang-15)
-set(CMAKE_CXX_COMPILER /usr/bin/clang++-15)
-set(CMAKE_Fortran_COMPILER /usr/bin/flang-new-15)
-set(CMAKE_EXE_LINKER_FLAGS "-L/usr/lib/llvm-15/lib -Wl,-rpath,/usr/lib/llvm-15/lib")
-set(CMAKE_CUDA_COMPILER /usr/bin/nvcc)
-set(CMAKE_CUDA_HOST_COMPILER /usr/bin/clang++-15)

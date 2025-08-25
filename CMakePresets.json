@@ -86,24 +86,6 @@
       ]
     },
     {
-      "name": "clang-16-static",
-      "displayName": "clang-16-static",
-      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-16.cmake",
-      "inherits": [
-        "basic",
-        "static"
-      ]
-    },
-    {
-      "name": "clang-16-shared",
-      "displayName": "clang-16-shared",
-      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-16.cmake",
-      "inherits": [
-        "basic",
-        "shared"
-      ]
-    },
-    {
       "name": "clang-19-static",
       "displayName": "clang-19-static",
       "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang-19.cmake",
