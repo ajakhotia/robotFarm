@@ -71,8 +71,11 @@ jobs:
           push: true
           tags: ${{ steps.docker-metadata.outputs.tags }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
-          cache-from: type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}:buildcache
-          cache-to: type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}:buildcache
+          cache-from: |
+            type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-base-${{ steps.normalize-os-name.outputs.string }}:buildcache
+            type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ matrix.toolchain }}:buildcache
+          cache-to: |
+            type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ matrix.toolchain }}:buildcache
           build-args: |
             BASE_IMAGE=${{ matrix.os_base }}
             TOOLCHAIN=${{ matrix.toolchain }}

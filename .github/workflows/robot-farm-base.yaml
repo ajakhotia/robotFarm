@@ -45,8 +45,8 @@ jobs:
         with:
           images: ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-base-${{ steps.normalize-os-name.outputs.string }}-${{ matrix.toolchain }}
           tags: |
-            type=raw,value=${{ github.event.workflow_run.head_sha }}
-            type=raw,value=latest,enable=${{ github.event.workflow_run.head_branch == 'main' }}
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
 
       - name: robot-farm-base
         uses: docker/build-push-action@v6
@@ -57,7 +57,9 @@ jobs:
           push: true
           tags: ${{ steps.docker-metadata.outputs.tags }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
-          cache-from: type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}:buildcache
-          cache-to: type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}:buildcache
+          cache-from: |
+            type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-base-${{ steps.normalize-os-name.outputs.string }}:buildcache
+          cache-to: |
+            type=registry,mode=max,ref=ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-base-${{ steps.normalize-os-name.outputs.string }}:buildcache
           build-args: |
             BASE_IMAGE=${{ matrix.os_base }}
