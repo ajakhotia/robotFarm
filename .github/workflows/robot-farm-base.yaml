@@ -29,13 +29,13 @@ jobs:
 
       - name: normalize-repository-name
         id: normalize-repository-name
-        uses: .github/actions/normalize
+        uses: ./.github/actions/normalize
         with:
           string: ${{ github.repository }}
 
       - name: normalize-os-name
         id: normalize-os-name
-        uses: .github/actions/normalize
+        uses: ./.github/actions/normalize
         with:
           string: ${{ matrix.os_base }}
 
