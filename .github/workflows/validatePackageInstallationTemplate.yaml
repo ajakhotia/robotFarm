@@ -1,0 +1,68 @@
+name: validatePackageInstallationTemplate
+
+on:
+  workflow_call:
+    inputs:
+      os_base:
+        description: 'Base image, e.g. ubuntu:22.04'
+        required: true
+        type: string
+      toolchain:
+        description: 'Toolchain, e.g. linux-gnu-12'
+        required: true
+        type: string
+      library_name:
+        description: 'Library to test (e.g. Eigen3)'
+        required: true
+        type: string
+      image_tag:
+        description: 'Image tag to pull (e.g. head SHA from imageBuild)'
+        required: true
+        type: string
+
+jobs:
+  validatePackageInstallation:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkoutImportTester
+        uses: actions/checkout@v4
+        with:
+          repository: ajakhotia/importTester
+          path: importTester
+          ref: main
+
+      - name: setupLogin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: normalizeNames
+        run: |
+          echo "REPOSITORY_NORMALIZED_NAME=$(echo '${{ github.repository }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_ENV
+          echo "OS_BASE_NORMALIZED_NAME=$(echo '${{ inputs.os_base }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_ENV
+
+      - name: dockerMetadata
+        id: docker-metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}-${{ env.OS_BASE_NORMALIZED_NAME }}-${{ matrix.toolchain }}
+          tags: |
+            type=raw,value=${{ github.event.workflow_run.head_sha }}
+
+      - name: pullRobotFarmImage
+        run: |
+          docker pull ${{ steps.docker-metadata.outputs.tags }}
+
+      - name: runImportTest
+        run: |
+          docker run --rm --volume ./importTester:/tmp/importTester ghcr.io/ajakhotia/robot-farm-ubuntu-22-04-linux-gnu-12 bash -c \
+            " \
+              cd /tmp && \
+              ls -lart /opt/robotFarm && \
+              cmake --version && \
+              cmake -E make_directory build && \
+              cmake -S importTester -B build -DCMAKE_PREFIX_PATH=/opt/robotFarm -DIMPORT_TESTER_PACKAGE_LIST="Eigen3" \
+          "
