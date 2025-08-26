@@ -65,7 +65,7 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
 set(ROBOT_FARM_BUILD_LIST "")
 
 foreach(ITEM ${ROBOT_FARM_REQUESTED_BUILD_LIST})
-    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${ITEM}.cmake)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/externalProjects/${ITEM}.cmake)
 endforeach()
 
 
