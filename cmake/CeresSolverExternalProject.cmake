@@ -33,11 +33,6 @@ else()
     make_space_delimited_string(CERES_EXE_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_EXE_LINKER_FLAGS})
     make_space_delimited_string(CERES_SHARED_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_SHARED_LINKER_FLAGS} )
 
-    message(STATUS "Using c flags: " ${CERES_C_FLAGS})
-    message(STATUS "Using cxx flags: " ${CERES_CXX_FLAGS})
-    message(STATUS "Using exe Linker flags: " ${CERES_EXE_LINKER_FLAGS})
-    message(STATUS "Using shared linker flags: " ${CERES_SHARED_LINKER_FLAGS})
-
     externalproject_add(CeresSolverExternalProject
         PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ceressolver
         GIT_REPOSITORY ${ROBOT_FARM_CERES_SOLVER_URL}
