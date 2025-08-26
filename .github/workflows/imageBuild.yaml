@@ -50,7 +50,7 @@ jobs:
         id: docker-metadata
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}-base-${{ env.OS_BASE_NORMALIZED_NAME }}-${{ matrix.toolchain }}
+          images: ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}-${{ env.OS_BASE_NORMALIZED_NAME }}-${{ matrix.toolchain }}
           tags: |
             type=raw,value=${{ github.event.workflow_run.head_sha }}
             type=raw,value=latest,enable=${{ github.event.workflow_run.head_branch == 'main' }}

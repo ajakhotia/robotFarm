@@ -1,6 +1,6 @@
 [![infraFilesCongruencyCheck](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml)
 [![baseImageBuild](https://github.com/ajakhotia/robotFarm/actions/workflows/baseImageBuild.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/baseImageBuild.yaml)
-[![External library builds](https://github.com/ajakhotia/robotFarm/actions/workflows/libraryBuild.yaml/badge.svg?branch=main)](https://github.com/ajakhotia/robotFarm/actions/workflows/libraryBuild.yaml)
+[![Image build](https://github.com/ajakhotia/robotFarm/actions/workflows/imageBuild.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/imageBuild.yaml)
 
 # robotFarm
 A convenience project to build and install certain open source libraries(and listed dependencies)
