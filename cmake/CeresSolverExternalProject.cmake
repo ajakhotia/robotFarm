@@ -15,6 +15,11 @@ option(ROBOT_FARM_SKIP_CeresSolverExternalProject "Forcefully skip Ceres Solver"
 if(ROBOT_FARM_SKIP_CeresSolverExternalProject)
     add_custom_target(CeresSolverExternalProject)
 else()
+    function(make_space_delimited_string OUTPUT_VAR)
+      string (REPLACE ";" " " SPACE_DELIMITED_STRING "${ARGN}")
+      set(${OUTPUT_VAR} ${SPACE_DELIMITED_STRING} PARENT_SCOPE)
+    endfunction()
+
     list(APPEND ROBOT_FARM_BUILD_LIST CeresSolverExternalProject)
 
     set(ROBOT_FARM_CERES_SOLVER_URL
@@ -23,14 +28,15 @@ else()
         "URL of the Ceres Solver source archive")
 
     find_package(OpenMP REQUIRED)
-    set(OMP_C_FLAGS        "${OpenMP_C_FLAGS}")
-    set(OMP_CXX_FLAGS      "${OpenMP_CXX_FLAGS}")
-    set(OMP_LINK_LIBS      "${OpenMP_CXX_LIBRARIES}")
+    make_space_delimited_string(CERES_C_FLAGS ${OpenMP_C_FLAGS} ${CMAKE_C_FLAGS})
+    make_space_delimited_string(CERES_CXX_FLAGS ${OpenMP_CXX_FLAGS} ${CMAKE_CXX_FLAGS})
+    make_space_delimited_string(CERES_EXE_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_EXE_LINKER_FLAGS})
+    make_space_delimited_string(CERES_SHARED_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_SHARED_LINKER_FLAGS} )
 
-    set(CERES_C_FLAGS        "${CMAKE_C_FLAGS} ${OMP_C_FLAGS}")
-    set(CERES_CXX_FLAGS      "${CMAKE_CXX_FLAGS} ${OMP_CXX_FLAGS}")
-    set(CERES_EXE_LDFLAGS    "${CMAKE_EXE_LINKER_FLAGS} ${OMP_LINK_LIBS}")
-    set(CERES_SHARED_LDFLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OMP_LINK_LIBS}")
+    message(STATUS "Using c flags: " ${CERES_C_FLAGS})
+    message(STATUS "Using cxx flags: " ${CERES_CXX_FLAGS})
+    message(STATUS "Using exe Linker flags: " ${CERES_EXE_LINKER_FLAGS})
+    message(STATUS "Using shared linker flags: " ${CERES_SHARED_LINKER_FLAGS})
 
     externalproject_add(CeresSolverExternalProject
         PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ceressolver
@@ -41,8 +47,8 @@ else()
           ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
           -DCMAKE_C_FLAGS:STRING=${CERES_C_FLAGS}
           -DCMAKE_CXX_FLAGS:STRING=${CERES_CXX_FLAGS}
-          -DCMAKE_EXE_LINKER_FLAGS:STRING=${CERES_EXE_LDFLAGS}
-          -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CERES_SHARED_LDFLAGS})
+          -DCMAKE_EXE_LINKER_FLAGS:STRING=${CERES_EXE_LINKER_FLAGS}
+          -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CERES_SHARED_LINKER_FLAGS})
 endif()
 
 add_dependencies(CeresSolverExternalProject
