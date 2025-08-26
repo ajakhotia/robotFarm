@@ -1,12 +1,12 @@
-name: Image build
+name: imageBuild
 
 on:
   workflow_run:
-    workflows: [ "Base image build" ]
+    workflows: [ "baseImageBuild" ]
     types: [ completed ]
 
 jobs:
-  externalLibraryBuild:
+  imageBuild:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: self-hosted
     strategy:

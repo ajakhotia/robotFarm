@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  congruency-check:
+  congruencyCheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,11 +21,11 @@ jobs:
           path: templateRepository
           ref: main
 
-      - name: "Run congruency check"
+      - name: "runCongruencyTest"
         run: python3 templateRepository/ci/congruency_test.py -t templateRepository -c clientRepository --apply-diffs
 
-      - name: "Check for changes"
-        id: check_for_changes
+      - name: "checkForLocalChanges"
+        id: checkForChanges
         run: |
           cd clientRepository
           if [[ -n "$(git status --porcelain)" ]]; then
@@ -34,8 +34,8 @@ jobs:
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: "Create branch and pull request"
-        if: steps.check_for_changes.outputs.has_changes == 'true'
+      - name: "createPullRequest"
+        if: steps.checkForChanges.outputs.has_changes == 'true'
         run: |
           gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
           cd clientRepository

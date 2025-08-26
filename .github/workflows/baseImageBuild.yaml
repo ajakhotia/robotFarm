@@ -1,4 +1,4 @@
-name: Base image build
+name: baseImageBuild
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   baseImageBuild:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
