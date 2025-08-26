@@ -1,4 +1,4 @@
-name: base-image-build
+name: robot-farm-base
 
 on:
   push:

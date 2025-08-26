@@ -1,4 +1,4 @@
-name: validatePackageInstallationTemplate
+name: validate-library-install-template
 
 on:
   workflow_call:
@@ -21,44 +21,50 @@ on:
         type: string
 
 jobs:
-  validatePackageInstallation:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  validate-library-install:
     runs-on: ubuntu-latest
     steps:
-      - name: checkoutImportTester
+      - name: checkout-import-tester
         uses: actions/checkout@v4
         with:
           repository: ajakhotia/importTester
           path: importTester
           ref: main
 
-      - name: setupLogin
+      - name: setup-login
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: normalizeNames
-        run: |
-          echo "REPOSITORY_NORMALIZED_NAME=$(echo '${{ github.repository }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_ENV
-          echo "OS_BASE_NORMALIZED_NAME=$(echo '${{ inputs.os_base }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_ENV
+      - name: normalize-repository-name
+        id: normalize-repository-name
+        uses: ./.github/actions/normalize
+        with:
+          string: ${{ github.repository }}
 
-      - name: dockerMetadata
+      - name: normalize-os-name
+        id: normalize-os-name
+        uses: ./.github/actions/normalize
+        with:
+          string: ${{ inputs.os_base }}
+
+      - name: docker-metadata
         id: docker-metadata
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ env.REPOSITORY_NORMALIZED_NAME }}-${{ env.OS_BASE_NORMALIZED_NAME }}-${{ matrix.toolchain }}
+          images: ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ inputs.toolchain }}
           tags: |
-            type=raw,value=${{ github.event.workflow_run.head_sha }}
+            type=raw,value=${{ github.event.workflow_call.head_sha }}
 
-      - name: pullRobotFarmImage
+      - name: pull-robot-farm-image
         run: |
           docker pull ${{ steps.docker-metadata.outputs.tags }}
 
-      - name: runImportTest
+      - name: import-test
         run: |
-          docker run --rm --volume ./importTester:/tmp/importTester ghcr.io/ajakhotia/robot-farm-ubuntu-22-04-linux-gnu-12 bash -c \
+          docker run --rm --volume ./importTester:/tmp/importTester ${{ steps.docker-metadata.outputs.tags }} bash -c \
             " \
               cd /tmp && \
               ls -lart /opt/robotFarm && \
