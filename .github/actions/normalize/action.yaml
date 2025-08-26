@@ -1,0 +1,21 @@
+name: normalize
+description: "Normalize a string for use with docker related operations"
+
+inputs:
+  string:
+    required: true
+    description: "String to normalize."
+
+outputs:
+  string:
+    description: "Normalized string."
+    value: ${{ steps.normalize.outputs.string }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: normalize
+      id: normalize
+      shell: bash
+      run: |
+        echo "string=$(echo '${{ inputs.string }}' | sed -E 's/([a-z0-9])([A-Z])/\1-\L\2/g' | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9/]+/-/g')" >> $GITHUB_OUTPUT
