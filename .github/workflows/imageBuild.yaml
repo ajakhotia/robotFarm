@@ -8,7 +8,7 @@ on:
 jobs:
   externalLibraryBuild:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
