@@ -10,8 +10,8 @@
   "groups": [
     {
       "group": "Basics",
-      "ubuntu:22.04": "ca-certificates cmake curl git gnupg grep lsb-release ninja-build pkg-config sed software-properties-common unzip wget",
-      "ubuntu:24.04": "ca-certificates cmake curl git gnupg grep lsb-release ninja-build pkg-config sed software-properties-common unzip wget",
+      "ubuntu:22.04": "ca-certificates curl git gnupg grep lsb-release ninja-build pkg-config sed software-properties-common unzip wget",
+      "ubuntu:24.04": "ca-certificates curl git gnupg grep lsb-release ninja-build pkg-config sed software-properties-common unzip wget",
       "tag": "all"
     },
     {

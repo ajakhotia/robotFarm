@@ -19,9 +19,10 @@ RUN apt-get update &&                                   \
     apt-get autoclean -y &&                             \
     apt-get autoremove -y
 
-COPY ./tools/apt /tmp/tools/apt
+COPY ./tools /tmp/tools
 RUN apt-get update && apt-get install -y --no-install-recommends $(sh /tmp/tools/apt/extractDependencies.sh Basics)
 
+RUN bash /tmp/tools/installCMake.sh
 RUN bash /tmp/tools/apt/addGNUSources.sh -y
 RUN bash /tmp/tools/apt/addLLVMSources.sh -y
 RUN bash /tmp/tools/apt/addNvidiaSources.sh -y
