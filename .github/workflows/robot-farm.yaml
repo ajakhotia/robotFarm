@@ -26,7 +26,7 @@ jobs:
             toolchain: linux-gnu-12
 
     steps:
-      - name: checkout
+      - name: checkout-self
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}

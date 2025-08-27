@@ -24,6 +24,11 @@ jobs:
   validate-library-install:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout-self
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_call.head_sha }}
+
       - name: checkout-import-tester
         uses: actions/checkout@v4
         with:
