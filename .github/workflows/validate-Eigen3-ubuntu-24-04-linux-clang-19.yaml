@@ -1,0 +1,16 @@
+name: validate-eigen3-ubuntu-24-04-linux-clang-19.yaml
+
+on:
+  workflow_run:
+    workflows: [ "robot-farm" ]
+    types: [ completed ]
+
+jobs:
+  validate-install:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/validate-library-install-template.yaml
+    with:
+      os_base: ubuntu:24.04
+      toolchain: linux-clang-19
+      library_name: Eigen3
+      image_tag: ${{ github.event.workflow_run.head_sha }}
