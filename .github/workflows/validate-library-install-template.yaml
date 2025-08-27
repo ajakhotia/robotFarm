@@ -77,6 +77,3 @@ jobs:
               cmake -E make_directory build && \
               cmake -S importTester -B build -DCMAKE_PREFIX_PATH=/opt/robotFarm -DIMPORT_TESTER_PACKAGE_LIST="Eigen3" \
           "
-
-ghcr.io/ajakhotia/robot-farm-ubuntu-22-04-linux-gnu-12:
-absl,AMD,Boost,CAMD,CapnProto,CCOLAMD,Ceres,CHOLMOD,COLAMD,Eigen3,flatbuffers,Gflags,Glog,GTest,nlohmann_json,oatpp,oatpp-websocket,OGRE,OpenCV,protobuf,Python3,spdlog,SPQR,SuiteSparse_config,VTK
