@@ -3,7 +3,7 @@ A convenience project to build and install certain open source libraries(and lis
 using cmake external projects. See files under the `cmake` directory to learn about available
 options. 
 
-[![infraFilesCongruencyCheck](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml)  [![robot-farm-base](https://github.com/ajakhotia/robotFarm/actions/workflows/robot-farm-base.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/robot-farm-base.yaml)
+[![infraFilesCongruencyCheck](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/infraFilesCongruencyCheck.yaml)  [![robot-farm-base](https://github.com/ajakhotia/robotFarm/actions/workflows/robot-farm-base.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/robot-farm-base.yaml) [![robot-farm](https://github.com/ajakhotia/robotFarm/actions/workflows/robot-farm.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/robot-farm.yaml)
 
 | Library | ubuntu:22.04 / linux-gnu-12 | ubuntu:22.04 / linux-clang-19 |
 | --- | --- | --- |
