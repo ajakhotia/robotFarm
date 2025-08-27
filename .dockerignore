@@ -1,5 +1,8 @@
 *build*
+.dockerignore
 .git
+.github
 .idea
 docker/*.dockerfile
-.github
+LICENSE
+README.md
