@@ -27,7 +27,7 @@ jobs:
       - name: checkout-self
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_call.head_sha }}
+          ref: ${{ github.sha }}
 
       - name: checkout-import-tester
         uses: actions/checkout@v4
@@ -59,9 +59,9 @@ jobs:
         id: docker-metadata
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ inputs.toolchain }}
+          images: ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ matrix.toolchain }}
           tags: |
-            type=raw,value=${{ github.event.workflow_call.head_sha }}
+            type=raw,value=${{ github.sha }}
 
       - name: pull-robot-farm-image
         run: |
