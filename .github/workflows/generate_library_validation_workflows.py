@@ -73,7 +73,7 @@ def generate_workflow_file(output_dir: str, library: str, os_base: str, toolchai
 def build_badge_cell(repo_owner: str, repo_name: str, library: str, os_base: str, toolchain: str) -> str:
     osb_fn = os_base_to_filename(os_base)
     wf_file = f"validate-{library}-{osb_fn}-{toolchain}.yaml"
-    return (f"[![{library}](https://github.com/{repo_owner}/{repo_name}"
+    return (f"[![status](https://github.com/{repo_owner}/{repo_name}"
             f"/actions/workflows/{wf_file}/badge.svg)]"
             f"(https://github.com/{repo_owner}/{repo_name}"
             f"/actions/workflows/{wf_file})")
