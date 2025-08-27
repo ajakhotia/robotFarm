@@ -59,7 +59,7 @@ jobs:
         id: docker-metadata
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ matrix.toolchain }}
+          images: ghcr.io/${{ steps.normalize-repository-name.outputs.string }}-${{ steps.normalize-os-name.outputs.string }}-${{ inputs.toolchain }}
           tags: |
             type=raw,value=${{ github.sha }}
 
