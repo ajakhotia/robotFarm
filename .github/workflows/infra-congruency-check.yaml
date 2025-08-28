@@ -1,4 +1,4 @@
-name: infraFilesCongruencyCheck
+name: infra-congruency-check
 
 on:
   schedule:
@@ -8,24 +8,26 @@ on:
       - main
 
 jobs:
-  congruencyCheck:
+  congruency-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout-self
+        uses: actions/checkout@v4
         with:
-          path: clientRepository
+          path: ${{ github.event.repository.name }}
 
-      - uses: actions/checkout@v4
+      - name: checkout-infra-commons
+        uses: actions/checkout@v4
         with:
           repository: ajakhotia/infraCommons
-          path: templateRepository
+          path: infraCommons
           ref: main
 
-      - name: "runCongruencyTest"
-        run: python3 templateRepository/ci/congruency_test.py -t templateRepository -c clientRepository --apply-diffs
+      - name: congruency-test
+        run: python3 infraCommons/ci/congruency_test.py -t infraCommons -c ${{ github.event.repository.name }} --apply-diffs
 
-      - name: "checkForLocalChanges"
-        id: checkForChanges
+      - name: check-diffs
+        id: check-diffs
         run: |
           cd clientRepository
           if [[ -n "$(git status --porcelain)" ]]; then
@@ -34,8 +36,8 @@ jobs:
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: "createPullRequest"
-        if: steps.checkForChanges.outputs.has_changes == 'true'
+      - name: create-pull-request
+        if: steps.check-diffs.outputs.has_changes == 'true'
         run: |
           gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
           cd clientRepository
