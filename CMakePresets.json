@@ -50,6 +50,24 @@
       "hidden": true
     },
     {
+      "name": "gnu-default-static",
+      "displayName": "gnu-default-static",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-default.cmake",
+      "inherits": [
+        "basic",
+        "static"
+      ]
+    },
+    {
+      "name": "gnu-default-shared",
+      "displayName": "gnu-default-shared",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-default.cmake",
+      "inherits": [
+        "basic",
+        "shared"
+      ]
+    },
+    {
       "name": "gnu-12-static",
       "displayName": "gnu-12-static",
       "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gnu-12.cmake",

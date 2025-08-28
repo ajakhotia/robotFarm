@@ -19,6 +19,7 @@ jobs:
           - linux-clang-19
           - linux-gnu-12
           - linux-gnu-14
+          - linux-gnu-default
         exclude:
           - os_base: "ubuntu:22.04"
             toolchain: linux-gnu-14

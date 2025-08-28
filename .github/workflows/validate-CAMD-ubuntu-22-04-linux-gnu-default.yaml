@@ -1,0 +1,16 @@
+name: validate-camd-ubuntu-22-04-linux-gnu-default.yaml
+
+on:
+  workflow_run:
+    workflows: [ "robot-farm" ]
+    types: [ completed ]
+
+jobs:
+  validate-install:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/validate-library-install-template.yaml
+    with:
+      os_base: ubuntu:22.04
+      toolchain: linux-gnu-default
+      library_name: CAMD
+      image_tag: ${{ github.event.workflow_run.head_sha }}
