@@ -216,7 +216,7 @@ NOTE:
 
 ### 📦 Install system dependencies
 
-The configure command above will generate a file called `systemDependencies.txt`
+The configure command above will generate a file named `systemDependencies.txt`
 in the build tree. This file contains a list of system dependencies that are
 required to build libraries you requested. Install the dependencies using the
 following command:
@@ -232,8 +232,6 @@ Use the following command to build and install the requested libraries:
 ```shell
 cmake --build ${BUILD_TREE}
 ```
-
-You can build a specific subset of libraries available via `robotFarm` using:
 
 # 🧑‍💻 Developer notes:
 
@@ -261,8 +259,8 @@ python3 ./.github/workflows/generate_library_validation_workflows.py \
 
 robotFarm can build Python 3 from source if needed. By default, the build uses
 the system Python 3 and skips the source build. To force building Python3 from
-source, pass `-DROBOT_FARM_SKIP_PYTHON3:BOOL=OFF` cache argument to cmake in
-the configuration step
+source, pass `-DROBOT_FARM_SKIP_PYTHON3:BOOL=OFF` cache argument to cmake in the
+configuration step
 
 ## OpenCV
 
