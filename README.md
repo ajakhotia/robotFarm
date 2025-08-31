@@ -132,7 +132,7 @@ tokens appear.
 Path where you will clone the robotFarm project. This may be a temporary
 directory if you only plan to build once. Examples:
 
-- `"$HOME/sandbox/robotFarm"`
+- `"${HOME}/sandbox/robotFarm"`
 - `"/tmp/robotFarm"`
 
 #### BUILD_DIR
@@ -142,14 +142,14 @@ not iterating on builds. Examples:
 
 - `"${SOURCE_DIR}/build"`
 - `"/tmp/robotFarm-build"`
-- `"$HOME/sandbox/robotFarm-build"`
+- `"${HOME}/sandbox/robotFarm-build"`
 
 #### INSTALL_DIR
 
 Path where installation artifacts will be placed. Keep this directory long-term;
 it will contain executables, libraries, and supporting files. Examples:
 
-- `"$HOME/usr"`
+- `"${HOME}/usr"`
 - `"/opt/robotFarm"`
 - `"/usr"` (requires `sudo` during the installation step)
 
@@ -157,9 +157,9 @@ it will contain executables, libraries, and supporting files. Examples:
 terminal context if you prefer**
 
 ```shell
-export SOURCE_TREE=$HOME/sandbox/robotFarm
-export BUILD_TREE=$HOME/sandbox/robotFarm-build
-export INSTALL_TREE=$HOME/usr
+export SOURCE_TREE=${HOME}/sandbox/robotFarm
+export BUILD_TREE=${HOME}/sandbox/robotFarm-build
+export INSTALL_TREE=${HOME}/usr
 ```
 
 ### 🧬 Clone robotFarm
