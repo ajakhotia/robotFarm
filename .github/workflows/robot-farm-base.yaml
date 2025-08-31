@@ -2,7 +2,14 @@ name: robot-farm-base
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches:
+      - main
 
 jobs:
   base-image-build:
