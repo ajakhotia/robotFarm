@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: checkout-self
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: setup-buildx
         uses: docker/setup-buildx-action@v3
@@ -39,6 +41,15 @@ jobs:
         with:
           string: ${{ matrix.os_base }}
 
+      - name: find-tag
+        id: tag
+        uses: digital-ai/query-tag-action@v2
+        with:
+          commit-ish: HEAD
+          exact-match: 'true'
+          include: 'v*'
+          skip-unshallow: 'true'
+
       - name: docker-metadata
         id: docker-metadata
         uses: docker/metadata-action@v5
@@ -47,6 +58,8 @@ jobs:
           tags: |
             type=raw,value=${{ github.sha }}
             type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
+            type=raw,value=${{ steps.tag.outputs.tag && steps.tag.outputs.tag != 'NO_TAGS' && steps.tag.outputs.tag || '' }}
+
 
       - name: robot-farm-base
         uses: docker/build-push-action@v6
