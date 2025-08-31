@@ -72,7 +72,7 @@ jobs:
           tags: |
             type=raw,value=${{ github.event.workflow_run.head_sha }}
             type=raw,value=latest,enable=${{ github.event.workflow_run.head_branch == 'main' }}
-            type=raw,value=${{ steps.tag.outputs.tag && steps.tag.outputs.tag != 'NO_TAGS' && steps.tag.outputs.tag || '' }}
+            type=raw,value=${{ steps.tag.outputs.tag }},enable=${{ steps.tag.outputs.tag != 'NO_TAGS' }}
 
       - name: robot-farm
         uses: docker/build-push-action@v6

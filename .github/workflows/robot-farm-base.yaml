@@ -58,7 +58,7 @@ jobs:
           tags: |
             type=raw,value=${{ github.sha }}
             type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
-            type=raw,value=${{ steps.tag.outputs.tag && steps.tag.outputs.tag != 'NO_TAGS' && steps.tag.outputs.tag || '' }}
+            type=raw,value=${{ steps.tag.outputs.tag }},enable=${{ steps.tag.outputs.tag != 'NO_TAGS' }}
 
 
       - name: robot-farm-base
