@@ -6,7 +6,7 @@
 libraries. Package managers often ship stale versions, and some libraries take
 too long to rebuild as submodules. `robotFarm` builds and installs the latest
 versions with documented, optimized parameters so your projects can reliably
-link against them. Refer to the [Build Matrices](#-build-matrices) for available
+link against them. Refer to the [Build status](#-build-status) for available
 libraries.
 
 # 🌱 Why use robotFarm?
