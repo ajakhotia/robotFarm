@@ -13,7 +13,7 @@ else()
     list(APPEND ROBOT_FARM_BUILD_LIST CapnprotoExternalProject)
 
     set(ROBOT_FARM_CAPNPROTO_URL
-        "https://github.com/capnproto/capnproto/archive/refs/tags/v0.9.1.tar.gz"
+        "https://github.com/capnproto/capnproto/archive/refs/tags/v1.2.0.tar.gz"
         CACHE STRING
         "URL of the Cap'n'proto source archive")
 
