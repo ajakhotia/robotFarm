@@ -2,12 +2,13 @@
 
 # 🚜 robotFarm
 
-`robotFarm` is a CMake-based build system for commonly used robotics and AI
-libraries. Package managers often ship stale versions, and some libraries take
-too long to rebuild as submodules. `robotFarm` builds and installs the latest
-versions with documented, optimized parameters so your projects can reliably
-link against them. Refer to the [Build status](#-build-status) for available
-libraries.
+`robotFarm` is a `super-build` setup for commonly used AI and robotics 
+libraries. It
+uses `CMake` to build libraries from source, manages inter-library dependencies,
+and highlights which prerequisites should be installed through the OS package
+manager. Each library is configured to enable the broadest set of features and
+optimizations, ensuring reproducible and up-to-date builds. See `Build 
+Status` section for the list of supported libraries.
 
 # 🌱 Why use robotFarm?
 
@@ -15,7 +16,7 @@ libraries.
   versions via CMake command-line parameters.
 * **Efficient**: build once, install to a prefix, reuse across projects.
 * **Optimized & consistent**: each library’s config is documented, and builds
-  enable maximum features by default for reproducible performance.
+  enable maximum features by default for high downstream performance.
 
 # 🏗️ Build status
 
