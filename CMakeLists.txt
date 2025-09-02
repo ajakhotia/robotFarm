@@ -11,6 +11,7 @@ endif()
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Global flag to build shared libraries [Default: OFF]")
 set(BUILD_TESTING OFF CACHE BOOL "Global flag used by CTest [Default: OFF]")
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Cmake build type [Default: Release]")
 
 set(ROBOT_FARM_FORWARDED_CMAKE_ARGS
     -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
@@ -97,5 +98,13 @@ foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
 endforeach()
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt "${ROBOT_FARM_SYSTEM_DEPENDENCY_STR}")
+
+add_custom_command(
+    OUTPUT ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt
+    COMMENT "Installing ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt to ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt")
+
+add_custom_target(systemDependenciesManifest ALL DEPENDS ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt)
 
 add_subdirectory(docker)
