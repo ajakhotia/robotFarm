@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout-self
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ${{ github.event.repository.name }}
 
       - name: checkout-infra-commons
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ajakhotia/infraCommons
           path: infraCommons

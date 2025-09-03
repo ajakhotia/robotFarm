@@ -22,7 +22,7 @@ jobs:
           - ubuntu:24.04
     steps:
       - name: checkout-self
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
