@@ -35,6 +35,7 @@ jobs:
 
 
   build-deploy-stages:
+    needs: base-stage
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -77,6 +78,7 @@ jobs:
             TOOLCHAIN=${{ matrix.toolchain }}
 
   find-libraries:
+    needs: build-deploy-stages
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -123,7 +125,7 @@ jobs:
         uses: ajakhotia/infraCommons/.github/actions/cmake-find-package@main
         with:
           library-name: ${{ matrix.library-name }}
-          prefix-path: /opt/robotFarm
+          prefix-path: "/opt/robotFarm"
           image-name: |
             ${{ format('{0}/{1}/{2}', github.repository, matrix.os_base, matrix.toolchain )}}
           password: ${{ secrets.GITHUB_TOKEN }}
