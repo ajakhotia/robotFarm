@@ -75,3 +75,55 @@ jobs:
           build-args: |
             OS_BASE=${{ matrix.os_base }}
             TOOLCHAIN=${{ matrix.toolchain }}
+
+  find-libraries:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os_base:
+          - ubuntu:22.04
+          - ubuntu:24.04
+        toolchain:
+          - linux-clang-19
+          - linux-gnu-14
+          - linux-gnu-default
+        exclude:
+          - os_base: "ubuntu:22.04"
+            toolchain: linux-gnu-14
+        library-name:
+          - absl
+          - AMD
+          - Boost
+          - CAMD
+          - CapnProto
+          - CCOLAMD
+          - Ceres
+          - CHOLMOD
+          - COLAMD
+          - Eigen3
+          - flatbuffers
+          - Gflags
+          - Glog
+          - GTest
+          - nlohmann_json
+          - oatpp
+          - oatpp-websocket
+          - OGRE
+          - OpenCV
+          - protobuf
+          - Python3
+          - spdlog
+          - SPQR
+          - SuiteSparse_config
+          - VTK
+
+    steps:
+      - name: find-library
+        uses: ajakhotia/infraCommons/.github/actions/cmake-find-package@main
+        with:
+          library-name: ${{ matrix.library-name }}
+          prefix-path: /opt/robotFarm
+          image-name: |
+            ${{ format('{0}/{1}/{2}', github.repository, matrix.os_base, matrix.toolchain )}}
+          password: ${{ secrets.GITHUB_TOKEN }}
