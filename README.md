@@ -79,7 +79,7 @@ Status` section for the list of supported libraries.
 # 🛠️ Setup
 
 **The following instructions have been tested on Ubuntu 22.04 and Ubuntu 24.04.
-Read the docker/robotFarm-ubuntu.dockerfile for details.**
+Read the docker/ubuntu.dockerfile for details.**
 
 ## 🔧 Install tools
 
