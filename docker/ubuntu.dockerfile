@@ -23,12 +23,14 @@ RUN --mount=type=bind,src=tools,dst=/tools,ro                                   
     apt-get update &&                                                                               \
     apt-get full-upgrade -y --no-install-recommends &&                                              \
     apt-get install -y --no-install-recommends jq &&                                                \
-    apt-get install -y --no-install-recommends $(bash /tools/apt/extractDependencies.sh Basics) &&  \
+    apt-get install -y --no-install-recommends                                                      \
+      $(bash /tools/apt/extractDependencies.sh Basics) &&                                           \
     bash /tools/installCMake.sh &&                                                                  \
     bash /tools/apt/addGNUSources.sh -y &&                                                          \
     bash /tools/apt/addLLVMSources.sh -y &&                                                         \
     bash /tools/apt/addNvidiaSources.sh -y &&                                                       \
-    apt-get install -y --no-install-recommends $(bash /tools/apt/extractDependencies.sh Compilers)
+    apt-get install -y --no-install-recommends                                                      \
+      $(bash /tools/apt/extractDependencies.sh Compilers)
 
 
 FROM base AS build
@@ -49,21 +51,17 @@ RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                           
       -DCMAKE_INSTALL_DO_STRIP=ON                                                                   \
       ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}} &&                             \
     apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends $(cat /tmp/robotFarm-build/systemDependencies.txt) &&\
+    apt-get install -y --no-install-recommends                                                      \
+      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                         \
     cmake --build /tmp/robotFarm-build
 
 
-FROM ${OS_BASE} AS deploy
-ENV DEBIAN_FRONTEND=noninteractive
-SHELL ["/bin/bash","-o","pipefail","-c"]
-
-RUN echo -e 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*\npath-exclude /usr/share/locale/*\npath-exclude /usr/share/info/*' \
-  > /etc/dpkg/dpkg.cfg.d/01_nodoc
+FROM base AS deploy
 
 COPY --from=build /opt/robotFarm /opt/robotFarm
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked                                         \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked                                     \
     apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends $(cat /opt/robotFarm/systemDependencies.txt) &&      \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends --fix-missing                                        \
+      $(cat /opt/robotFarm/systemDependencies.txt)
