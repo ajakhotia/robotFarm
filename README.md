@@ -210,26 +210,6 @@ cmake --build ${BUILD_TREE}
 
 # 🧑‍💻 Developer notes:
 
-## Generate validation workflows for GitHub.
-
-#### Ubuntu:22.04
-
-```shell
-python3 ./.github/workflows/generate_library_validation_workflows.py \
-     --library absl,AMD,Boost,CAMD,CapnProto,CCOLAMD,Ceres,CHOLMOD,COLAMD,Eigen3,flatbuffers,Gflags,Glog,GTest,nlohmann_json,oatpp,oatpp-websocket,OGRE,OpenCV,protobuf,Python3,spdlog,SPQR,SuiteSparse_config,VTK \
-     --os-base ubuntu:22.04 \
-     --toolchain linux-gnu-12,linux-clang-19,linux-gnu-default
-```
-
-#### Ubuntu:24.04
-
-```shell
-python3 ./.github/workflows/generate_library_validation_workflows.py \
-     --library absl,AMD,Boost,CAMD,CapnProto,CCOLAMD,Ceres,CHOLMOD,COLAMD,Eigen3,flatbuffers,Gflags,Glog,GTest,nlohmann_json,oatpp,oatpp-websocket,OGRE,OpenCV,protobuf,Python3,spdlog,SPQR,SuiteSparse_config,VTK \
-     --os-base ubuntu:24.04 \
-     --toolchain linux-gnu-14,linux-clang-19,linux-gnu-default
-```
-
 ## Python 3
 
 robotFarm can build Python 3 from source if needed. By default, the build uses
