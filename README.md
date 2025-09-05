@@ -159,7 +159,11 @@ cmake                                                                           
 NOTE:
 
 - Using `-G Ninja` is optional but recommended for faster builds.
-- Choose the appropriate toolchain file for your needs.
+- Choose the appropriate toolchain file for your needs. Here are some that are
+  supported out-of-the-box:
+  - linux-clang-19.cmake
+  - linux-gnu-14.cmake 
+  - linux-gnu-default.cmake
 - If you want to build only a subset of the available libraries, add the
   following line to the configuration command
   - `-DROBOT_FARM_REQUESTED_BUILD_LIST:STRING=<lib1>;<lib2>;<lib3>;...`
