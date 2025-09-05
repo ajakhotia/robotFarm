@@ -29,6 +29,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           target-stage: base
           target-stage-id: base
+          cache-type: registry
           build-name: ${{ matrix.os_base }}
           build-args: |
             OS_BASE=${{ matrix.os_base }}
@@ -59,6 +60,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           target-stage: build
           target-stage-id: build
+          cache-type: registry
           build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}
           build-args: |
             OS_BASE=${{ matrix.os_base }}
@@ -72,6 +74,7 @@ jobs:
           target-stage: deploy
           target-stage-id: deploy
           upstream-stage-id: build
+          cache-type: registry
           build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}
           build-args: |
             OS_BASE=${{ matrix.os_base }}
