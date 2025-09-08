@@ -86,6 +86,7 @@ RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                           
     cmake -G Ninja                                                                                  \
       -S /tmp/robotFarm-src                                                                         \
       -B /tmp/robotFarm-build                                                                       \
+      -U *                                                                                          \
       -DCMAKE_BUILD_TYPE=Release                                                                    \
       -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                         \
       -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake                 \
