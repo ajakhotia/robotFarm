@@ -104,12 +104,4 @@ RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                           
     --mount=type=cache,target=/tmp/robotFarm-build,id=${ROBOTFARM_BUILD_TREE_ID}                    \
     cmake --build /tmp/robotFarm-build
 
-FROM base AS deploy
-
-COPY --from=build /opt/robotFarm /opt/robotFarm
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends --fix-missing                                        \
-      $(cat /opt/robotFarm/systemDependencies.txt)
+FROM build AS deploy
