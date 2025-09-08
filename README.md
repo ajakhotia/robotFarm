@@ -118,7 +118,8 @@ sudo bash tools/installCMake.sh
 Install basic build tools:
 
 ```shell
-sudo apt-get install -y --no-install-recommends $(sh tools/apt/extractDependencies.sh Basics)
+sudo apt-get install -y --no-install-recommends \
+  $(sh tools/apt/extractDependencies.sh Basics systemDependencies.json)
 ```
 
 Set up apt-sources for the latest compilers / toolchains. Prefer to skip this if
@@ -136,7 +137,8 @@ yourself if you are skipping the commands below.
 sudo bash tools/apt/addGNUSources.sh -y
 sudo bash tools/apt/addLLVMSources.sh -y
 sudo bash tools/apt/addNvidiaSources.sh -y
-sudo apt-get update && apt-get install -y --no-install-recommends $(sh tools/apt/extractDependencies.sh Compilers)
+sudo apt-get update && apt-get install -y --no-install-recommends \
+  $(sh tools/apt/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
 ## 🧑‍💻 Compile
