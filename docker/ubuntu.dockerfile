@@ -100,7 +100,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
       $(cat /tmp/robotFarm-build/systemDependencies.txt)
 
 RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
-    --mount=type=cache,target=/tmp/robotFarm-build,id=${BUILD_TREE_ID}                              \
+    --mount=type=cache,target=/tmp/robotFarm-build,id=${ROBOTFARM_BUILD_TREE_ID}                    \
     cmake --build /tmp/robotFarm-build
 
 FROM base AS deploy
