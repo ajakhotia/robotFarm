@@ -99,9 +99,8 @@ OS_KEY="${OS_ID}:${OS_VERSION}"
 
 # Ensure the group exists
 if ! jq -e --arg GRP "${GROUP_NAME}" '.groups[] | select(.group == $GRP)' "${DEPENDENCIES_JSON_PATH}" > /dev/null; then
-  printf 'Error: group "%s" not found. Available groups:\n' "${GROUP_NAME}" >&2
-  jq -r '.groups[].group' "${DEPENDENCIES_JSON_PATH}" >&2
-  exit ${EX_DATAERR}
+  printf 'No system dependencies specified for "%s".\n' "${GROUP_NAME}" >&2
+  exit ${EX_OK}
 fi
 
 # Exact lookup
