@@ -77,30 +77,22 @@ FROM base AS build
 ARG BUILD_LIST
 ARG TOOLCHAIN=linux-gnu-12
 
-ENV ROBOTFARM_BUILD_TREE_ID=robotfarm-build-${OS_BASE}-${TOOLCHAIN}
-
 RUN cmake -E make_directory /opt/robotFarm
-
-RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
-    --mount=type=cache,target=/tmp/robotFarm-build,id=${ROBOTFARM_BUILD_TREE_ID}                    \
-    cmake -G Ninja                                                                                  \
-      -S /tmp/robotFarm-src                                                                         \
-      -B /tmp/robotFarm-build                                                                       \
-      -U *                                                                                          \
-      -DCMAKE_BUILD_TYPE=Release                                                                    \
-      -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                         \
-      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake                 \
-      ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=cache,target=/tmp/robotFarm-build,id=${ROBOTFARM_BUILD_TREE_ID}                    \
+    --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
+    --mount=type=tmpfs,target=/tmp/robotFarm-build                                                  \
+    cmake -G Ninja                                                                                  \
+      -S /tmp/robotFarm-src                                                                         \
+      -B /tmp/robotFarm-build                                                                       \
+      -DCMAKE_BUILD_TYPE=Release                                                                    \
+      -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                         \
+      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake                 \
+      ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}} &&                             \
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends                                                      \
-      $(cat /tmp/robotFarm-build/systemDependencies.txt)
-
-RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
-    --mount=type=cache,target=/tmp/robotFarm-build,id=${ROBOTFARM_BUILD_TREE_ID}                    \
+      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                         \
     cmake --build /tmp/robotFarm-build
 
 FROM build AS deploy
