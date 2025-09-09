@@ -70,7 +70,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro               \
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends                                                      \
-      $(bash /tmp/tools/extractDependencies.sh Compilers /tmp/systemDependencies.json)
+      $(sh /tmp/tools/extractDependencies.sh Compilers /tmp/systemDependencies.json)
 
 
 FROM base AS build
@@ -90,7 +90,6 @@ RUN --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                           
       -DCMAKE_BUILD_TYPE=Release                                                                    \
       -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                         \
       -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake                 \
-      -DCMAKE_INSTALL_DO_STRIP=ON                                                                   \
       ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
