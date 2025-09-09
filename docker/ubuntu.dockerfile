@@ -82,7 +82,6 @@ RUN cmake -E make_directory /opt/robotFarm
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
     --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
-    --mount=type=tmpfs,target=/tmp/robotFarm-build                                                  \
     cmake -G Ninja                                                                                  \
       -S /tmp/robotFarm-src                                                                         \
       -B /tmp/robotFarm-build                                                                       \
@@ -93,6 +92,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends                                                      \
       $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                         \
-    cmake --build /tmp/robotFarm-build
+    cmake --build /tmp/robotFarm-build &&                                                           \
+    rm -rf /tmp/robotFarm-build
 
 FROM build AS deploy
