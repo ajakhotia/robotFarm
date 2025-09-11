@@ -132,3 +132,17 @@ jobs:
           image-name: |
             ${{ format('{0}/{1}/{2}/deploy', github.repository, matrix.os_base, matrix.toolchain )}}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+  aggregate-find-libraries:
+    name: all find-libraries
+    if: always()
+    needs: [ find-libraries ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any matrix job failed
+        run: |
+          echo "find-libraries result: ${{ needs.find-libraries.result }}"
+          if [ "${{ needs.find-libraries.result }}" != "success" ]; then
+            echo "One or more find-libraries matrix runs failed."
+            exit 1
+          fi
