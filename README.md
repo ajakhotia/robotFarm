@@ -44,32 +44,6 @@ features and optimizations, ensuring reproducible and up-to-date builds.
 - SuiteSparse_config
 - VTK
 
-# Table of contents:
-
-<!-- TOC -->
-* [🚜 robotFarm](#-robotfarm)
-* [🌱 Why use robotFarm?](#-why-use-robotfarm)
-* [📚 Supported libraries](#-supported-libraries)
-* [Table of contents:](#table-of-contents)
-* [⚡ Quick Start](#-quick-start)
-  * [🐳 Prebuilt Docker images](#-prebuilt-docker-images)
-  * [🐳🧑‍💻 Build your own Docker image](#-build-your-own-docker-image)
-  * [🧑‍💻 Build from source](#-build-from-source)
-* [🛠️ Setup](#-setup)
-  * [📂 Clone](#-clone)
-      * [SOURCE_DIR](#source_dir)
-      * [BUILD_DIR](#build_dir)
-      * [INSTALL_DIR](#install_dir)
-  * [🔧 Install tools](#-install-tools)
-  * [🧑‍💻 Compile](#-compile)
-    * [⚙️ Configure robotFarm](#-configure-robotfarm)
-    * [📦 Install system dependencies](#-install-system-dependencies)
-    * [🏭 Build robotFarm](#-build-robotfarm)
-* [🧑‍💻 Developer notes:](#-developer-notes)
-  * [Python 3](#python-3)
-  * [OpenCV](#opencv)
-<!-- TOC -->
-
 # ⚡ Quick Start
 
 You can find detailed instructions in the [Setup](#-Setup) section, but here are
