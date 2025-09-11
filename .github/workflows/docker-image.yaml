@@ -134,7 +134,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
   aggregate-find-libraries:
-    name: all find-libraries
+    name: aggregate-find-libraries
     if: always()
     needs: [ find-libraries ]
     runs-on: ubuntu-latest
