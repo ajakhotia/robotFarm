@@ -8,7 +8,7 @@ dependencies, and highlights which prerequisites should be installed through the
 OS package manager. Each library is configured to enable the broadest set of
 features and optimizations, ensuring reproducible and up-to-date builds.
 
-# 🌱 Why use robotFarm?
+## 🌱 Why use robotFarm?
 
 * **Up-to-date & flexible**: get the latest stable versions or select specific
   versions via CMake command-line parameters.
@@ -16,7 +16,7 @@ features and optimizations, ensuring reproducible and up-to-date builds.
 * **Optimized & consistent**: each library’s config is documented, and builds
   enable maximum features by default for high downstream performance.
 
-# 📚 Supported libraries
+## 📚 Supported libraries
 
 - absl
 - AMD
@@ -44,12 +44,12 @@ features and optimizations, ensuring reproducible and up-to-date builds.
 - SuiteSparse_config
 - VTK
 
-# ⚡ Quick Start
+## ⚡ Quick Start
 
 You can find detailed instructions in the [Setup](#-Setup) section, but here are
 a few quick start options for the impatient.
 
-## 🐳 Prebuilt Docker images
+### 🐳 Prebuilt Docker images
 
 Pull the CI-generated Docker image with:
 
@@ -70,7 +70,7 @@ Available CI-generated images:
 Note: These images track the `main` branch. Replace `latest` with a release tag
 or commit hash to pin a specific version.
 
-## 🐳🧑‍💻 Build your own Docker image
+### 🐳🧑‍💻 Build your own Docker image
 
 You can build your own docker image using the following command:
 
@@ -87,7 +87,7 @@ docker buildx build                                   \
   /tmp/robotFarm-src
 ```
 
-## 🧑‍💻 Build from source
+### 🧑‍💻 Build from source
 
 ```shell
 git clone https://github.com/ajakhotia/robotFarm.git /tmp/robotFarm-src
@@ -98,27 +98,20 @@ sudo apt install -y jq
 ```
 
 ```shell
-sudo apt install -y $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Basics /tmp/robotFarm-src/systemDependencies.json)
+sudo apt install -y \
+  $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Basics /tmp/robotFarm-src/systemDependencies.json)
 ```
 
 ```shell
-sudo bash /tmp/robotFarm-src/tools/installCMake.sh
-```
-
-```shell
-sudo bash /tmp/robotFarm-src/tools/apt/addGNUSources.sh -y
-```
-
-```shell
-sudo bash /tmp/robotFarm-src/tools/apt/addLLVMSources.sh -y
-```
-
-```shell
+sudo bash /tmp/robotFarm-src/tools/installCMake.sh &&             \
+sudo bash /tmp/robotFarm-src/tools/apt/addGNUSources.sh -y &&     \
+sudo bash /tmp/robotFarm-src/tools/apt/addLLVMSources.sh -y &&    \
 sudo bash /tmp/robotFarm-src/tools/apt/addNvidiaSources.sh -y
 ```
 
 ```shell
-sudo apt install -y $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Compilers /tmp/robotFarm-src/systemDependencies.json)
+sudo apt install -y \
+  $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Compilers /tmp/robotFarm-src/systemDependencies.json)
 ```
 
 ```shell
@@ -138,19 +131,19 @@ sudo apt install -y $(cat /tmp/robotFarm-build/systemDependencies.txt)
 cmake --build /tmp/robotFarm-build 
 ```
 
-# 🛠️ Setup
+## 🛠️ Setup
 
 **The following instructions have been tested on Ubuntu 22.04 and Ubuntu 24.04.
 Read the docker/ubuntu.dockerfile for details.**
 
-## 📂 Clone
+### 📂 Clone
 
 Before getting started, define three paths and ensure you have read and write
 permission for each. These paths are referenced throughout the rest of this
 document using the following tokens. Substitute your actual paths wherever these
 tokens appear.
 
-#### SOURCE_DIR
+##### SOURCE_DIR
 
 Path where you will clone the robotFarm project. This may be a temporary
 directory if you only plan to build once. Examples:
@@ -158,7 +151,7 @@ directory if you only plan to build once. Examples:
 - `"${HOME}/sandbox/robotFarm"`
 - `"/tmp/robotFarm"`
 
-#### BUILD_DIR
+##### BUILD_DIR
 
 Path where you will create the build tree. This may also be temporary if you are
 not iterating on builds. Examples:
@@ -167,7 +160,7 @@ not iterating on builds. Examples:
 - `"/tmp/robotFarm-build"`
 - `"${HOME}/sandbox/robotFarm-build"`
 
-#### INSTALL_DIR
+##### INSTALL_DIR
 
 Path where installation artifacts will be placed. Keep this directory long-term;
 it will contain executables, libraries, and supporting files. Examples:
@@ -198,7 +191,7 @@ Clone the `robotFarm` project using the following:
 git clone git@github.com:ajakhotia/robotFarm.git ${SOURCE_TREE}
 ```
 
-## 🔧 Install tools
+### 🔧 Install tools
 
 Install `jq` so that we can extract the list of system dependencies from the
 [systemDependencies.txt](https://github.com/ajakhotia/robotFarm/blob/main/tools/apt/systemDependencies.json)
@@ -247,9 +240,9 @@ sudo bash tools/apt/addNvidiaSources.sh -y
 sudo apt update && sudo apt install -y --no-install-recommends $(sh tools/apt/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
-## 🧑‍💻 Compile
+### 🧑‍💻 Compile
 
-### ⚙️ Configure robotFarm
+#### ⚙️ Configure robotFarm
 
 Use the following command to configure the build tree. This will set up
 robotFarm to build all libraries it is capable of.
@@ -297,7 +290,7 @@ NOTE:
     - SuiteSparseExternalProject
     - VTKExternalProject
 
-### 📦 Install system dependencies
+#### 📦 Install system dependencies
 
 The configure command above will generate a file named `systemDependencies.txt`
 in the build tree. This file contains a list of system dependencies that are
@@ -308,7 +301,7 @@ following command:
 sudo apt install -y --no-install-recommends $(cat ${BUILD_TREE}/systemDependencies.txt)
 ```
 
-### 🏭 Build robotFarm
+#### 🏭 Build robotFarm
 
 Use the following command to build and install the requested libraries:
 
@@ -319,16 +312,16 @@ cmake --build ${BUILD_TREE}
 * You may need to use `sudo` here if you are installing to a location that
   requires superuser privileges.
 
-# 🧑‍💻 Developer notes:
+## 🧑‍💻 Developer notes:
 
-## Python 3
+### Python 3
 
 robotFarm can build Python 3 from source if needed. By default, the build uses
 the system Python 3 and skips the source build. To force building Python3 from
 source, pass `-DROBOT_FARM_SKIP_PYTHON3:BOOL=OFF` cache argument to cmake in the
 configuration step
 
-## OpenCV
+### OpenCV
 
 - Building OpenCV with CUDA requires opencv_contrib modules because CUDA
   features depend on cudev.
