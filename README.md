@@ -143,7 +143,7 @@ permission for each. These paths are referenced throughout the rest of this
 document using the following tokens. Substitute your actual paths wherever these
 tokens appear.
 
-##### SOURCE_DIR
+#### SOURCE_DIR
 
 Path where you will clone the robotFarm project. This may be a temporary
 directory if you only plan to build once. Examples:
@@ -151,7 +151,7 @@ directory if you only plan to build once. Examples:
 - `"${HOME}/sandbox/robotFarm"`
 - `"/tmp/robotFarm"`
 
-##### BUILD_DIR
+#### BUILD_DIR
 
 Path where you will create the build tree. This may also be temporary if you are
 not iterating on builds. Examples:
@@ -160,7 +160,7 @@ not iterating on builds. Examples:
 - `"/tmp/robotFarm-build"`
 - `"${HOME}/sandbox/robotFarm-build"`
 
-##### INSTALL_DIR
+#### INSTALL_DIR
 
 Path where installation artifacts will be placed. Keep this directory long-term;
 it will contain executables, libraries, and supporting files. Examples:
