@@ -3,14 +3,36 @@ set -euo pipefail
 
 # robotFarm quickBuild.sh - Download robotFarm archive
 # Usage: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash
-# Usage with version: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- v1.0.0
-# Usage with all params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- v1.0.0 /opt/robotFarm linux-gnu-14 "Eigen3ExternalProject;OpenCVExternalProject"
+# Usage with named params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v1.0.0
+# Usage with all params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v1.0.0 --prefix /opt/robotFarm --toolchain linux-gnu-14 --build-list "Eigen3ExternalProject;OpenCVExternalProject"
 
 (
-  VERSION="${1:-main}"
-  INSTALL_PREFIX="${2:-/opt/robotFarm}"
-  TOOLCHAIN="${3:-linux-gnu-default}"
-  BUILD_LIST="${4:-}"
+  # Default values
+  VERSION="main"
+  INSTALL_PREFIX="/opt/robotFarm"
+  TOOLCHAIN="linux-gnu-default"
+  BUILD_LIST=""
+
+  # Simple argument parsing
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -v|--version) VERSION="$2"; shift 2 ;;
+      -p|--prefix) INSTALL_PREFIX="$2"; shift 2 ;;
+      -t|--toolchain) TOOLCHAIN="$2"; shift 2 ;;
+      -b|--build-list) BUILD_LIST="$2"; shift 2 ;;
+      -h|--help)
+        echo "Usage: $(basename "$0") [options]"
+        echo "Options:"
+        echo "  -v, --version VERSION      Version to download (default: main)"
+        echo "  -p, --prefix PREFIX        Install prefix (default: /opt/robotFarm)"
+        echo "  -t, --toolchain TOOLCHAIN  Toolchain to use (default: linux-gnu-default)"
+        echo "  -b, --build-list LIST      Semicolon-separated list of libraries to build (default: all)"
+        echo "  -h, --help                 Show this help message"
+        exit 0
+        ;;
+      *) echo "Unknown option: $1" >&2; exit 1 ;;
+    esac
+  done
   GITHUB_REPO="https://github.com/ajakhotia/robotFarm"
 
   TMP_DIR=$(mktemp -d)
