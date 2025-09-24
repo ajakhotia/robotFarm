@@ -89,46 +89,24 @@ docker buildx build                                   \
 
 ### 🧑‍💻 Build from source
 
-```shell
-git clone https://github.com/ajakhotia/robotFarm.git /tmp/robotFarm-src
-```
+Use the quick build script to build robotFarm from sources on your machine.
+> WARNING: Note the use of `sudo` in the following command
 
 ```shell
-sudo apt install -y jq
+curl -fsSL                                                                                    \
+  https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh | \
+  sudo bash
 ```
 
-```shell
-sudo apt install -y \
-  $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Basics /tmp/robotFarm-src/systemDependencies.json)
-```
+You can also specify the version, toolchain, and build list as follows:
 
 ```shell
-sudo bash /tmp/robotFarm-src/tools/installCMake.sh &&             \
-sudo bash /tmp/robotFarm-src/tools/apt/addGNUSources.sh -y &&     \
-sudo bash /tmp/robotFarm-src/tools/apt/addLLVMSources.sh -y &&    \
-sudo bash /tmp/robotFarm-src/tools/apt/addNvidiaSources.sh -y
-```
-
-```shell
-sudo apt install -y \
-  $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Compilers /tmp/robotFarm-src/systemDependencies.json)
-```
-
-```shell
-cmake -G Ninja                                                                                      \
-      -S /tmp/robotFarm-src                                                                         \
-      -B /tmp/robotFarm-build                                                                       \
-      -DCMAKE_BUILD_TYPE=Release                                                                    \
-      -DCMAKE_INSTALL_PREFIX=${HOME}/opt/robotFarm                                                  \
-      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/linux-gnu-default.cmake
-```
-
-```shell
-sudo apt install -y $(cat /tmp/robotFarm-build/systemDependencies.txt)
-```
-
-```shell
-cmake --build /tmp/robotFarm-build 
+curl -fsSL                                                                                    \
+  https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh | \
+  sudo bash -s --                                                                             \
+    --version v1.1.0                                                                          \
+    --toolchain linux-clang-19                                                                \
+    --build-list "GlogExternalProject"
 ```
 
 ## 🛠️ Setup
