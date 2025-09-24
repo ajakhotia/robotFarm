@@ -79,56 +79,39 @@ git clone https://github.com/ajakhotia/robotFarm.git /tmp/robotFarm-src
 ```
 
 ```shell
-docker buildx build                                   \
-  --tag robotfarm                                     \
-  --file /tmp/robotFarm-src/docker/ubuntu.dockerfile  \
-  --build-arg OS_BASE=ubuntu:24.04                    \
-  --build-arg TOOLCHAIN=linux-gnu-default             \
+docker buildx build                                                                                 \
+  --tag robotfarm                                                                                   \
+  --file /tmp/robotFarm-src/docker/ubuntu.dockerfile                                                \
+  --build-arg OS_BASE=ubuntu:24.04                                                                  \
+  --build-arg TOOLCHAIN=linux-gnu-default                                                           \
   /tmp/robotFarm-src
 ```
 
 ### 🧑‍💻 Build from source
 
-```shell
-git clone https://github.com/ajakhotia/robotFarm.git /tmp/robotFarm-src
-```
+Use the [quickBuild.sh](tools/quickBuild.sh) script to build `robotFarm` in your
+own environment. This script will download the source code, install the required
+dependencies, build and install the libraries and clean up all temporary
+artifacts — ideal for build-and-forget scenarios.
+
+> [!WARNING] Note the use of `sudo` in the following command
 
 ```shell
-sudo apt install -y jq
+curl -fsSL                                                                                          \
+  https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh |       \
+  sudo bash
 ```
 
-```shell
-sudo apt install -y \
-  $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Basics /tmp/robotFarm-src/systemDependencies.json)
-```
+You can also specify the version, toolchain, build-list, and prefix as follows:
 
 ```shell
-sudo bash /tmp/robotFarm-src/tools/installCMake.sh &&             \
-sudo bash /tmp/robotFarm-src/tools/apt/addGNUSources.sh -y &&     \
-sudo bash /tmp/robotFarm-src/tools/apt/addLLVMSources.sh -y &&    \
-sudo bash /tmp/robotFarm-src/tools/apt/addNvidiaSources.sh -y
-```
-
-```shell
-sudo apt install -y \
-  $(sh /tmp/robotFarm-src/tools/extractDependencies.sh Compilers /tmp/robotFarm-src/systemDependencies.json)
-```
-
-```shell
-cmake -G Ninja                                                                                      \
-      -S /tmp/robotFarm-src                                                                         \
-      -B /tmp/robotFarm-build                                                                       \
-      -DCMAKE_BUILD_TYPE=Release                                                                    \
-      -DCMAKE_INSTALL_PREFIX=${HOME}/opt/robotFarm                                                  \
-      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/linux-gnu-default.cmake
-```
-
-```shell
-sudo apt install -y $(cat /tmp/robotFarm-build/systemDependencies.txt)
-```
-
-```shell
-cmake --build /tmp/robotFarm-build 
+curl -fsSL                                                                                          \
+  https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh |       \
+  sudo bash -s --                                                                                   \
+    --version v1.1.0                                                                                \
+    --toolchain linux-clang-19                                                                      \
+    --prefix /tmp/robotFarm                                                                         \
+    --build-list "GlogExternalProject;GTestExternalProject;FlatBuffersExternalProject"
 ```
 
 ## 🛠️ Setup
