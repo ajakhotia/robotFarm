@@ -4,3 +4,6 @@ CMakeUserPresets.json
 
 # IDE related
 .idea
+
+# AI related
+CLAUDE.md
