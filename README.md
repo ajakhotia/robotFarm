@@ -89,7 +89,10 @@ docker buildx build                                                             
 
 ### 🧑‍💻 Build from source
 
-Use the quick build script to build robotFarm from source on your machine.
+Use the [quickBuild.sh](tools/quickBuild.sh) script to build `robotFarm` in your
+own environment. This script will download the source code, install the required
+dependencies, build and install the libraries and clean up all temporary
+artifacts — ideal for build-and-forget scenarios.
 
 > [!WARNING] Note the use of `sudo` in the following command
 
