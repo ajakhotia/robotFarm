@@ -8,26 +8,26 @@ set -euo pipefail
 (
   VERSION="${1:-main}"
   GITHUB_REPO="ajakhotia/robotFarm"
+
   TMP_DIR=$(mktemp -d)
-  SRC_DIR="${TMP_DIR}/robotFarm-src"
+  pushd "${TMP_DIR}" > /dev/null
 
-  cleanup() {
-    echo "Cleaning up ${TMP_DIR}..."
-    rm -rf "${TMP_DIR}"
-  }
+  trap 'popd > /dev/null; echo "Cleaning up ${TMP_DIR}..."; rm -rf "${TMP_DIR}"' EXIT
+  echo "Working in temporary directory: ${TMP_DIR}"
 
-  trap cleanup EXIT
+  (
+    SRC_DIR="robotFarm-src"
+    mkdir -p "${SRC_DIR}"
+    trap 'echo "Cleaning up source directory..."; rm -rf "${SRC_DIR}"' EXIT
+    echo "Downloading robotFarm ${VERSION}..."
 
-  echo "Downloading robotFarm ${VERSION}..."
+    if [[ "${VERSION}" == "main" ]]; then
+      ARCHIVE_URL="https://github.com/${GITHUB_REPO}/archive/refs/heads/main.tar.gz"
+    else
+      ARCHIVE_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
+    fi
 
-  if [[ "${VERSION}" == "main" ]]; then
-    ARCHIVE_URL="https://github.com/${GITHUB_REPO}/archive/refs/heads/main.tar.gz"
-  else
-    ARCHIVE_URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
-  fi
-
-  mkdir -p "${SRC_DIR}"
-  curl -fsSL "${ARCHIVE_URL}" | tar -xz -C "${SRC_DIR}" --strip-components=1
-
-  echo "robotFarm ${VERSION} downloaded to ${SRC_DIR}"
+    curl -fsSL "${ARCHIVE_URL}" | tar -xz -C "${SRC_DIR}" --strip-components=1
+    echo "robotFarm ${VERSION} downloaded to ${TMP_DIR}/${SRC_DIR}"
+  )
 )
