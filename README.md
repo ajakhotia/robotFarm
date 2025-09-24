@@ -193,9 +193,8 @@ git clone git@github.com:ajakhotia/robotFarm.git ${SOURCE_TREE}
 
 ### 🔧 Install tools
 
-Install `jq` so that we can extract the list of system dependencies from the
-[systemDependencies.txt](https://github.com/ajakhotia/robotFarm/blob/main/tools/apt/systemDependencies.json)
-file.
+Install `jq` so that we can extract the list of system dependencies from
+[systemDependencies.json](systemDependencies.json).
 
 ```shell
 sudo apt install -y --no-install-recommends jq
