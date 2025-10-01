@@ -49,6 +49,9 @@ features and optimizations, ensuring reproducible and up-to-date builds.
 You can find detailed instructions in the [Setup](#-Setup) section, but here are
 a few quick start options for the impatient.
 
+> If you are planning on iterating on the builds or making robotFarm the basis 
+> for your project long term, it's best to follow the [Setup](#-Setup) section.
+
 ### 🐳 Prebuilt Docker images
 
 Pull the CI-generated Docker image with:
@@ -114,10 +117,15 @@ curl -fsSL                                                                      
     --build-list "GlogExternalProject;GTestExternalProject;FlatBuffersExternalProject"
 ```
 
+See this in action in the [nioc](https://github.com/ajakhotia/nioc) project's
+[README.md](https://github.com/ajakhotia/nioc/blob/main/README.md#external-dependencies)
+and [dockerfile](https://github.com/ajakhotia/nioc/blob/5a7c06a541edee78cc013a007467f1200e44ae46/docker/ubuntu.dockerfile#L83).
+
 ## 🛠️ Setup
 
-**The following instructions have been tested on Ubuntu 22.04 and Ubuntu 24.04.
-Read the docker/ubuntu.dockerfile for details.**
+Below are the classic cmake setup instructions for building robotFarm. **These
+have been tested on Ubuntu 22.04 and Ubuntu 24.04. Follow the
+docker/ubuntu.dockerfile to see these instructions in action.**
 
 ### 📂 Clone
 
