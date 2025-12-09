@@ -60,17 +60,17 @@ set -euo pipefail
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends jq &&                                                \
     apt-get install -y --no-install-recommends                                                      \
-      "$(sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                           \
+      $(sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                            \
       Basics                                                                                        \
-      "${SOURCE_TREE}/systemDependencies.json")" &&                                                 \
+      "${SOURCE_TREE}/systemDependencies.json") &&                                                  \
     bash "${SOURCE_TREE}/tools/installCMake.sh" &&                                                  \
     bash "${SOURCE_TREE}/tools/apt/addGNUSources.sh" -y &&                                          \
     bash "${SOURCE_TREE}/tools/apt/addLLVMSources.sh" -y &&                                         \
     bash "${SOURCE_TREE}/tools/apt/addNvidiaSources.sh" -y &&                                       \
     apt-get install -y --no-install-recommends                                                      \
-      "$(sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                           \
+      $(sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                            \
       Compilers                                                                                     \
-      "${SOURCE_TREE}/systemDependencies.json")"
+      "${SOURCE_TREE}/systemDependencies.json")
 
     (
       BUILD_TREE="${TMP_DIR}/robotFarm-build"
