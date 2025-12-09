@@ -118,4 +118,4 @@ if [ -z "${VALUE}" ] || [ "${VALUE}" = "null" ]; then
 fi
 
 # Print exactly (no extra newline)
-printf '%s' ${VALUE}
+printf '%s' "${VALUE}"
