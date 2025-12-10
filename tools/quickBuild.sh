@@ -59,12 +59,16 @@ set -euo pipefail
     echo "Installing basic tools & compilers..."
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends jq &&                                                \
-    sh "${SOURCE_TREE}/tools/extractDependencies.sh" Basics "${SOURCE_TREE}/systemDependencies.json" | xargs apt-get install -y --no-install-recommends && \
+    sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                                \
+      Basics "${SOURCE_TREE}/systemDependencies.json" |                                             \
+      xargs apt-get install -y --no-install-recommends &&                                           \
     bash "${SOURCE_TREE}/tools/installCMake.sh" &&                                                  \
     bash "${SOURCE_TREE}/tools/apt/addGNUSources.sh" -y &&                                          \
     bash "${SOURCE_TREE}/tools/apt/addLLVMSources.sh" -y &&                                         \
     bash "${SOURCE_TREE}/tools/apt/addNvidiaSources.sh" -y &&                                       \
-    sh "${SOURCE_TREE}/tools/extractDependencies.sh" Compilers "${SOURCE_TREE}/systemDependencies.json" | xargs apt-get install -y --no-install-recommends
+    sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                                \
+      Compilers "${SOURCE_TREE}/systemDependencies.json" |                                          \
+      xargs apt-get install -y --no-install-recommends
 
     (
       BUILD_TREE="${TMP_DIR}/robotFarm-build"
