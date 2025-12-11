@@ -30,8 +30,8 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
     apt-get update &&                                                                               \
     apt-get full-upgrade -y --no-install-recommends &&                                              \
-    apt-get autoremove &&                                                                           \
-    apt-get autoclean
+    apt-get autoremove -y --no-install-recommends &&                                                \
+    apt-get autoclean -y --no-install-recommends
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
