@@ -59,14 +59,14 @@ set -euo pipefail
     echo "Installing basic tools & compilers..."
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends jq &&                                                \
-    sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                                \
+    sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"                          \
       Basics "${SOURCE_TREE}/systemDependencies.json" |                                             \
       xargs apt-get install -y --no-install-recommends &&                                           \
-    bash "${SOURCE_TREE}/tools/installCMake.sh" &&                                                  \
-    bash "${SOURCE_TREE}/tools/apt/addGNUSources.sh" -y &&                                          \
-    bash "${SOURCE_TREE}/tools/apt/addLLVMSources.sh" -y &&                                         \
-    bash "${SOURCE_TREE}/tools/apt/addNvidiaSources.sh" -y &&                                       \
-    sh "${SOURCE_TREE}/tools/extractDependencies.sh"                                                \
+    bash "${SOURCE_TREE}/external/infraCommons/tools/installCMake.sh" &&                            \
+    bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addGNUSources.sh" -y &&                    \
+    bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addLLVMSources.sh" -y &&                   \
+    bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addNvidiaSources.sh" -y &&                 \
+    sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"                          \
       Compilers "${SOURCE_TREE}/systemDependencies.json" |                                          \
       xargs apt-get install -y --no-install-recommends
 
@@ -76,12 +76,12 @@ set -euo pipefail
       trap 'echo "Cleaning up build tree at ${BUILD_TREE}"; rm -rf "${BUILD_TREE}"' EXIT
 
       echo "Configuring robotFarm with CMake..."
-      cmake -G Ninja                                                                                \
-        -S "${SOURCE_TREE}"                                                                         \
-        -B "${BUILD_TREE}"                                                                          \
-        -DCMAKE_BUILD_TYPE=Release                                                                  \
-        -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                  \
-        -DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/cmake/toolchains/${TOOLCHAIN}.cmake"                 \
+      cmake -G Ninja                                                                                      \
+        -S "${SOURCE_TREE}"                                                                               \
+        -B "${BUILD_TREE}"                                                                                \
+        -DCMAKE_BUILD_TYPE=Release                                                                        \
+        -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                        \
+        -DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake" \
         ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
 
       # shellcheck disable=SC2046

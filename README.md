@@ -1,4 +1,4 @@
-[![infra-congruency-check](https://github.com/ajakhotia/robotFarm/actions/workflows/infra-congruency-check.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/infra-congruency-check.yaml) [![docker-image](https://github.com/ajakhotia/robotFarm/actions/workflows/docker-image.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/docker-image.yaml)
+[![docker-image](https://github.com/ajakhotia/robotFarm/actions/workflows/docker-image.yaml/badge.svg)](https://github.com/ajakhotia/robotFarm/actions/workflows/docker-image.yaml)
 
 # 🚜 robotFarm
 
@@ -194,13 +194,13 @@ sudo apt install -y --no-install-recommends jq
 Install `cmake`. You may skip this if your OS-default cmake version is > 3.27
 
 ```shell
-sudo bash tools/installCMake.sh
+sudo bash external/infraCommons/tools/installCMake.sh
 ```
 
 Install basic build tools:
 
 ```shell
-sudo apt install -y --no-install-recommends $(sh tools/apt/extractDependencies.sh Basics systemDependencies.json)
+sudo apt install -y --no-install-recommends $(sh external/infraCommons/tools/extractDependencies.sh Basics systemDependencies.json)
 ```
 
 Set up apt-sources for the latest compilers / toolchains. Prefer to skip this if
@@ -215,19 +215,19 @@ You are responsible for installing the appropriate compilers / toolchains
 yourself if you are skipping the commands below.
 
 ```shell
-sudo bash tools/apt/addGNUSources.sh -y
+sudo bash external/infraCommons/tools/apt/addGNUSources.sh -y
 ```
 
 ```shell
-sudo bash tools/apt/addLLVMSources.sh -y
+sudo bash external/infraCommons/tools/apt/addLLVMSources.sh -y
 ```
 
 ```shell
-sudo bash tools/apt/addNvidiaSources.sh -y
+sudo bash external/infraCommons/tools/apt/addNvidiaSources.sh -y
 ```
 
 ```shell
-sudo apt update && sudo apt install -y --no-install-recommends $(sh tools/apt/extractDependencies.sh Compilers systemDependencies.json)
+sudo apt update && sudo apt install -y --no-install-recommends $(sh external/infraCommons/tools/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
 ### 🧑‍💻 Compile

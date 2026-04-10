@@ -9,6 +9,18 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24.1)
   cmake_policy(SET CMP0135 NEW)
 endif()
 
+
+#[[ Setup project level tools and external dependencies if and only if this project
+    is the top-level project. If this project has been included with-in another
+    project as a submodule, then the onus of setting up these requirement falls on that
+    top-level project. This prevent this project from overreaching when it is used as a submodule
+    in another project. ]]
+if(PROJECT_IS_TOP_LEVEL)
+  add_subdirectory(external)
+  add_subdirectory(docker)
+endif()
+
+
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Global flag to build shared libraries [Default: OFF]")
 set(BUILD_TESTING OFF CACHE BOOL "Global flag used by CTest [Default: OFF]")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Cmake build type [Default: Release]")
@@ -88,7 +100,7 @@ print_list("RobotFarm will build" ${ROBOT_FARM_BUILD_LIST})
 set(ROBOT_FARM_SYSTEM_DEPENDENCY_STR "")
 foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
   execute_process(
-      COMMAND sh tools/extractDependencies.sh ${ITEM} systemDependencies.json
+      COMMAND sh external/infraCommons/tools/extractDependencies.sh ${ITEM} systemDependencies.json
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE ITEM_DEPENDENCIES)
 
@@ -106,5 +118,3 @@ add_custom_command(
     COMMENT "Installing ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt to ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt")
 
 add_custom_target(systemDependenciesManifest ALL DEPENDS ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt)
-
-add_subdirectory(docker)

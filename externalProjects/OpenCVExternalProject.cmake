@@ -244,8 +244,6 @@ else()
         list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
             -DOPENCV_ENABLE_NONFREE:BOOL=ON
             -DOPENCV_EXTRA_MODULES_PATH:PATH=${SOURCE_DIR}/modules)
-
-        add_dependencies(OpenCVExternalProject OpenCVContribExternalProject)
     endif()
 
     externalproject_add(OpenCVExternalProject
@@ -264,3 +262,7 @@ add_dependencies(OpenCVExternalProject
     GlogExternalProject
     CeresSolverExternalProject
     OgreExternalProject)
+
+if(ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+  add_dependencies(OpenCVExternalProject OpenCVContribExternalProject)
+endif()

@@ -38,35 +38,35 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends jq
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=tools/extractDependencies.sh,dst=/tmp/tools/extractDependencies.sh,ro     \
-    --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro               \
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends                                                      \
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
+    --mount=type=bind,src=external/infraCommons/tools/extractDependencies.sh,dst=/tmp/tools/extractDependencies.sh,ro   \
+    --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro                                   \
+    apt-get update &&                                                                                                   \
+    apt-get install -y --no-install-recommends                                                                          \
       $(sh /tmp/tools/extractDependencies.sh Basics /tmp/systemDependencies.json)
 
-RUN --mount=type=bind,src=tools/installCMake.sh,dst=/tmp/tools/installCMake.sh,ro                   \
+RUN --mount=type=bind,src=external/infraCommons/tools/installCMake.sh,dst=/tmp/tools/installCMake.sh,ro                 \
     bash /tmp/tools/installCMake.sh
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=tools/apt/addGNUSources.sh,dst=/tmp/tools/apt/addGNUSources.sh,ro         \
+    --mount=type=bind,src=external/infraCommons/tools/apt/addGNUSources.sh,dst=/tmp/tools/apt/addGNUSources.sh,ro       \
     bash /tmp/tools/apt/addGNUSources.sh -y
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=tools/apt/addLLVMSources.sh,dst=/tmp/tools/apt/addLLVMSources.sh,ro       \
+    --mount=type=bind,src=external/infraCommons/tools/apt/addLLVMSources.sh,dst=/tmp/tools/apt/addLLVMSources.sh,ro     \
     bash /tmp/tools/apt/addLLVMSources.sh -y
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=tools/apt/addNvidiaSources.sh,dst=/tmp/tools/apt/addNvidiaSources.sh,ro   \
+    --mount=type=bind,src=external/infraCommons/tools/apt/addNvidiaSources.sh,dst=/tmp/tools/apt/addNvidiaSources.sh,ro \
     bash /tmp/tools/apt/addNvidiaSources.sh -y
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=tools/extractDependencies.sh,dst=/tmp/tools/extractDependencies.sh,ro     \
+    --mount=type=bind,src=external/infraCommons/tools/extractDependencies.sh,dst=/tmp/tools/extractDependencies.sh,ro   \
     --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro               \
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends                                                      \
@@ -79,20 +79,20 @@ ARG TOOLCHAIN=linux-gnu-12
 
 RUN cmake -E make_directory /opt/robotFarm
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
-    cmake -G Ninja                                                                                  \
-      -S /tmp/robotFarm-src                                                                         \
-      -B /tmp/robotFarm-build                                                                       \
-      -DCMAKE_BUILD_TYPE=Release                                                                    \
-      -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                         \
-      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/cmake/toolchains/${TOOLCHAIN}.cmake                 \
-      ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}} &&                             \
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends                                                      \
-      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                         \
-    cmake --build /tmp/robotFarm-build &&                                                           \
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                            \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                       \
+    --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                                         \
+    cmake -G Ninja                                                                                            \
+      -S /tmp/robotFarm-src                                                                                   \
+      -B /tmp/robotFarm-build                                                                                 \
+      -DCMAKE_BUILD_TYPE=Release                                                                              \
+      -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                                   \
+      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake     \
+      ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}} &&                                       \
+    apt-get update &&                                                                                         \
+    apt-get install -y --no-install-recommends                                                                \
+      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                                   \
+    cmake --build /tmp/robotFarm-build &&                                                                     \
     rm -rf /tmp/robotFarm-build
 
 FROM build AS deploy
