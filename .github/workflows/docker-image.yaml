@@ -22,15 +22,30 @@ jobs:
           - ubuntu:24.04
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: docker-login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: image-name
+        id: image-name
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base }}/base
+
       - name: base
-        uses: ajakhotia/infraCommons/.github/actions/docker-typical-build-push@main
+        uses: ./external/infraCommons/.github/actions/docker-typical-build-push
         with:
           dockerfile: docker/ubuntu.dockerfile
-          password: ${{ secrets.GITHUB_TOKEN }}
           target-stage: base
-          target-stage-id: base
-          cache-type: registry
-          build-name: ${{ matrix.os_base }}
+          image-name: ${{ steps.image-name.outputs.name }}
           build-args: |
             OS_BASE=${{ matrix.os_base }}
 
@@ -53,29 +68,46 @@ jobs:
             toolchain: linux-gnu-14
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: docker-login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build-image-name
+        id: build-image-name
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}/build
+
       - name: build
-        uses: ajakhotia/infraCommons/.github/actions/docker-typical-build-push@main
+        uses: ./external/infraCommons/.github/actions/docker-typical-build-push
         with:
           dockerfile: docker/ubuntu.dockerfile
-          password: ${{ secrets.GITHUB_TOKEN }}
           target-stage: build
-          target-stage-id: build
-          cache-type: registry
-          build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}
+          image-name: ${{ steps.build-image-name.outputs.name }}
           build-args: |
             OS_BASE=${{ matrix.os_base }}
             TOOLCHAIN=${{ matrix.toolchain }}
 
+      - name: deploy-image-name
+        id: deploy-image-name
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}/deploy
+
       - name: deploy
-        uses: ajakhotia/infraCommons/.github/actions/docker-typical-build-push@main
+        uses: ./external/infraCommons/.github/actions/docker-typical-build-push
         with:
           dockerfile: docker/ubuntu.dockerfile
-          password: ${{ secrets.GITHUB_TOKEN }}
           target-stage: deploy
-          target-stage-id: deploy
-          upstream-stage-id: build
-          cache-type: registry
-          build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}
+          image-name: ${{ steps.deploy-image-name.outputs.name }}
           build-args: |
             OS_BASE=${{ matrix.os_base }}
             TOOLCHAIN=${{ matrix.toolchain }}
@@ -124,14 +156,30 @@ jobs:
           - VTK
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: docker-login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: deploy-image-name
+        id: deploy-image-name
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base }}/${{ matrix.toolchain }}/deploy
+
       - name: find-library
-        uses: ajakhotia/infraCommons/.github/actions/cmake-find-package@main
+        uses: ./external/infraCommons/.github/actions/cmake-find-package
         with:
           library-name: ${{ matrix.library-name }}
           prefix-path: "/opt/robotFarm"
-          image-name: |
-            ${{ format('{0}/{1}/{2}/deploy', github.repository, matrix.os_base, matrix.toolchain )}}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          image-name: ${{ steps.deploy-image-name.outputs.name }}
 
   aggregate-find-libraries:
     name: aggregate-find-libraries
