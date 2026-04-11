@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
-# robotFarm quickBuild.sh - Download robotFarm archive
+# robotFarm quickBuild.sh - Build and install libraries using robotFarm quickly.
 # Usage: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash
 # Usage with named params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v1.0.0
 # Usage with all params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v1.0.0 --prefix /opt/robotFarm --toolchain linux-gnu-14 --build-list "Eigen3ExternalProject;OpenCVExternalProject"
 
 (
+  set -euo pipefail
+
   # Default values
   VERSION="main"
   INSTALL_PREFIX="/opt/robotFarm"
@@ -23,7 +23,7 @@ set -euo pipefail
       -h|--help)
         echo "Usage: $(basename "$0") [options]"
         echo "Options:"
-        echo "  -v, --version VERSION      Version to download (default: main)"
+        echo "  -v, --version VERSION      Tag or branch to check out (default: main)"
         echo "  -p, --prefix PREFIX        Install prefix (default: /opt/robotFarm)"
         echo "  -t, --toolchain TOOLCHAIN  Toolchain to use (default: linux-gnu-default)"
         echo "  -b, --build-list LIST      Semicolon-separated list of libraries to build (default: all)"
@@ -36,58 +36,51 @@ set -euo pipefail
   GITHUB_REPO="https://github.com/ajakhotia/robotFarm"
 
   TMP_DIR=$(mktemp -d)
-  pushd "${TMP_DIR}" > /dev/null
-
-  trap 'popd > /dev/null; echo "Cleaning up ${TMP_DIR}..."; rm -rf "${TMP_DIR}"' EXIT
+  trap 'echo "Cleaning up ${TMP_DIR}..."; rm -rf "${TMP_DIR}"' EXIT
   echo "Working in temporary directory: ${TMP_DIR}"
 
-  (
-    SOURCE_TREE="${TMP_DIR}/robotFarm-src"
-    mkdir -p "${SOURCE_TREE}"
-    trap 'echo "Cleaning up source tree at ${SOURCE_TREE}"; rm -rf "${SOURCE_TREE}"' EXIT
+  SOURCE_TREE="${TMP_DIR}/robotFarm-src"
+  BUILD_TREE="${TMP_DIR}/robotFarm-build"
 
-    if [[ "${VERSION}" == "main" ]]; then
-      ARCHIVE_URL="${GITHUB_REPO}/archive/refs/heads/main.tar.gz"
-    else
-      ARCHIVE_URL="${GITHUB_REPO}/archive/refs/tags/${VERSION}.tar.gz"
-    fi
+  echo "Installing prerequisites for shallow checkout..."
+  apt-get update
+  apt-get install -y --no-install-recommends ca-certificates git jq
 
-    echo "Downloading robotFarm from ${ARCHIVE_URL}"
-    curl -fsSL "${ARCHIVE_URL}" | tar -xz -C "${SOURCE_TREE}" --strip-components=1
-    echo "robotFarm ${VERSION} downloaded to ${SOURCE_TREE}"
+  echo "Shallow-cloning robotFarm ${VERSION} from ${GITHUB_REPO}"
+  git clone --depth 1 --branch "${VERSION}" "${GITHUB_REPO}.git" "${SOURCE_TREE}"
 
-    echo "Installing basic tools & compilers..."
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends jq &&                                                \
-    sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"                          \
-      Basics "${SOURCE_TREE}/systemDependencies.json" |                                             \
-      xargs apt-get install -y --no-install-recommends &&                                           \
-    bash "${SOURCE_TREE}/external/infraCommons/tools/installCMake.sh" &&                            \
-    bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addGNUSources.sh" -y &&                    \
-    bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addLLVMSources.sh" -y &&                   \
-    bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addNvidiaSources.sh" -y &&                 \
-    sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"                          \
-      Compilers "${SOURCE_TREE}/systemDependencies.json" |                                          \
-      xargs apt-get install -y --no-install-recommends
+  echo "Shallow-fetching top-level submodules (no recursion)"
+  git -C "${SOURCE_TREE}" submodule update --init --depth 1
+  echo "robotFarm ${VERSION} checked out to ${SOURCE_TREE}"
 
-    (
-      BUILD_TREE="${TMP_DIR}/robotFarm-build"
-      mkdir -p "${BUILD_TREE}"
-      trap 'echo "Cleaning up build tree at ${BUILD_TREE}"; rm -rf "${BUILD_TREE}"' EXIT
+  echo "Installing basic tools & compilers..."
 
-      echo "Configuring robotFarm with CMake..."
-      cmake -G Ninja                                                                                      \
-        -S "${SOURCE_TREE}"                                                                               \
-        -B "${BUILD_TREE}"                                                                                \
-        -DCMAKE_BUILD_TYPE=Release                                                                        \
-        -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                        \
-        -DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake" \
-        ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
+  sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"        \
+      Basics "${SOURCE_TREE}/systemDependencies.json"                           \
+      | xargs -r apt-get install -y --no-install-recommends
 
-      # shellcheck disable=SC2046
-      apt-get install -y --no-install-recommends $(cat "${BUILD_TREE}/systemDependencies.txt")
+  bash "${SOURCE_TREE}/external/infraCommons/tools/installCMake.sh"
+  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addGNUSources.sh" -y
+  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addLLVMSources.sh" -y
+  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addNvidiaSources.sh" -y
 
-      cmake --build "${BUILD_TREE}"
-    )
-  )
+  sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"        \
+      Compilers "${SOURCE_TREE}/systemDependencies.json"                        \
+      | xargs -r apt-get install -y --no-install-recommends
+
+  mkdir -p "${BUILD_TREE}"
+
+  echo "Configuring robotFarm with CMake..."
+  cmake -G Ninja                                                                                      \
+    -S "${SOURCE_TREE}"                                                                               \
+    -B "${BUILD_TREE}"                                                                                \
+    -DCMAKE_BUILD_TYPE=Release                                                                        \
+    -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                        \
+    -DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake" \
+    ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
+
+  # shellcheck disable=SC2046
+  apt-get install -y --no-install-recommends $(cat "${BUILD_TREE}/systemDependencies.txt")
+
+  cmake --build "${BUILD_TREE}"
 )
