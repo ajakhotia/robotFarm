@@ -1,4 +1,4 @@
 [submodule "external/infraCommons"]
 	path = external/infraCommons
-	url = git@github.com:ajakhotia/infraCommons.git
+	url = https://github.com/ajakhotia/infraCommons.git
 	branch = main
