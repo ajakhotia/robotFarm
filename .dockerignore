@@ -1,8 +1,13 @@
 *build*
+.claude
 .dockerignore
+.editorconfig
 .git
 .github
+.gitignore
+.gitmodules
 .idea
+CLAUDE.md
 docker/*.dockerfile
 LICENSE
 README.md
