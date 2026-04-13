@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # robotFarm quickBuild.sh - Build and install libraries using robotFarm quickly.
-# Usage: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash
-# Usage with named params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v1.0.0
-# Usage with all params: curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v1.0.0 --prefix /opt/robotFarm --toolchain linux-gnu-14 --build-list "Eigen3ExternalProject;OpenCVExternalProject"
+# Usage:
+#   curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash
+# Usage with named params:
+#   curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v2.0.0
+# Usage with all params:
+#   curl -sSL https://raw.githubusercontent.com/ajakhotia/robotFarm/main/tools/quickBuild.sh | bash -s -- --version v2.0.0 --prefix /opt/robotFarm --toolchain linux-gnu-14 --build-list "Eigen3ExternalProject;OpenCVExternalProject"
 
 (
   set -euo pipefail
