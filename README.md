@@ -111,7 +111,7 @@ You can also specify the version, toolchain, build-list, and prefix as follows:
 curl -fsSL                                                                                          \
   https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh |       \
   sudo bash -s --                                                                                   \
-    --version v1.1.0                                                                                \
+    --version v2.0.0                                                                                \
     --toolchain linux-clang-19                                                                      \
     --prefix /tmp/robotFarm                                                                         \
     --build-list "GlogExternalProject;GTestExternalProject;FlatBuffersExternalProject"
