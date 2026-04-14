@@ -60,6 +60,23 @@ jobs:
             OS_BASE=${{ matrix.os_base }}
 
 
+  aggregate-base-stage:
+    name: aggregate-base-stage
+    if: always()
+    needs: [base-stage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: aggregate
+        uses: ./external/infraCommons/.github/actions/matrix-aggregate
+        with:
+          result: ${{ needs.base-stage.result }}
+
+
   build-deploy-stages:
     needs: base-stage
     runs-on: self-hosted
@@ -132,6 +149,24 @@ jobs:
             OS_BASE=${{ matrix.os_base }}
             TOOLCHAIN=${{ matrix.toolchain }}
 
+
+  aggregate-build-deploy-stages:
+    name: aggregate-build-deploy-stages
+    if: always()
+    needs: [build-deploy-stages]
+    runs-on: ubuntu-latest
+    steps:
+      - name: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: aggregate
+        uses: ./external/infraCommons/.github/actions/matrix-aggregate
+        with:
+          result: ${{ needs.build-deploy-stages.result }}
+
+
   find-libraries:
     needs: build-deploy-stages
     runs-on: ubuntu-latest
@@ -201,16 +236,19 @@ jobs:
           prefix-path: "/opt/robotFarm"
           image-name: ${{ steps.deploy-image-name.outputs.name }}
 
+
   aggregate-find-libraries:
     name: aggregate-find-libraries
     if: always()
-    needs: [ find-libraries ]
+    needs: [find-libraries]
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if any matrix job failed
-        run: |
-          echo "find-libraries result: ${{ needs.find-libraries.result }}"
-          if [ "${{ needs.find-libraries.result }}" != "success" ]; then
-            echo "One or more find-libraries matrix runs failed."
-            exit 1
-          fi
+      - name: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: aggregate
+        uses: ./external/infraCommons/.github/actions/matrix-aggregate
+        with:
+          result: ${{ needs.find-libraries.result }}
