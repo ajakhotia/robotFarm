@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os_base:
-          - ubuntu:22.04
-          - ubuntu:24.04
+          - ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
+          - ghcr.io/ajakhotia/infracommons/weekly/ubuntu:24.04
 
     steps:
       - name: self-checkout
@@ -67,14 +67,14 @@ jobs:
       fail-fast: false
       matrix:
         os_base:
-          - ubuntu:22.04
-          - ubuntu:24.04
+          - ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
+          - ghcr.io/ajakhotia/infracommons/weekly/ubuntu:24.04
         toolchain:
           - linux-clang-19
           - linux-gnu-14
           - linux-gnu-default
         exclude:
-          - os_base: "ubuntu:22.04"
+          - os_base: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
             toolchain: linux-gnu-14
 
     steps:
@@ -139,14 +139,14 @@ jobs:
       fail-fast: false
       matrix:
         os_base:
-          - ubuntu:22.04
-          - ubuntu:24.04
+          - ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
+          - ghcr.io/ajakhotia/infracommons/weekly/ubuntu:24.04
         toolchain:
           - linux-clang-19
           - linux-gnu-14
           - linux-gnu-default
         exclude:
-          - os_base: "ubuntu:22.04"
+          - os_base: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
             toolchain: linux-gnu-14
         library-name:
           - absl
