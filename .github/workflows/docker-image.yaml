@@ -60,6 +60,7 @@ jobs:
         with:
           dockerfile: docker/ubuntu.dockerfile
           target-stage: base
+          cache-backend: registry
           image-name: ${{ steps.image-name-base.outputs.name }}
           shared-cache-to: ${{ steps.job-cache-base.outputs.name }}:cache
           build-args: |
@@ -142,6 +143,7 @@ jobs:
         with:
           dockerfile: docker/ubuntu.dockerfile
           target-stage: build
+          cache-backend: registry
           image-name: ${{ steps.image-name-build.outputs.name }}
           shared-cache-from: ${{ steps.job-cache-base.outputs.name }}:cache
           build-args: |
@@ -160,6 +162,7 @@ jobs:
         with:
           dockerfile: docker/ubuntu.dockerfile
           target-stage: deploy
+          cache-backend: registry
           image-name: ${{ steps.image-name-deploy.outputs.name }}
           build-args: |
             OS_BASE=${{ matrix.os_base.image }}
