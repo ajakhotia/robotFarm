@@ -249,6 +249,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: docker-metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v6
+        with:
+          tags: |
+            type=sha,format=long
+
       - name: image-name-deploy
         id: image-name-deploy
         uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
@@ -261,7 +268,7 @@ jobs:
         with:
           library-name: ${{ matrix.library-name }}
           prefix-path: "/opt/robotFarm"
-          image-name: ${{ steps.image-name-deploy.outputs.name }}
+          image-name: ${{ steps.image-name-deploy.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
 
 
   aggregate-find-library:
