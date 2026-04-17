@@ -124,6 +124,9 @@ jobs:
       - name: setup-buildx
         id: setup-buildx
         uses: docker/setup-buildx-action@v4
+        with:
+          name: robotfarm-buildx
+          keep-state: true
 
       - name: job-cache-base
         id: job-cache-base
