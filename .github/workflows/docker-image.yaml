@@ -60,6 +60,7 @@ jobs:
         with:
           dockerfile: docker/ubuntu.dockerfile
           target-stage: base
+          cache-backend: registry
           image-name: ${{ steps.image-name-base.outputs.name }}
           shared-cache-to: ${{ steps.job-cache-base.outputs.name }}:cache
           build-args: |
@@ -142,6 +143,7 @@ jobs:
         with:
           dockerfile: docker/ubuntu.dockerfile
           target-stage: build
+          cache-backend: registry
           image-name: ${{ steps.image-name-build.outputs.name }}
           shared-cache-from: ${{ steps.job-cache-base.outputs.name }}:cache
           build-args: |
@@ -160,6 +162,7 @@ jobs:
         with:
           dockerfile: docker/ubuntu.dockerfile
           target-stage: deploy
+          cache-backend: registry
           image-name: ${{ steps.image-name-deploy.outputs.name }}
           build-args: |
             OS_BASE=${{ matrix.os_base.image }}
@@ -246,6 +249,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: docker-metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v6
+        with:
+          tags: |
+            type=sha,format=long
+
       - name: image-name-deploy
         id: image-name-deploy
         uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
@@ -258,7 +268,7 @@ jobs:
         with:
           library-name: ${{ matrix.library-name }}
           prefix-path: "/opt/robotFarm"
-          image-name: ${{ steps.image-name-deploy.outputs.name }}
+          image-name: ${{ steps.image-name-deploy.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
 
 
   aggregate-find-library:
