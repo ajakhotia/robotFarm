@@ -72,8 +72,4 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get install -y --no-install-recommends                                                      \
       $(sh /tmp/tools/extractDependencies.sh Compilers /tmp/systemDependencies.json)
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends ccache zstd
 

@@ -294,11 +294,15 @@ jobs:
           prefix-path: /opt/robotFarm
           volumes: |
             ${{ runner.temp }}/artifact:/tmp/artifact:ro
+            ${{ github.workspace }}/systemDependencies.json:/tmp/systemDependencies.json:ro
+            ${{ github.workspace }}/external/infraCommons/tools/extractDependencies.sh:/tmp/extractDependencies.sh:ro
           pre-check: |
             set -euo pipefail
             export DEBIAN_FRONTEND=noninteractive
             apt-get update
-            apt-get install -y --no-install-recommends cmake build-essential zstd
+            apt-get install -y --no-install-recommends jq
+            apt-get install -y --no-install-recommends \
+              $(sh /tmp/extractDependencies.sh Basics /tmp/systemDependencies.json)
             tar --zstd -C /opt -xf /tmp/artifact/robotFarm-*.tar.zst
             apt-get install -y --no-install-recommends \
               $(cat /opt/robotFarm/systemDependencies.txt)
