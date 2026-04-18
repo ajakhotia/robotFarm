@@ -26,14 +26,16 @@ set(BUILD_TESTING OFF CACHE BOOL "Global flag used by CTest [Default: OFF]")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Cmake build type [Default: Release]")
 
 set(ROBOT_FARM_FORWARDED_CMAKE_ARGS
-    -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
-    -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
-    -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
-    -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
-    -DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-    -DBUILD_TESTING:BOOL=${BUILD_TESTING})
+  -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
+  -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
+  -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
+  -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
+  -DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.50
+  -DCMAKE_INSTALL_RPATH:STRING=$ORIGIN
+  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON
+  -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+  -DBUILD_TESTING:BOOL=${BUILD_TESTING})
 
 if(CMAKE_BUILD_TYPE)
   list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
@@ -53,27 +55,27 @@ endif()
 list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_PREFIX_PATH:STRING="${PREFIX_PATH}")
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
-    AbseilExternalProject
-    BoostExternalProject
-    CapnprotoExternalProject
-    CeresSolverExternalProject
-    Eigen3ExternalProject
-    FlatBuffersExternalProject
-    GFlagsExternalProject
-    GlogExternalProject
-    GoogleTestExternalProject
-    NlohmannJsonExternalProject
-    OatppExternalProject
-    OatppWebSocketExternalProject
-    OgreExternalProject
-    OpenCVExternalProject
-    ProtobufExternalProject
-    Python3ExternalProject
-    SpdLogExternalProject
-    SuiteSparseExternalProject
-    VTKExternalProject
-    CACHE STRING
-    "Semi-colon separated list of projects requested by the user. Default includes all")
+  AbseilExternalProject
+  BoostExternalProject
+  CapnprotoExternalProject
+  CeresSolverExternalProject
+  Eigen3ExternalProject
+  FlatBuffersExternalProject
+  GFlagsExternalProject
+  GlogExternalProject
+  GoogleTestExternalProject
+  NlohmannJsonExternalProject
+  OatppExternalProject
+  OatppWebSocketExternalProject
+  OgreExternalProject
+  OpenCVExternalProject
+  ProtobufExternalProject
+  Python3ExternalProject
+  SpdLogExternalProject
+  SuiteSparseExternalProject
+  VTKExternalProject
+  CACHE STRING
+  "Semi-colon separated list of projects requested by the user. Default includes all")
 
 set(ROBOT_FARM_BUILD_LIST "")
 
@@ -100,9 +102,9 @@ print_list("RobotFarm will build" ${ROBOT_FARM_BUILD_LIST})
 set(ROBOT_FARM_SYSTEM_DEPENDENCY_STR "")
 foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
   execute_process(
-      COMMAND sh external/infraCommons/tools/extractDependencies.sh ${ITEM} systemDependencies.json
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE ITEM_DEPENDENCIES)
+    COMMAND sh external/infraCommons/tools/extractDependencies.sh ${ITEM} systemDependencies.json
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE ITEM_DEPENDENCIES)
 
   if(ITEM_DEPENDENCIES)
     string(APPEND ROBOT_FARM_SYSTEM_DEPENDENCY_STR " " ${ITEM_DEPENDENCIES})
@@ -112,9 +114,9 @@ endforeach()
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt "${ROBOT_FARM_SYSTEM_DEPENDENCY_STR}")
 
 add_custom_command(
-    OUTPUT ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt
-    COMMENT "Installing ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt to ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt")
+  OUTPUT ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt
+  COMMENT "Installing ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt to ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt")
 
 add_custom_target(systemDependenciesManifest ALL DEPENDS ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt)
