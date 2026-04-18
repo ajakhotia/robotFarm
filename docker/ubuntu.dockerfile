@@ -72,27 +72,8 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get install -y --no-install-recommends                                                      \
       $(sh /tmp/tools/extractDependencies.sh Compilers /tmp/systemDependencies.json)
 
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
+    apt-get update &&                                                                               \
+    apt-get install -y --no-install-recommends ccache zstd
 
-FROM base AS build
-ARG BUILD_LIST
-ARG TOOLCHAIN=linux-gnu-12
-
-RUN cmake -E make_directory /opt/robotFarm
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                            \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                       \
-    --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                                         \
-    cmake -G Ninja                                                                                            \
-      -S /tmp/robotFarm-src                                                                                   \
-      -B /tmp/robotFarm-build                                                                                 \
-      -DCMAKE_BUILD_TYPE=Release                                                                              \
-      -DCMAKE_INSTALL_PREFIX=/opt/robotFarm                                                                   \
-      -DCMAKE_TOOLCHAIN_FILE=/tmp/robotFarm-src/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake     \
-      ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}} &&                                       \
-    apt-get update &&                                                                                         \
-    apt-get install -y --no-install-recommends                                                                \
-      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                                   \
-    cmake --build /tmp/robotFarm-build &&                                                                     \
-    rm -rf /tmp/robotFarm-build
-
-FROM build AS deploy
