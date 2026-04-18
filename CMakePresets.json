@@ -44,9 +44,9 @@
             "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-default.cmake"
         },
         {
-            "name": "clang-22",
+            "name": "clang-21",
             "hidden": true,
-            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-22.cmake"
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-21.cmake"
         },
 
         {
@@ -86,16 +86,16 @@
             "inherits": ["base", "static", "clang-default"]
         },
         {
-            "name": "clang-22-shared",
-            "displayName": "Clang 22 Shared (CI)",
-            "description": "CI preset — Clang 22 toolchain, shared libraries",
-            "inherits": ["base", "shared", "clang-22"]
+            "name": "clang-21-shared",
+            "displayName": "Clang 21 Shared (CI)",
+            "description": "CI preset — Clang 21 toolchain, shared libraries",
+            "inherits": ["base", "shared", "clang-21"]
         },
         {
-            "name": "clang-22-static",
-            "displayName": "Clang 22 Static (CI)",
-            "description": "CI preset — Clang 22 toolchain, static libraries",
-            "inherits": ["base", "static", "clang-22"]
+            "name": "clang-21-static",
+            "displayName": "Clang 21 Static (CI)",
+            "description": "CI preset — Clang 21 toolchain, static libraries",
+            "inherits": ["base", "static", "clang-21"]
         }
     ]
 }

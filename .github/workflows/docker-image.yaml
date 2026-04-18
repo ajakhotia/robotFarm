@@ -104,8 +104,8 @@ jobs:
           - gnu-14-static
           - clang-default-shared
           - clang-default-static
-          - clang-22-shared
-          - clang-22-static
+          - clang-21-shared
+          - clang-21-static
 
     steps:
       - name: self-checkout
@@ -236,8 +236,8 @@ jobs:
           - gnu-14-static
           - clang-default-shared
           - clang-default-static
-          - clang-22-shared
-          - clang-22-static
+          - clang-21-shared
+          - clang-21-static
         library-name:
           - absl
           - AMD

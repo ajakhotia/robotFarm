@@ -1,24 +1,31 @@
-#[[ Local convenience targets for building the base image used by CI.
-    The library build itself no longer runs through `docker build` — it runs via
-    `docker run` with presets in the CI workflow (see .github/workflows/docker-image.yaml). ]]
+add_custom_target(robotFarmDockerBuildUbuntu2204
+    COMMAND
+      bash -c "docker buildx build --progress=plain                                                 \
+          --force-rm                                                                                \
+          --target base                                                                             \
+          --tag ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest                                \
+          --build-arg OS_BASE=ubuntu:22.04                                                          \
+          --file ${CMAKE_CURRENT_LIST_DIR}/ubuntu.dockerfile                                        \
+          ${robotFarm_SOURCE_DIR}"
+    WORKING_DIRECTORY
+      ${robotFarm_SOURCE_DIR}
+    COMMENT
+      "Building robotFarm base image for ubuntu 22.04"
+    VERBATIM
+    USES_TERMINAL)
 
-foreach(OS_VARIANT IN ITEMS "ubuntu-22-04;ubuntu:22.04" "ubuntu-24-04;ubuntu:24.04")
-  list(GET OS_VARIANT 0 OS_SLUG)
-  list(GET OS_VARIANT 1 OS_BASE)
-
-  add_custom_target(robotFarmDockerBuildBase_${OS_SLUG}
-      COMMAND
-        bash -c "docker buildx build --progress=plain                                           \
-            --force-rm                                                                          \
-            --target base                                                                       \
-            --tag ghcr.io/ajakhotia/robotfarm/${OS_SLUG}/base:latest                            \
-            --build-arg OS_BASE=${OS_BASE}                                                      \
-            --file ${CMAKE_CURRENT_LIST_DIR}/ubuntu.dockerfile                                  \
-            ${robotFarm_SOURCE_DIR}"
-      WORKING_DIRECTORY
-        ${robotFarm_SOURCE_DIR}
-      COMMENT
-        "Building robotFarm base image for ${OS_BASE}"
-      VERBATIM
-      USES_TERMINAL)
-endforeach()
+add_custom_target(robotFarmDockerBuildUbuntu2404
+    COMMAND
+      bash -c "docker buildx build --progress=plain                                                 \
+          --force-rm                                                                                \
+          --target base                                                                             \
+          --tag ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest                                \
+          --build-arg OS_BASE=ubuntu:24.04                                                          \
+          --file ${CMAKE_CURRENT_LIST_DIR}/ubuntu.dockerfile                                        \
+          ${robotFarm_SOURCE_DIR}"
+    WORKING_DIRECTORY
+      ${robotFarm_SOURCE_DIR}
+    COMMENT
+      "Building robotFarm base image for ubuntu 24.04"
+    VERBATIM
+    USES_TERMINAL)
