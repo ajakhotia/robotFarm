@@ -25,13 +25,20 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Global flag to build shared libraries [Def
 set(BUILD_TESTING OFF CACHE BOOL "Global flag used by CTest [Default: OFF]")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Cmake build type [Default: Release]")
 
+# In-band list separator for values forwarded through ExternalProject_Add. Each
+# call pairs this with LIST_SEPARATOR so that `|` is translated back to `;` in
+# the generated initial-cache file; values that are CMake lists must be escaped
+# with string(REPLACE ";" "|" ...) before being baked into a -D<VAR>:TYPE=...
+# entry to prevent the outer list from splitting them into stray positionals.
+set(ROBOT_FARM_LIST_SEPARATOR "|")
+
 set(ROBOT_FARM_FORWARDED_CMAKE_ARGS
   -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
   -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
   -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
   -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
   -DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.50
+  -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
   -DCMAKE_INSTALL_RPATH:STRING=$ORIGIN
   -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON
   -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
@@ -62,7 +69,8 @@ if(CMAKE_PREFIX_PATH)
   list(APPEND PREFIX_PATH ${CMAKE_PREFIX_PATH})
 endif()
 
-list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_PREFIX_PATH:STRING="${PREFIX_PATH}")
+string(REPLACE ";" "${ROBOT_FARM_LIST_SEPARATOR}" ROBOT_FARM_PREFIX_PATH_ESCAPED "${PREFIX_PATH}")
+list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_PREFIX_PATH:STRING=${ROBOT_FARM_PREFIX_PATH_ESCAPED})
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
   AbseilExternalProject
