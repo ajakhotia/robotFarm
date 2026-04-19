@@ -72,4 +72,17 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get install -y --no-install-recommends                                                      \
       $(sh /tmp/tools/extractDependencies.sh Compilers /tmp/systemDependencies.json)
 
-
+# Resolve the per-external-project system dependencies by running a bare cmake configure against
+# the source tree. The list depends only on ROBOT_FARM_BUILD_LIST and the host OS, so no toolchain
+# file, preset, or compiler launcher is needed here.
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
+    --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
+    cmake                                                                                           \
+      -S /tmp/robotFarm-src                                                                         \
+      -B /tmp/robotFarm-build                                                                       \
+      --toolchain /tmp/robotFarm-src/external/infraCommons/cmake/toolchains/linux-gnu-default.cmake && \
+    apt-get update &&                                                                               \
+    apt-get install -y --no-install-recommends                                                      \
+      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                         \
+    rm -rf /tmp/robotFarm-build

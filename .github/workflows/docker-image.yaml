@@ -169,10 +169,6 @@ jobs:
                     -DCMAKE_C_COMPILER_LAUNCHER=ccache                          \
                     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-              apt-get update
-              apt-get install -y --no-install-recommends                        \
-                $(cat /tmp/robotFarm-build/systemDependencies.txt)
-
               cmake --build   /tmp/robotFarm-build
               cmake --install /tmp/robotFarm-build
 
