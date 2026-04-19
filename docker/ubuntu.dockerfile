@@ -49,40 +49,50 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
 RUN --mount=type=bind,src=external/infraCommons/tools/installCMake.sh,dst=/tmp/tools/installCMake.sh,ro                 \
     bash /tmp/tools/installCMake.sh
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
     --mount=type=bind,src=external/infraCommons/tools/apt/addGNUSources.sh,dst=/tmp/tools/apt/addGNUSources.sh,ro       \
     bash /tmp/tools/apt/addGNUSources.sh -y
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
     --mount=type=bind,src=external/infraCommons/tools/apt/addLLVMSources.sh,dst=/tmp/tools/apt/addLLVMSources.sh,ro     \
     bash /tmp/tools/apt/addLLVMSources.sh -y
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
     --mount=type=bind,src=external/infraCommons/tools/apt/addNvidiaSources.sh,dst=/tmp/tools/apt/addNvidiaSources.sh,ro \
     bash /tmp/tools/apt/addNvidiaSources.sh -y
 
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
+# Install the compiler toolchains together with the per-external-project
+# system dependencies for every project compiled inside this image. Groups
+# without an entry in systemDependencies.json are silently skipped by the
+# script, so listing every externalProjects/*.cmake entry is safe.
+RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
+    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
     --mount=type=bind,src=external/infraCommons/tools/extractDependencies.sh,dst=/tmp/tools/extractDependencies.sh,ro   \
-    --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro               \
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends                                                      \
-      $(sh /tmp/tools/extractDependencies.sh Compilers /tmp/systemDependencies.json)
-
-# Resolve the per-external-project system dependencies by running a bare cmake configure against
-# the source tree. The list depends only on ROBOT_FARM_BUILD_LIST and the host OS, so no toolchain
-# file, preset, or compiler launcher is needed here.
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
-    --mount=type=bind,src=.,dst=/tmp/robotFarm-src,ro                                               \
-    cmake                                                                                           \
-      -S /tmp/robotFarm-src                                                                         \
-      -B /tmp/robotFarm-build                                                                       \
-      --toolchain /tmp/robotFarm-src/external/infraCommons/cmake/toolchains/linux-gnu-default.cmake && \
-    apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends                                                      \
-      $(cat /tmp/robotFarm-build/systemDependencies.txt) &&                                         \
-    rm -rf /tmp/robotFarm-build
+    --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro                                   \
+    apt-get update &&                                                                                                   \
+    apt-get install -y --no-install-recommends                                                                          \
+      $(sh /tmp/tools/extractDependencies.sh                                                                            \
+          "Compilers                                                                                                    \
+           AbseilExternalProject                                                                                        \
+           BoostExternalProject                                                                                         \
+           CapnprotoExternalProject                                                                                     \
+           CeresSolverExternalProject                                                                                   \
+           Eigen3ExternalProject                                                                                        \
+           FlatBuffersExternalProject                                                                                   \
+           GFlagsExternalProject                                                                                        \
+           GlogExternalProject                                                                                          \
+           GoogleTestExternalProject                                                                                    \
+           NlohmannJsonExternalProject                                                                                  \
+           OatppExternalProject                                                                                         \
+           OatppWebSocketExternalProject                                                                                \
+           OgreExternalProject                                                                                          \
+           OpenCVExternalProject                                                                                        \
+           ProtobufExternalProject                                                                                      \
+           Python3ExternalProject                                                                                       \
+           SpdLogExternalProject                                                                                        \
+           SuiteSparseExternalProject                                                                                   \
+           VTKExternalProject"                                                                                          \
+          /tmp/systemDependencies.json)

@@ -74,25 +74,49 @@ function(robot_farm_add_docker_compile_target)
 endfunction()
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2204GnuShared
+    TARGET_NAME dockerUbuntu2204Gnu15Shared
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
-    PRESET      release-gnu-shared
+    PRESET      gnu-15-shared
     DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2204ClangStatic
+    TARGET_NAME dockerUbuntu2204Gnu15Static
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
-    PRESET      release-clang-static
+    PRESET      gnu-15-static
     DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2404GnuShared
+    TARGET_NAME dockerUbuntu2204Clang22Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      clang-22-shared
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Clang22Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      clang-22-static
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Gnu15Shared
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
-    PRESET      release-gnu-shared
+    PRESET      gnu-15-shared
     DEPENDS     dockerUbuntu2404Image)
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2404ClangStatic
+    TARGET_NAME dockerUbuntu2404Gnu15Static
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
-    PRESET      release-clang-static
+    PRESET      gnu-15-static
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Clang22Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      clang-22-shared
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Clang22Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      clang-22-static
     DEPENDS     dockerUbuntu2404Image)
