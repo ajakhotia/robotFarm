@@ -98,10 +98,10 @@ jobs:
           - name: ubuntu:24.04
             slug: ubuntu-24-04
         preset:
+          - gnu-14-shared
+          - gnu-14-static
           - gnu-15-shared
           - gnu-15-static
-          - gnu-16-shared
-          - gnu-16-static
           - clang-22-shared
           - clang-22-static
           - clang-23-shared
@@ -226,10 +226,10 @@ jobs:
           - name: ubuntu:24.04
             slug: ubuntu-24-04
         preset:
+          - gnu-14-shared
+          - gnu-14-static
           - gnu-15-shared
           - gnu-15-static
-          - gnu-16-shared
-          - gnu-16-static
           - clang-22-shared
           - clang-22-static
           - clang-23-shared

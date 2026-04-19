@@ -34,9 +34,9 @@
             "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-15.cmake"
         },
         {
-            "name": "gnu-16",
+            "name": "gnu-14",
             "hidden": true,
-            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-16.cmake"
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-14.cmake"
         },
         {
             "name": "clang-22",
@@ -62,16 +62,16 @@
             "inherits": ["base", "static", "gnu-15"]
         },
         {
-            "name": "gnu-16-shared",
-            "displayName": "GNU 16 Shared (CI)",
-            "description": "CI preset — GNU 16 toolchain, shared libraries",
-            "inherits": ["base", "shared", "gnu-16"]
+            "name": "gnu-14-shared",
+            "displayName": "GNU 14 Shared (CI)",
+            "description": "CI preset — GNU 14 toolchain, shared libraries",
+            "inherits": ["base", "shared", "gnu-14"]
         },
         {
-            "name": "gnu-16-static",
-            "displayName": "GNU 16 Static (CI)",
-            "description": "CI preset — GNU 16 toolchain, static libraries",
-            "inherits": ["base", "static", "gnu-16"]
+            "name": "gnu-14-static",
+            "displayName": "GNU 14 Static (CI)",
+            "description": "CI preset — GNU 14 toolchain, static libraries",
+            "inherits": ["base", "static", "gnu-14"]
         },
         {
             "name": "clang-22-shared",
