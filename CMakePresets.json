@@ -29,16 +29,6 @@
             "cacheVariables": { "BUILD_SHARED_LIBS": false }
         },
         {
-            "name": "gnu-15",
-            "hidden": true,
-            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-15.cmake"
-        },
-        {
-            "name": "gnu-14",
-            "hidden": true,
-            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-14.cmake"
-        },
-        {
             "name": "clang-22",
             "hidden": true,
             "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-22.cmake"
@@ -48,31 +38,17 @@
             "hidden": true,
             "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-23.cmake"
         },
+        {
+            "name": "gnu-14",
+            "hidden": true,
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-14.cmake"
+        },
+        {
+            "name": "gnu-15",
+            "hidden": true,
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu-15.cmake"
+        },
 
-        {
-            "name": "gnu-15-shared",
-            "displayName": "GNU 15 Shared (CI)",
-            "description": "CI preset — GNU 15 toolchain, shared libraries",
-            "inherits": ["base", "shared", "gnu-15"]
-        },
-        {
-            "name": "gnu-15-static",
-            "displayName": "GNU 15 Static (CI)",
-            "description": "CI preset — GNU 15 toolchain, static libraries",
-            "inherits": ["base", "static", "gnu-15"]
-        },
-        {
-            "name": "gnu-14-shared",
-            "displayName": "GNU 14 Shared (CI)",
-            "description": "CI preset — GNU 14 toolchain, shared libraries",
-            "inherits": ["base", "shared", "gnu-14"]
-        },
-        {
-            "name": "gnu-14-static",
-            "displayName": "GNU 14 Static (CI)",
-            "description": "CI preset — GNU 14 toolchain, static libraries",
-            "inherits": ["base", "static", "gnu-14"]
-        },
         {
             "name": "clang-22-shared",
             "displayName": "Clang 22 Shared (CI)",
@@ -96,6 +72,30 @@
             "displayName": "Clang 23 Static (CI)",
             "description": "CI preset — Clang 23 toolchain, static libraries",
             "inherits": ["base", "static", "clang-23"]
+        },
+        {
+            "name": "gnu-14-shared",
+            "displayName": "GNU 14 Shared (CI)",
+            "description": "CI preset — GNU 14 toolchain, shared libraries",
+            "inherits": ["base", "shared", "gnu-14"]
+        },
+        {
+            "name": "gnu-14-static",
+            "displayName": "GNU 14 Static (CI)",
+            "description": "CI preset — GNU 14 toolchain, static libraries",
+            "inherits": ["base", "static", "gnu-14"]
+        },
+        {
+            "name": "gnu-15-shared",
+            "displayName": "GNU 15 Shared (CI)",
+            "description": "CI preset — GNU 15 toolchain, shared libraries",
+            "inherits": ["base", "shared", "gnu-15"]
+        },
+        {
+            "name": "gnu-15-static",
+            "displayName": "GNU 15 Static (CI)",
+            "description": "CI preset — GNU 15 toolchain, static libraries",
+            "inherits": ["base", "static", "gnu-15"]
         }
     ]
 }

@@ -74,18 +74,6 @@ function(robot_farm_add_docker_compile_target)
 endfunction()
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2204Gnu15Shared
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
-    PRESET      gnu-15-shared
-    DEPENDS     dockerUbuntu2204Image)
-
-robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2204Gnu15Static
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
-    PRESET      gnu-15-static
-    DEPENDS     dockerUbuntu2204Image)
-
-robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2204Clang22Shared
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
     PRESET      clang-22-shared
@@ -98,16 +86,40 @@ robot_farm_add_docker_compile_target(
     DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2404Gnu15Shared
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
-    PRESET      gnu-15-shared
-    DEPENDS     dockerUbuntu2404Image)
+    TARGET_NAME dockerUbuntu2204Clang23Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      clang-23-shared
+    DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2404Gnu15Static
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    TARGET_NAME dockerUbuntu2204Clang23Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      clang-23-static
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Gnu14Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      gnu-14-shared
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Gnu14Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      gnu-14-static
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Gnu15Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      gnu-15-shared
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Gnu15Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
     PRESET      gnu-15-static
-    DEPENDS     dockerUbuntu2404Image)
+    DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2404Clang22Shared
@@ -119,4 +131,40 @@ robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2404Clang22Static
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
     PRESET      clang-22-static
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Clang23Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      clang-23-shared
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Clang23Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      clang-23-static
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Gnu14Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      gnu-14-shared
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Gnu14Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      gnu-14-static
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Gnu15Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      gnu-15-shared
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Gnu15Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      gnu-15-static
     DEPENDS     dockerUbuntu2404Image)
