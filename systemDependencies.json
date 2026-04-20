@@ -16,8 +16,8 @@
     },
     {
       "group": "Compilers",
-      "ubuntu:22.04": "clang-22 clang-23 cuda-toolkit-13 flang-22 g++-14 g++-15 gcc-14 gcc-15 gfortran-14 gfortran-15 libomp-22-dev",
-      "ubuntu:24.04": "clang-22 clang-23 cuda-toolkit-13 flang-22 g++-14 g++-15 gcc-14 gcc-15 gfortran-14 gfortran-15 libomp-22-dev",
+      "ubuntu:22.04": "clang-21 clang-22 cuda-toolkit-13 flang-22 g++-14 g++-15 gcc-14 gcc-15 gfortran-14 gfortran-15 libomp-22-dev",
+      "ubuntu:24.04": "clang-21 clang-22 cuda-toolkit-13 flang-22 g++-14 g++-15 gcc-14 gcc-15 gfortran-14 gfortran-15 libomp-22-dev",
       "tag": "all"
     },
     {
@@ -47,7 +47,7 @@
     {
       "group": "Python3ExternalProject",
       "ubuntu:22.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev libmpdec-dev",
-      "ubuntu:24.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev libmpdec-dev",
+      "ubuntu:24.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev",
       "tag": "skip"
     },
     {

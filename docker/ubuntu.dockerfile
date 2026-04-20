@@ -96,3 +96,11 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
            SuiteSparseExternalProject                                                                                   \
            VTKExternalProject"                                                                                          \
           /tmp/systemDependencies.json)
+
+# apt.llvm.org's libomp-N-dev packages all Provide and Conflict on the
+# virtual package libomp-x.y-dev, so only one major can be installed at a
+# time. We pick libomp-22-dev (matches clang-22's resource dir natively)
+# and expose its omp.h to clang-21. The runtime libomp.so comes from
+# /usr/lib/llvm-22 via linker flags in linux-clang-21.cmake.
+RUN ln -s /usr/lib/llvm-22/lib/clang/22/include/omp.h                                                                   \
+          /usr/lib/llvm-21/lib/clang/21/include/omp.h

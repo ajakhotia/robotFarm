@@ -74,6 +74,18 @@ function(robot_farm_add_docker_compile_target)
 endfunction()
 
 robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Clang21Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      clang-21-shared
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2204Clang21Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
+    PRESET      clang-21-static
+    DEPENDS     dockerUbuntu2204Image)
+
+robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2204Clang22Shared
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
     PRESET      clang-22-shared
@@ -83,18 +95,6 @@ robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2204Clang22Static
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
     PRESET      clang-22-static
-    DEPENDS     dockerUbuntu2204Image)
-
-robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2204Clang23Shared
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
-    PRESET      clang-23-shared
-    DEPENDS     dockerUbuntu2204Image)
-
-robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2204Clang23Static
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest
-    PRESET      clang-23-static
     DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
@@ -122,6 +122,18 @@ robot_farm_add_docker_compile_target(
     DEPENDS     dockerUbuntu2204Image)
 
 robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Clang21Shared
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      clang-21-shared
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
+    TARGET_NAME dockerUbuntu2404Clang21Static
+    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
+    PRESET      clang-21-static
+    DEPENDS     dockerUbuntu2404Image)
+
+robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2404Clang22Shared
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
     PRESET      clang-22-shared
@@ -131,18 +143,6 @@ robot_farm_add_docker_compile_target(
     TARGET_NAME dockerUbuntu2404Clang22Static
     IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
     PRESET      clang-22-static
-    DEPENDS     dockerUbuntu2404Image)
-
-robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2404Clang23Shared
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
-    PRESET      clang-23-shared
-    DEPENDS     dockerUbuntu2404Image)
-
-robot_farm_add_docker_compile_target(
-    TARGET_NAME dockerUbuntu2404Clang23Static
-    IMAGE       ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest
-    PRESET      clang-23-static
     DEPENDS     dockerUbuntu2404Image)
 
 robot_farm_add_docker_compile_target(

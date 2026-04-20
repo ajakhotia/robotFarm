@@ -12,7 +12,6 @@
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
                 "BUILD_TESTING": false,
                 "CMAKE_INSTALL_PREFIX": "/opt/robotFarm",
                 "ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB": false
@@ -29,14 +28,14 @@
             "cacheVariables": { "BUILD_SHARED_LIBS": false }
         },
         {
+            "name": "clang-21",
+            "hidden": true,
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-21.cmake"
+        },
+        {
             "name": "clang-22",
             "hidden": true,
             "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-22.cmake"
-        },
-        {
-            "name": "clang-23",
-            "hidden": true,
-            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang-23.cmake"
         },
         {
             "name": "gnu-14",
@@ -50,6 +49,18 @@
         },
 
         {
+            "name": "clang-21-shared",
+            "displayName": "Clang 21 Shared (CI)",
+            "description": "CI preset — Clang 21 toolchain, shared libraries",
+            "inherits": ["base", "shared", "clang-21"]
+        },
+        {
+            "name": "clang-21-static",
+            "displayName": "Clang 21 Static (CI)",
+            "description": "CI preset — Clang 21 toolchain, static libraries",
+            "inherits": ["base", "static", "clang-21"]
+        },
+        {
             "name": "clang-22-shared",
             "displayName": "Clang 22 Shared (CI)",
             "description": "CI preset — Clang 22 toolchain, shared libraries",
@@ -60,18 +71,6 @@
             "displayName": "Clang 22 Static (CI)",
             "description": "CI preset — Clang 22 toolchain, static libraries",
             "inherits": ["base", "static", "clang-22"]
-        },
-        {
-            "name": "clang-23-shared",
-            "displayName": "Clang 23 Shared (CI)",
-            "description": "CI preset — Clang 23 toolchain, shared libraries",
-            "inherits": ["base", "shared", "clang-23"]
-        },
-        {
-            "name": "clang-23-static",
-            "displayName": "Clang 23 Static (CI)",
-            "description": "CI preset — Clang 23 toolchain, static libraries",
-            "inherits": ["base", "static", "clang-23"]
         },
         {
             "name": "gnu-14-shared",
