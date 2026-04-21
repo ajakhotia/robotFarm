@@ -282,7 +282,87 @@ jobs:
         with:
           image-name: ${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
           library-names: >-
-            absl;AMD;Boost;CAMD;CapnProto;CCOLAMD;Ceres;CHOLMOD;COLAMD;Eigen3;flatbuffers;Gflags;Glog;GTest;nlohmann_json;oatpp;oatpp-websocket;OGRE;OpenCV;protobuf;Python3;spdlog;SPQR;SuiteSparse_config;VTK
+            absl;AMD;Boost;CAMD;CapnProto;CCOLAMD;CHOLMOD;COLAMD;Eigen3;flatbuffers;Gflags;Glog;GTest;nlohmann_json;oatpp;oatpp-websocket;OGRE;OpenCV;protobuf;Python3;spdlog;SPQR;SuiteSparse_config;VTK
+          prefix-path: /opt/robotFarm
+          volumes: |
+            ${{ runner.temp }}/artifact:/tmp/artifact:ro
+          pre-check: |
+            set -euo pipefail
+            tar --zstd -C /opt -xf /tmp/artifact/robotFarm-*.tar.zst
+
+
+  # Ceres is split out of find-package because its bundled FindSuiteSparse.cmake
+  # clashes with SuiteSparse's per-component Config files when both appear in the
+  # same configure — see ceres-solver/ceres-solver#1116. Isolating Ceres sidesteps
+  # the interaction.
+  find-package-ceres:
+    needs: build-package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os_base:
+          - name: ubuntu:22.04
+            slug: ubuntu-22-04
+          - name: ubuntu:24.04
+            slug: ubuntu-24-04
+        preset:
+          - clang-21-shared
+          - clang-21-static
+          - clang-22-shared
+          - clang-22-static
+          - gnu-14-shared
+          - gnu-14-static
+          - gnu-15-shared
+          - gnu-15-static
+
+    steps:
+      - name: self-checkout
+        id: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: setup-login
+        id: setup-login
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: image-name-base
+        id: image-name-base
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base.name }}/base
+
+      - name: docker-metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v6
+        with:
+          tags: |
+            type=sha,format=long
+
+      - name: archive-name
+        id: archive-name
+        shell: bash
+        run: |
+          echo "stem=robotFarm-${{ matrix.os_base.slug }}-${{ matrix.preset }}" >> "${GITHUB_OUTPUT}"
+
+      - name: download-artifact
+        id: download-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.archive-name.outputs.stem }}
+          path: ${{ runner.temp }}/artifact
+
+      - name: find-library
+        id: find-library
+        uses: ./external/infraCommons/.github/actions/cmake-find-package
+        with:
+          image-name: ${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
+          library-names: Ceres
           prefix-path: /opt/robotFarm
           volumes: |
             ${{ runner.temp }}/artifact:/tmp/artifact:ro
