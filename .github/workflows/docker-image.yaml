@@ -242,6 +242,27 @@ jobs:
         with:
           submodules: true
 
+      - name: setup-login
+        id: setup-login
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: image-name-base
+        id: image-name-base
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base.name }}/base
+
+      - name: docker-metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v6
+        with:
+          tags: |
+            type=sha,format=long
+
       - name: archive-name
         id: archive-name
         shell: bash
@@ -259,24 +280,15 @@ jobs:
         id: find-library
         uses: ./external/infraCommons/.github/actions/cmake-find-package
         with:
-          image-name: ${{ matrix.os_base.name }}
+          image-name: ${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
           library-names: >-
             absl;AMD;Boost;CAMD;CapnProto;CCOLAMD;Ceres;CHOLMOD;COLAMD;Eigen3;flatbuffers;Gflags;Glog;GTest;nlohmann_json;oatpp;oatpp-websocket;OGRE;OpenCV;protobuf;Python3;spdlog;SPQR;SuiteSparse_config;VTK
           prefix-path: /opt/robotFarm
           volumes: |
             ${{ runner.temp }}/artifact:/tmp/artifact:ro
-            ${{ github.workspace }}/systemDependencies.json:/tmp/systemDependencies.json:ro
-            ${{ github.workspace }}/external/infraCommons/tools/extractDependencies.sh:/tmp/extractDependencies.sh:ro
           pre-check: |
             set -euo pipefail
-            export DEBIAN_FRONTEND=noninteractive
-            apt-get update
-            apt-get install -y --no-install-recommends jq
-            apt-get install -y --no-install-recommends \
-              $(sh /tmp/extractDependencies.sh Basics /tmp/systemDependencies.json)
             tar --zstd -C /opt -xf /tmp/artifact/robotFarm-*.tar.zst
-            apt-get install -y --no-install-recommends \
-              $(cat /opt/robotFarm/systemDependencies.txt)
 
 
   aggregate-find-package:
