@@ -4,8 +4,8 @@
 
 `robotFarm` is a CMake super-build for common AI and robotics libraries. It downloads, builds, and
 installs the libraries from source, handles the dependencies between them, and tells you which
-system packages to install with your OS package manager. Each library is built with the full set
-of supported features so downstream projects can use them without having to rebuild.
+system packages to install with your OS package manager. Each library is built with the full set of
+supported features so downstream projects can use them without having to rebuild.
 
 ## 🌱 Why use robotFarm?
 
@@ -53,8 +53,8 @@ quickly, pick one of the options below.
 
 ### 📦 Prebuilt release tarballs
 
-Every tagged release (`v*`) attaches a set of zstd-compressed install archives to the GitHub
-release page — one archive for each combination of OS version and
+Every tagged release (`v*`) attaches a set of zstd-compressed install archives to the GitHub release
+page — one archive for each combination of OS version and
 [CMake preset](#cmake-presets). Download the archive that matches your OS and toolchain, then
 extract it under `/opt`:
 
@@ -98,7 +98,7 @@ docker buildx build                                         \
   /tmp/robotFarm-src
 ```
 
-To run the build inside a container and copy the finished install tree to the host, use the command
+To run the build inside a container and copy the finished install-tree to the host, use the command
 below:
 
 ```shell
@@ -122,10 +122,15 @@ docker run --rm                                                                 
   '
 ```
 
-`/tmp/robotFarm-install` is only an example. Replace it with any writable path on the host to choose
-where the install tree ends up.
+The `apt-get install` line inside the container is a no-op when you start from the prebuilt base
+image, because the base image already has every build dependency installed. It is kept explicit so
+that the same command also works when you start from a plain `ubuntu:24.04` image.
 
-Before you use the install, install the system packages the libraries need at runtime:
+`/tmp/robotFarm-install` is only an example. Replace it with any writable path on the host to choose
+where the install-tree ends up.
+
+Before you use the install-tree, be sure to install the system packages the libraries need at
+runtime:
 
 ```shell
 sudo apt update && sudo apt install -y --no-install-recommends \
@@ -150,8 +155,8 @@ curl -fsSL                                                                      
   sudo bash
 ```
 
-You can override the version, toolchain, [build list](#selecting-a-subset-of-libraries), and
-install prefix:
+You can override the version, toolchain, [build list](#selecting-a-subset-of-libraries), and install
+prefix:
 
 ```shell
 curl -fsSL                                                                                          \
@@ -169,8 +174,6 @@ and [dockerfile](https://github.com/ajakhotia/nioc/blob/5a7c06a541edee78cc013a00
 
 ## 🐢 Slow Start
 
-*For detail-oriented, methodical people & geniuses.*
-
 The steps below walk through a manual CMake setup for building robotFarm. **They have been tested on
 Ubuntu 22.04 and Ubuntu 24.04. See [docker/ubuntu.dockerfile](docker/ubuntu.dockerfile) for a
 working example.**
@@ -186,12 +189,12 @@ section refers to them using the tokens below. Replace the tokens with your own 
 | Token          | Purpose                                               | Examples                                                 |
 |----------------|-------------------------------------------------------|----------------------------------------------------------|
 | `SOURCE_TREE`  | Where robotFarm is cloned. Can be temporary.          | `${HOME}/sandbox/robotFarm`, `/tmp/robotFarm`            |
-| `BUILD_TREE`   | Where CMake creates the build tree. Can be temporary. | `${SOURCE_TREE}/build`, `/tmp/robotFarm-build`           |
+| `BUILD_TREE`   | Where CMake creates the build-tree. Can be temporary. | `${SOURCE_TREE}/build`, `/tmp/robotFarm-build`           |
 | `INSTALL_TREE` | Where the final artifacts are installed. Keep this.   | `${HOME}/opt/robotFarm`, `/opt/robotFarm` (needs `sudo`) |
 
-If you choose an install path that needs root access (for example, `/opt/robotFarm` or `/usr`),
-you will need `sudo` for the [Build step](#build-step). When possible, pick a path that your user
-can write to.
+If you choose an install path that needs root access (for example, `/opt/robotFarm` or `/usr`), you
+will need `sudo` for the [Build step](#build-step). When possible, pick a path that your user can
+write to.
 
 The commands below use these tokens directly. You can export them as environment variables for
 convenience, but this is optional:
@@ -221,10 +224,10 @@ sudo apt install -y --no-install-recommends                                     
   $(sh external/infraCommons/tools/extractDependencies.sh Basics systemDependencies.json)
 ```
 
-**Compilers (your choice)** — robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. How
-you install them is up to you: an apt repository, downloaded tarballs, or any other method that
-works for your environment. One option is to run the helper scripts below. They add apt sources
-for the latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
+**Compilers (your choice)** — robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. How you
+install them is up to you: an apt repository, downloaded tarballs, or any other method that works
+for your environment. One option is to run the helper scripts below. They add apt sources for the
+latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
 `systemDependencies.json`:
 
 ```shell
@@ -236,9 +239,9 @@ sudo apt install -y --no-install-recommends                          \
   $(sh external/infraCommons/tools/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
-Run whichever of these scripts you need — all of them, some of them, or none. The minimum
-supported CUDA Toolkit version is 13. Each [toolchain file](#pre-packaged-toolchain-files) has
-its own rules about which host compiler versions it accepts. If your compiler does not match,
+Run whichever of these scripts you need — all of them, some of them, or none. The minimum supported
+CUDA Toolkit version is 13. Each [toolchain file](#pre-packaged-toolchain-files) has its own rules
+about which host compiler versions it accepts. If your compiler does not match,
 the [Configure step](#configure-step) fails with a clear error message.
 
 ### 🧑‍💻 Compile
@@ -249,7 +252,7 @@ The compile stage has three steps, each one a single command:
 
 #### Configure step
 
-This step creates the build tree and sets the build options (toolchain, install location, and so
+This step creates the build-tree and sets the build options (toolchain, install location, and so
 on):
 
 ```shell
@@ -264,8 +267,8 @@ come with robotFarm — see [Pre-packaged toolchain files](#pre-packaged-toolcha
 list.
 
 The [Build Customization](#-build-customization) section shows other ways to run this step: with
-a [CMake preset](#cmake-presets), or [building only a subset of the
-libraries](#selecting-a-subset-of-libraries).
+a [CMake preset](#cmake-presets),
+or [building only a subset of the libraries](#selecting-a-subset-of-libraries).
 
 #### System dependencies step
 
@@ -327,9 +330,9 @@ A few ready-to-use options are available through the `infraCommons` submodule:
 - [linux-gnu-15.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-15.cmake)
 
 After you clone robotFarm, the same files are on your machine at
-`${SOURCE_TREE}/external/infraCommons/cmake/toolchains/`. Use the path of the file you pick as
-the value of `-DCMAKE_TOOLCHAIN_FILE` in the [Configure step](#configure-step). For example, to
-use `linux-gnu-15.cmake`, the configure command becomes:
+`${SOURCE_TREE}/external/infraCommons/cmake/toolchains/`. Use the path of the file you pick as the
+value of `-DCMAKE_TOOLCHAIN_FILE` in the [Configure step](#configure-step). For example, to use
+`linux-gnu-15.cmake`, the configure command becomes:
 
 ```shell
 cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}                                                   \
@@ -355,7 +358,6 @@ cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}                               
 The allowed values are:
 
 - AbseilExternalProject
-- AtlasExternalProject
 - BoostExternalProject
 - CapnprotoExternalProject
 - CeresSolverExternalProject
@@ -379,8 +381,8 @@ The allowed values are:
 
 ### Python 3
 
-robotFarm can build Python 3 from source if you need it. By default, it uses the system Python 3
-and skips the source build. To build Python 3 from source instead, pass
+robotFarm can build Python 3 from source if you need it. By default, it uses the system Python 3 and
+skips the source build. To build Python 3 from source instead, pass
 `-DROBOT_FARM_SKIP_PYTHON3:BOOL=OFF` to CMake in the [Configure step](#configure-step).
 
 ### OpenCV
