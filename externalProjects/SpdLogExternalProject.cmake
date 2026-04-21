@@ -1,6 +1,6 @@
 #[[ Cmake guard. ]]
 if(TARGET SpdLogExternalProject)
-    return()
+  return()
 endif()
 
 include(ExternalProject)
@@ -8,20 +8,21 @@ include(ExternalProject)
 option(ROBOT_FARM_SKIP_SpdLogExternalProject "Forcefully skip spdlog" OFF)
 
 if(ROBOT_FARM_SKIP_SpdLogExternalProject)
-    add_custom_target(SpdLogExternalProject)
+  add_custom_target(SpdLogExternalProject)
 else()
-    list(APPEND ROBOT_FARM_BUILD_LIST SpdLogExternalProject)
+  list(APPEND ROBOT_FARM_BUILD_LIST SpdLogExternalProject)
 
-    set(ROBOT_FARM_SPDLOG_URL
-        "https://github.com/gabime/spdlog/archive/refs/tags/v1.15.3.tar.gz"
-        CACHE STRING
-        "URL of the spdlog source archive")
+  set(ROBOT_FARM_SPDLOG_URL
+    "https://github.com/gabime/spdlog/archive/refs/tags/v1.15.3.tar.gz"
+    CACHE STRING
+    "URL of the spdlog source archive")
 
-    externalproject_add(SpdLogExternalProject
-        PREFIX ${CMAKE_CURRENT_BINARY_DIR}/spdlog
-        URL ${ROBOT_FARM_SPDLOG_URL}
-        DOWNLOAD_NO_PROGRESS ON
-        CMAKE_ARGS
-        ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
-        -DSPDLOG_BUILD_SHARED:BOOL=${BUILD_SHARED_LIBS})
+  externalproject_add(SpdLogExternalProject
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/spdlog
+    URL ${ROBOT_FARM_SPDLOG_URL}
+    DOWNLOAD_NO_PROGRESS ON
+    LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
+    CMAKE_ARGS
+    ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
+    -DSPDLOG_BUILD_SHARED:BOOL=${BUILD_SHARED_LIBS})
 endif()

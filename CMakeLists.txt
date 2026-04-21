@@ -25,18 +25,37 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Global flag to build shared libraries [Def
 set(BUILD_TESTING OFF CACHE BOOL "Global flag used by CTest [Default: OFF]")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Cmake build type [Default: Release]")
 
+# In-band list separator for values forwarded through ExternalProject_Add. Each
+# call pairs this with LIST_SEPARATOR so that `|` is translated back to `;` in
+# the generated initial-cache file; values that are CMake lists must be escaped
+# with string(REPLACE ";" "|" ...) before being baked into a -D<VAR>:TYPE=...
+# entry to prevent the outer list from splitting them into stray positionals.
+set(ROBOT_FARM_LIST_SEPARATOR "|")
+
 set(ROBOT_FARM_FORWARDED_CMAKE_ARGS
-    -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
-    -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
-    -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
-    -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
-    -DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-    -DBUILD_TESTING:BOOL=${BUILD_TESTING})
+  -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
+  -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
+  -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
+  -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
+  -DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF
+  -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
+  -DCMAKE_INSTALL_RPATH:STRING=$ORIGIN
+  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON
+  -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+  -DBUILD_TESTING:BOOL=${BUILD_TESTING})
 
 if(CMAKE_BUILD_TYPE)
   list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
+endif()
+
+if(CMAKE_C_COMPILER_LAUNCHER)
+  list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS
+    -DCMAKE_C_COMPILER_LAUNCHER:STRING=${CMAKE_C_COMPILER_LAUNCHER})
+endif()
+
+if(CMAKE_CXX_COMPILER_LAUNCHER)
+  list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS
+    -DCMAKE_CXX_COMPILER_LAUNCHER:STRING=${CMAKE_CXX_COMPILER_LAUNCHER})
 endif()
 
 set(PREFIX_PATH "")
@@ -50,30 +69,31 @@ if(CMAKE_PREFIX_PATH)
   list(APPEND PREFIX_PATH ${CMAKE_PREFIX_PATH})
 endif()
 
-list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_PREFIX_PATH:STRING="${PREFIX_PATH}")
+string(REPLACE ";" "${ROBOT_FARM_LIST_SEPARATOR}" ROBOT_FARM_PREFIX_PATH_ESCAPED "${PREFIX_PATH}")
+list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_PREFIX_PATH:STRING=${ROBOT_FARM_PREFIX_PATH_ESCAPED})
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
-    AbseilExternalProject
-    BoostExternalProject
-    CapnprotoExternalProject
-    CeresSolverExternalProject
-    Eigen3ExternalProject
-    FlatBuffersExternalProject
-    GFlagsExternalProject
-    GlogExternalProject
-    GoogleTestExternalProject
-    NlohmannJsonExternalProject
-    OatppExternalProject
-    OatppWebSocketExternalProject
-    OgreExternalProject
-    OpenCVExternalProject
-    ProtobufExternalProject
-    Python3ExternalProject
-    SpdLogExternalProject
-    SuiteSparseExternalProject
-    VTKExternalProject
-    CACHE STRING
-    "Semi-colon separated list of projects requested by the user. Default includes all")
+  AbseilExternalProject
+  BoostExternalProject
+  CapnprotoExternalProject
+  CeresSolverExternalProject
+  Eigen3ExternalProject
+  FlatBuffersExternalProject
+  GFlagsExternalProject
+  GlogExternalProject
+  GoogleTestExternalProject
+  NlohmannJsonExternalProject
+  OatppExternalProject
+  OatppWebSocketExternalProject
+  OgreExternalProject
+  OpenCVExternalProject
+  ProtobufExternalProject
+  Python3ExternalProject
+  SpdLogExternalProject
+  SuiteSparseExternalProject
+  VTKExternalProject
+  CACHE STRING
+  "Semi-colon separated list of projects requested by the user. Default includes all")
 
 set(ROBOT_FARM_BUILD_LIST "")
 
@@ -100,9 +120,9 @@ print_list("RobotFarm will build" ${ROBOT_FARM_BUILD_LIST})
 set(ROBOT_FARM_SYSTEM_DEPENDENCY_STR "")
 foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
   execute_process(
-      COMMAND sh external/infraCommons/tools/extractDependencies.sh ${ITEM} systemDependencies.json
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE ITEM_DEPENDENCIES)
+    COMMAND sh external/infraCommons/tools/extractDependencies.sh ${ITEM} systemDependencies.json
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE ITEM_DEPENDENCIES)
 
   if(ITEM_DEPENDENCIES)
     string(APPEND ROBOT_FARM_SYSTEM_DEPENDENCY_STR " " ${ITEM_DEPENDENCIES})
@@ -112,9 +132,9 @@ endforeach()
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt "${ROBOT_FARM_SYSTEM_DEPENDENCY_STR}")
 
 add_custom_command(
-    OUTPUT ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt
-    COMMENT "Installing ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt to ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt")
+  OUTPUT ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt
+  COMMENT "Installing ${CMAKE_CURRENT_BINARY_DIR}/systemDependencies.txt to ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt")
 
 add_custom_target(systemDependenciesManifest ALL DEPENDS ${CMAKE_INSTALL_PREFIX}/systemDependencies.txt)

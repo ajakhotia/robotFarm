@@ -86,7 +86,7 @@ jobs:
           result: ${{ needs.base-stage.result }}
 
 
-  build-deploy-stage:
+  build-package:
     needs: base-stage
     runs-on: self-hosted
     strategy:
@@ -94,17 +94,18 @@ jobs:
       matrix:
         os_base:
           - name: ubuntu:22.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
+            slug: ubuntu-22-04
           - name: ubuntu:24.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:24.04
-        toolchain:
-          - linux-clang-19
-          - linux-gnu-14
-          - linux-gnu-default
-        exclude:
-          - os_base:
-              name: ubuntu:22.04
-            toolchain: linux-gnu-14
+            slug: ubuntu-24-04
+        preset:
+          - clang-21-shared
+          - clang-21-static
+          - clang-22-shared
+          - clang-22-static
+          - gnu-14-shared
+          - gnu-14-static
+          - gnu-15-shared
+          - gnu-15-static
 
     steps:
       - name: self-checkout
@@ -121,136 +122,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: setup-buildx
-        id: setup-buildx
-        uses: docker/setup-buildx-action@v4
-        with:
-          name: robotfarm-buildx
-          keep-state: true
-
-      - name: job-cache-base
-        id: job-cache-base
+      - name: image-name-base
+        id: image-name-base
         uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
         with:
-          build-name: job-cache/${{ matrix.os_base.name }}/base
-
-      - name: image-name-build
-        id: image-name-build
-        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
-        with:
-          build-name: ${{ matrix.os_base.name }}/${{ matrix.toolchain }}/build
-
-      - name: build
-        id: build
-        uses: ./external/infraCommons/.github/actions/docker-typical-build-push
-        with:
-          dockerfile: docker/ubuntu.dockerfile
-          target-stage: build
-          cache-backend: registry
-          image-name: ${{ steps.image-name-build.outputs.name }}
-          shared-cache-from: ${{ steps.job-cache-base.outputs.name }}:cache
-          build-args: |
-            OS_BASE=${{ matrix.os_base.image }}
-            TOOLCHAIN=${{ matrix.toolchain }}
-
-      - name: image-name-deploy
-        id: image-name-deploy
-        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
-        with:
-          build-name: ${{ matrix.os_base.name }}/${{ matrix.toolchain }}/deploy
-
-      - name: deploy
-        id: deploy
-        uses: ./external/infraCommons/.github/actions/docker-typical-build-push
-        with:
-          dockerfile: docker/ubuntu.dockerfile
-          target-stage: deploy
-          cache-backend: registry
-          image-name: ${{ steps.image-name-deploy.outputs.name }}
-          build-args: |
-            OS_BASE=${{ matrix.os_base.image }}
-            TOOLCHAIN=${{ matrix.toolchain }}
-
-
-  aggregate-build-deploy-stage:
-    name: aggregate-build-deploy-stage
-    if: always()
-    needs: [build-deploy-stage]
-    runs-on: ubuntu-latest
-    steps:
-      - name: self-checkout
-        id: self-checkout
-        uses: actions/checkout@v6
-        with:
-          submodules: true
-
-      - name: aggregate
-        id: aggregate
-        uses: ./external/infraCommons/.github/actions/matrix-aggregate
-        with:
-          result: ${{ needs.build-deploy-stage.result }}
-
-
-  find-library:
-    needs: build-deploy-stage
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os_base:
-          - name: ubuntu:22.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
-          - name: ubuntu:24.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:24.04
-        toolchain:
-          - linux-clang-19
-          - linux-gnu-14
-          - linux-gnu-default
-        exclude:
-          - os_base:
-              name: ubuntu:22.04
-            toolchain: linux-gnu-14
-        library-name:
-          - absl
-          - AMD
-          - Boost
-          - CAMD
-          - CapnProto
-          - CCOLAMD
-          - Ceres
-          - CHOLMOD
-          - COLAMD
-          - Eigen3
-          - flatbuffers
-          - Gflags
-          - Glog
-          - GTest
-          - nlohmann_json
-          - oatpp
-          - oatpp-websocket
-          - OGRE
-          - OpenCV
-          - protobuf
-          - Python3
-          - spdlog
-          - SPQR
-          - SuiteSparse_config
-          - VTK
-
-    steps:
-      - name: self-checkout
-        id: self-checkout
-        uses: actions/checkout@v6
-        with:
-          submodules: true
-
-      - name: setup-login
-        id: setup-login
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          build-name: ${{ matrix.os_base.name }}/base
 
       - name: docker-metadata
         id: docker-metadata
@@ -259,25 +135,70 @@ jobs:
           tags: |
             type=sha,format=long
 
-      - name: image-name-deploy
-        id: image-name-deploy
-        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+      - name: archive-name
+        id: archive-name
+        shell: bash
+        run: |
+          stem="robotFarm-${{ matrix.os_base.slug }}-${{ matrix.preset }}"
+          echo "stem=${stem}"                                                          >> "${GITHUB_OUTPUT}"
+          echo "file=${stem}-${{ steps.docker-metadata.outputs.version }}.tar.zst"     >> "${GITHUB_OUTPUT}"
+
+      - name: build-and-package
+        id: build-and-package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "${RUNNER_TEMP}/archive"
+
+          docker run --rm                                                                                 \
+            --volume "${GITHUB_WORKSPACE}":/tmp/robotFarm-src:ro                                          \
+            --volume "robotfarm-ccache-${{ matrix.os_base.slug }}":/ccache                                \
+            --volume "${RUNNER_TEMP}/archive":/archive                                                    \
+            --env CCACHE_DIR=/ccache                                                                      \
+            --env CCACHE_MAXSIZE=20G                                                                      \
+            "${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}"      \
+            bash -c '
+              set -euo pipefail
+
+              ccache --zero-stats
+
+              cmake -S /tmp/robotFarm-src                                       \
+                    -B /tmp/robotFarm-build                                     \
+                    --preset ${{ matrix.preset }}                               \
+                    -DCMAKE_C_COMPILER_LAUNCHER=ccache                          \
+                    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+              cmake --build   /tmp/robotFarm-build
+              cmake --install /tmp/robotFarm-build
+
+              ccache --show-stats
+
+              tar --zstd -C /opt -cf /archive/${{ steps.archive-name.outputs.file }} robotFarm
+            '
+
+      - name: upload-artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
         with:
-          build-name: ${{ matrix.os_base.name }}/${{ matrix.toolchain }}/deploy
+          name: ${{ steps.archive-name.outputs.stem }}
+          path: ${{ runner.temp }}/archive/${{ steps.archive-name.outputs.file }}
+          retention-days: 14
+          if-no-files-found: error
 
-      - name: find-library
-        id: find-library
-        uses: ./external/infraCommons/.github/actions/cmake-find-package
+      - name: publish-release
+        id: publish-release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          library-name: ${{ matrix.library-name }}
-          prefix-path: "/opt/robotFarm"
-          image-name: ${{ steps.image-name-deploy.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
+          files: ${{ runner.temp }}/archive/${{ steps.archive-name.outputs.file }}
+          fail_on_unmatched_files: true
 
 
-  aggregate-find-library:
-    name: aggregate-find-library
+  aggregate-build-package:
+    name: aggregate-build-package
     if: always()
-    needs: [find-library]
+    needs: [build-package]
     runs-on: ubuntu-latest
     steps:
       - name: self-checkout
@@ -290,4 +211,180 @@ jobs:
         id: aggregate
         uses: ./external/infraCommons/.github/actions/matrix-aggregate
         with:
-          result: ${{ needs.find-library.result }}
+          result: ${{ needs.build-package.result }}
+
+
+  find-package:
+    needs: build-package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os_base:
+          - name: ubuntu:22.04
+            slug: ubuntu-22-04
+          - name: ubuntu:24.04
+            slug: ubuntu-24-04
+        preset:
+          - clang-21-shared
+          - clang-21-static
+          - clang-22-shared
+          - clang-22-static
+          - gnu-14-shared
+          - gnu-14-static
+          - gnu-15-shared
+          - gnu-15-static
+
+    steps:
+      - name: self-checkout
+        id: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: setup-login
+        id: setup-login
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: image-name-base
+        id: image-name-base
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base.name }}/base
+
+      - name: docker-metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v6
+        with:
+          tags: |
+            type=sha,format=long
+
+      - name: archive-name
+        id: archive-name
+        shell: bash
+        run: |
+          echo "stem=robotFarm-${{ matrix.os_base.slug }}-${{ matrix.preset }}" >> "${GITHUB_OUTPUT}"
+
+      - name: download-artifact
+        id: download-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.archive-name.outputs.stem }}
+          path: ${{ runner.temp }}/artifact
+
+      - name: find-library
+        id: find-library
+        uses: ./external/infraCommons/.github/actions/cmake-find-package
+        with:
+          image-name: ${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
+          library-names: >-
+            absl;AMD;Boost;CAMD;CapnProto;CCOLAMD;CHOLMOD;COLAMD;Eigen3;flatbuffers;Gflags;Glog;GTest;nlohmann_json;oatpp;oatpp-websocket;OGRE;OpenCV;protobuf;Python3;spdlog;SPQR;SuiteSparse_config;VTK
+          prefix-path: /opt/robotFarm
+          volumes: |
+            ${{ runner.temp }}/artifact:/tmp/artifact:ro
+          pre-check: |
+            set -euo pipefail
+            tar --zstd -C /opt -xf /tmp/artifact/robotFarm-*.tar.zst
+
+
+  # Ceres is split out of find-package because its bundled FindSuiteSparse.cmake
+  # clashes with SuiteSparse's per-component Config files when both appear in the
+  # same configure — see ceres-solver/ceres-solver#1116. Isolating Ceres sidesteps
+  # the interaction.
+  find-package-ceres:
+    needs: build-package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os_base:
+          - name: ubuntu:22.04
+            slug: ubuntu-22-04
+          - name: ubuntu:24.04
+            slug: ubuntu-24-04
+        preset:
+          - clang-21-shared
+          - clang-21-static
+          - clang-22-shared
+          - clang-22-static
+          - gnu-14-shared
+          - gnu-14-static
+          - gnu-15-shared
+          - gnu-15-static
+
+    steps:
+      - name: self-checkout
+        id: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: setup-login
+        id: setup-login
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: image-name-base
+        id: image-name-base
+        uses: ./external/infraCommons/.github/actions/oci-compliant-image-name
+        with:
+          build-name: ${{ matrix.os_base.name }}/base
+
+      - name: docker-metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v6
+        with:
+          tags: |
+            type=sha,format=long
+
+      - name: archive-name
+        id: archive-name
+        shell: bash
+        run: |
+          echo "stem=robotFarm-${{ matrix.os_base.slug }}-${{ matrix.preset }}" >> "${GITHUB_OUTPUT}"
+
+      - name: download-artifact
+        id: download-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.archive-name.outputs.stem }}
+          path: ${{ runner.temp }}/artifact
+
+      - name: find-library
+        id: find-library
+        uses: ./external/infraCommons/.github/actions/cmake-find-package
+        with:
+          image-name: ${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}
+          library-names: Ceres
+          prefix-path: /opt/robotFarm
+          volumes: |
+            ${{ runner.temp }}/artifact:/tmp/artifact:ro
+          pre-check: |
+            set -euo pipefail
+            tar --zstd -C /opt -xf /tmp/artifact/robotFarm-*.tar.zst
+
+
+  aggregate-find-package:
+    name: aggregate-find-package
+    if: always()
+    needs: [find-package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: self-checkout
+        id: self-checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: aggregate
+        id: aggregate
+        uses: ./external/infraCommons/.github/actions/matrix-aggregate
+        with:
+          result: ${{ needs.find-package.result }}
