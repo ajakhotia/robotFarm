@@ -234,32 +234,6 @@ jobs:
           - gnu-14-static
           - gnu-15-shared
           - gnu-15-static
-        library-name:
-          - absl
-          - AMD
-          - Boost
-          - CAMD
-          - CapnProto
-          - CCOLAMD
-          - Ceres
-          - CHOLMOD
-          - COLAMD
-          - Eigen3
-          - flatbuffers
-          - Gflags
-          - Glog
-          - GTest
-          - nlohmann_json
-          - oatpp
-          - oatpp-websocket
-          - OGRE
-          - OpenCV
-          - protobuf
-          - Python3
-          - spdlog
-          - SPQR
-          - SuiteSparse_config
-          - VTK
 
     steps:
       - name: self-checkout
@@ -286,7 +260,8 @@ jobs:
         uses: ./external/infraCommons/.github/actions/cmake-find-package
         with:
           image-name: ${{ matrix.os_base.name }}
-          library-name: ${{ matrix.library-name }}
+          library-names: >-
+            absl;AMD;Boost;CAMD;CapnProto;CCOLAMD;Ceres;CHOLMOD;COLAMD;Eigen3;flatbuffers;Gflags;Glog;GTest;nlohmann_json;oatpp;oatpp-websocket;OGRE;OpenCV;protobuf;Python3;spdlog;SPQR;SuiteSparse_config;VTK
           prefix-path: /opt/robotFarm
           volumes: |
             ${{ runner.temp }}/artifact:/tmp/artifact:ro
