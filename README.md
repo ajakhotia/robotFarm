@@ -17,31 +17,62 @@ supported features so downstream projects can use them without having to rebuild
 
 ## 📚 Supported libraries
 
-- absl
-- AMD
-- Boost
-- CAMD
-- CapnProto
-- CCOLAMD
-- Ceres
-- CHOLMOD
-- COLAMD
-- Eigen3
-- flatbuffers
-- Gflags
-- Glog
-- GTest
-- nlohmann_json
-- oatpp
-- oatpp-websocket
-- OGRE
-- OpenCV
-- protobuf
-- Python3
-- spdlog
-- SPQR
-- SuiteSparse_config
-- VTK
+<table>
+  <tr>
+    <td align="center" width="140" height="80"><img src="https://abseil.io/img/absl_204px.png" alt="Abseil" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://www.boost.org/static/img/Boost_Symbol_Transparent.svg" alt="Boost" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://capnproto.org/images/logo.png" alt="Cap'n Proto" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://libeigen.gitlab.io/eigen/docs-nightly/Eigen_Silly_Professor_64x64.png" alt="Eigen" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://flatbuffers.dev/assets/flatbuffers_logo.svg" alt="FlatBuffers" height="48"/></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Abseil</sub></td>
+    <td align="center"><sub>Boost</sub></td>
+    <td align="center"><sub>Cap'n Proto</sub></td>
+    <td align="center"><sub>Ceres Solver</sub></td>
+    <td align="center"><sub>Eigen</sub></td>
+    <td align="center"><sub>FlatBuffers</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="140" height="80"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://raw.githubusercontent.com/nlohmann/json/develop/docs/mkdocs/docs/images/json.gif" alt="nlohmann/json" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://raw.githubusercontent.com/lganzzzo/oatpp-website-res/master/logo_x400.png" alt="Oat++" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://raw.githubusercontent.com/OGRECave/ogre/master/Other/ogre_header.svg" alt="OGRE" height="48"/></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Google Gflags</sub></td>
+    <td align="center"><sub>Google Glog</sub></td>
+    <td align="center"><sub>Google Test</sub></td>
+    <td align="center"><sub>Nlohmann Json</sub></td>
+    <td align="center"><sub>Oat++ <sup>*</sup></sub></td>
+    <td align="center"><sub>OGRE</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="140" height="80"><img src="https://raw.githubusercontent.com/opencv/opencv/4.x/doc/opencv-logo.png" alt="OpenCV" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://www.python.org/static/img/python-logo.png" alt="Python 3" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://raw.githubusercontent.com/gabime/spdlog/v1.x/logos/spdlog.png" alt="spdlog" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://aldenmath.com/wp-content/uploads/bb-plugin/cache/solver-landscape-0b332bbdfde4e320803c1fbef583c3de-.jpg" alt="SuiteSparse" height="48"/></td>
+    <td align="center" width="140" height="80"><img src="https://raw.githubusercontent.com/Kitware/VTK/master/vtkBanner.gif" alt="VTK" height="48"/></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>OpenCV</sub></td>
+    <td align="center"><sub>Protocol Buffers</sub></td>
+    <td align="center"><sub>Python 3</sub></td>
+    <td align="center"><sub>Spdlog</sub></td>
+    <td align="center"><sub>SuiteSparse <sup>†</sup></sub></td>
+    <td align="center"><sub>VTK</sub></td>
+  </tr>
+</table>
+
+<sub><sup>*</sup> <code>oatpp</code> also bundles <code>oatpp-websocket</code>.</sub>
+
+<sub><sup>†</sup> <code>SuiteSparse</code> bundles <code>AMD</code>, <code>CAMD</code>, <code>
+CCOLAMD</code>, <code>CHOLMOD</code>, <code>COLAMD</code>, <code>SPQR</code>, and <code>
+SuiteSparse_config</code>.</sub>
 
 ## ⚡ Quick Start
 
