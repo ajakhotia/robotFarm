@@ -86,11 +86,11 @@ quickly, pick one of the options below.
 
 Every tagged release (`v*`) attaches a set of zstd-compressed install archives to the GitHub release
 page — one archive for each combination of OS version and
-[CMake preset](#cmake-presets). Download the archive that matches your OS and toolchain, then
+[CMake preset](#cmake-presets). Download the archive that matches your OS and preset, then
 extract it under `/opt`:
 
 ```shell
-tar --zstd -C /opt -xf robotFarm-ubuntu-24-04-gnu-15-shared-<version>.tar.zst
+tar --zstd -C /opt -xf robotFarm-ubuntu-24-04-gnu-shared-<version>.tar.zst
 ```
 
 The archive also contains a `systemDependencies.txt` file at the install root. It lists the system
@@ -327,23 +327,23 @@ needs root access (for example, `/opt/robotFarm` or `/usr`), run the command abo
 
 ### CMake presets
 
-The repository includes a `CMakePresets.json` file. It covers the combinations of toolchain and
-linkage used by CI:
+The repository includes a `CMakePresets.json` file. It covers the combinations of compiler family
+and linkage used by CI:
 
-- `clang-21-shared`, `clang-21-static`
-- `clang-22-shared`, `clang-22-static`
-- `gnu-14-shared`,   `gnu-14-static`
-- `gnu-15-shared`,   `gnu-15-static`
+- `clang-shared`, `clang-static`
+- `gnu-shared`,   `gnu-static`
 
-These presets exist to make CI runs reproducible. They are not required for end users. If one of
-them matches your environment, use it in place of the [Configure step](#configure-step) command:
+The presets use the default (unversioned) `gcc` / `clang` compilers found on `PATH`, so whatever
+your system resolves those names to is what builds. These presets exist to make CI runs
+reproducible. They are not required for end users. If one of them matches your environment, use it
+in place of the [Configure step](#configure-step) command:
 
 ```shell
-cmake --preset gnu-15-shared -S ${SOURCE_TREE} -B ${BUILD_TREE} \
+cmake --preset gnu-shared -S ${SOURCE_TREE} -B ${BUILD_TREE} \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}
 ```
 
-The preset sets the generator, toolchain file, build type, and linkage for you. The
+The preset sets the generator, compilers, build type, and linkage for you. The
 `-DCMAKE_INSTALL_PREFIX` line overrides the default install location set in the preset. The
 [System dependencies step](#system-dependencies-step) and the [Build step](#build-step) do not
 change.

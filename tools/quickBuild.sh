@@ -13,7 +13,7 @@
   # Default values
   VERSION="main"
   INSTALL_PREFIX="/opt/robotFarm"
-  TOOLCHAIN="linux-gnu-default"
+  TOOLCHAIN=""
   BUILD_LIST=""
 
   # Simple argument parsing
@@ -28,7 +28,7 @@
         echo "Options:"
         echo "  -v, --version VERSION      Tag or branch to check out (default: main)"
         echo "  -p, --prefix PREFIX        Install prefix (default: /opt/robotFarm)"
-        echo "  -t, --toolchain TOOLCHAIN  Toolchain to use (default: linux-gnu-default)"
+        echo "  -t, --toolchain TOOLCHAIN  Toolchain to use (default: system default compilers)"
         echo "  -b, --build-list LIST      Semicolon-separated list of libraries to build (default: all)"
         echo "  -h, --help                 Show this help message"
         exit 0
@@ -77,8 +77,9 @@
     -S "${SOURCE_TREE}"                                                                               \
     -B "${BUILD_TREE}"                                                                                \
     -DCMAKE_BUILD_TYPE=Release                                                                        \
+    -DBUILD_SHARED_LIBS:BOOL=ON                                                                       \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                        \
-    -DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake" \
+    ${TOOLCHAIN:+-DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake"} \
     ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
 
   # shellcheck disable=SC2046
