@@ -47,7 +47,11 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
     apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends jq
+    apt-get install -y --no-install-recommends                                                      \
+      ca-certificates curl gnupg jq software-properties-common
+
+RUN --mount=type=bind,src=external/infraCommons/tools/apt/addAptSources.sh,dst=/tmp/tools/apt/addAptSources.sh,ro       \
+    bash /tmp/tools/apt/addAptSources.sh -y
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
@@ -56,24 +60,6 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get update &&                                                                                                   \
     apt-get install -y --no-install-recommends                                                                          \
       $(sh /tmp/tools/extractDependencies.sh Basics /tmp/systemDependencies.json)
-
-RUN --mount=type=bind,src=external/infraCommons/tools/installCMake.sh,dst=/tmp/tools/installCMake.sh,ro                 \
-    bash /tmp/tools/installCMake.sh
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
-    --mount=type=bind,src=external/infraCommons/tools/apt/addGNUSources.sh,dst=/tmp/tools/apt/addGNUSources.sh,ro       \
-    bash /tmp/tools/apt/addGNUSources.sh -y
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
-    --mount=type=bind,src=external/infraCommons/tools/apt/addLLVMSources.sh,dst=/tmp/tools/apt/addLLVMSources.sh,ro     \
-    bash /tmp/tools/apt/addLLVMSources.sh -y
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
-    --mount=type=bind,src=external/infraCommons/tools/apt/addNvidiaSources.sh,dst=/tmp/tools/apt/addNvidiaSources.sh,ro \
-    bash /tmp/tools/apt/addNvidiaSources.sh -y
 
 # Install the compiler toolchains together with the per-external-project
 # system dependencies for every project compiled inside this image. Groups

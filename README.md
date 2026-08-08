@@ -245,32 +245,33 @@ git -C ${SOURCE_TREE} submodule update --init
 
 ### 🔧 Install tools
 
-**Mandatory** — install `jq`, a recent `cmake` (>= 3.27), and basic build tools:
+**Mandatory** — install `jq`, a recent `cmake` (>= 3.27), and basic build tools. The `kitware`
+apt source provides the latest `cmake`:
 
 ```shell
 sudo apt update &&                                                                            \
-sudo apt install -y --no-install-recommends jq                                            &&  \
-sudo bash external/infraCommons/tools/installCMake.sh                                     &&  \
+sudo apt install -y --no-install-recommends                                                   \
+  ca-certificates curl gnupg jq software-properties-common                                &&  \
+sudo bash external/infraCommons/tools/apt/addAptSources.sh -y kitware                     &&  \
+sudo apt update                                                                           &&  \
 sudo apt install -y --no-install-recommends                                                   \
   $(sh external/infraCommons/tools/extractDependencies.sh Basics systemDependencies.json)
 ```
 
 **Compilers (your choice)** — robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. How you
 install them is up to you: an apt repository, downloaded tarballs, or any other method that works
-for your environment. One option is to run the helper scripts below. They add apt sources for the
-latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
+for your environment. One option is to register the `gnu`, `llvm`, and `nvidia` apt sources, which
+track the latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
 `systemDependencies.json`:
 
 ```shell
-sudo bash external/infraCommons/tools/apt/addGNUSources.sh    -y &&  \
-sudo bash external/infraCommons/tools/apt/addLLVMSources.sh   -y &&  \
-sudo bash external/infraCommons/tools/apt/addNvidiaSources.sh -y &&  \
-sudo apt update                                                  &&  \
-sudo apt install -y --no-install-recommends                          \
+sudo bash external/infraCommons/tools/apt/addAptSources.sh -y gnu llvm nvidia    &&  \
+sudo apt update                                                                  &&  \
+sudo apt install -y --no-install-recommends                                          \
   $(sh external/infraCommons/tools/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
-Run whichever of these scripts you need — all of them, some of them, or none. The minimum supported
+Run it with whichever of these apt sources you need — all of them, some of them, or none. The minimum supported
 CUDA Toolkit version is 13. Each [toolchain file](#pre-packaged-toolchain-files) has its own rules
 about which host compiler versions it accepts. If your compiler does not match,
 the [Configure step](#configure-step) fails with a clear error message.

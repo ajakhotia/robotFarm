@@ -47,7 +47,8 @@
 
   echo "Installing prerequisites for shallow checkout..."
   apt-get update
-  apt-get install -y --no-install-recommends ca-certificates git jq
+  apt-get install -y --no-install-recommends                                    \
+      ca-certificates curl git gnupg jq software-properties-common
 
   echo "Shallow-cloning robotFarm ${VERSION} from ${GITHUB_REPO}"
   git clone --depth 1 --branch "${VERSION}" "${GITHUB_REPO}.git" "${SOURCE_TREE}"
@@ -58,14 +59,12 @@
 
   echo "Installing basic tools & compilers..."
 
+  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addAptSources.sh" -y
+  apt-get update
+
   sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"        \
       Basics "${SOURCE_TREE}/systemDependencies.json"                           \
       | xargs -r apt-get install -y --no-install-recommends
-
-  bash "${SOURCE_TREE}/external/infraCommons/tools/installCMake.sh"
-  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addGNUSources.sh" -y
-  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addLLVMSources.sh" -y
-  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addNvidiaSources.sh" -y
 
   sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"        \
       Compilers "${SOURCE_TREE}/systemDependencies.json"                        \
