@@ -356,6 +356,10 @@ gitignored, and CMake merges it with `CMakePresets.json` automatically.
 
 A few ready-to-use options are available through the `infraCommons` submodule:
 
+- [linux-clang.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang.cmake)
+  (default Clang on the system)
+- [linux-gnu.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu.cmake)
+  (default GNU on the system)
 - [linux-clang-21.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-21.cmake)
 - [linux-clang-22.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-22.cmake)
 - [linux-gnu-14.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-14.cmake)

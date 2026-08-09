@@ -25,12 +25,12 @@ else()
     OFF)
 
   set(ROBOT_FARM_OPENCV_CONTRIB_URL
-    "https://github.com/opencv/opencv_contrib/archive/refs/tags/4.12.0.tar.gz"
+    "https://github.com/opencv/opencv_contrib/archive/refs/tags/4.13.0.tar.gz"
     CACHE STRING
     "URL of the OpenCV contrib source archive")
 
   set(ROBOT_FARM_OPENCV_URL
-    "https://github.com/opencv/opencv/archive/refs/tags/4.12.0.tar.gz"
+    "https://github.com/opencv/opencv/archive/refs/tags/4.13.0.tar.gz"
     CACHE STRING
     "URL of the OpenCV source archive")
 

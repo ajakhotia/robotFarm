@@ -14,7 +14,6 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "BUILD_TESTING": false,
                 "CMAKE_INSTALL_PREFIX": "/opt/robotFarm",
-                "CMAKE_CUDA_ARCHITECTURES": "75;80",
                 "ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB": false
             }
         },
@@ -31,23 +30,12 @@
         {
             "name": "clang",
             "hidden": true,
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_Fortran_COMPILER": "flang",
-                "CMAKE_CUDA_HOST_COMPILER": "clang++",
-                "CMAKE_CUDA_FLAGS": "-allow-unsupported-compiler"
-            }
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-clang.cmake"
         },
         {
             "name": "gnu",
             "hidden": true,
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++",
-                "CMAKE_Fortran_COMPILER": "gfortran",
-                "CMAKE_CUDA_HOST_COMPILER": "g++"
-            }
+            "toolchainFile": "${sourceDir}/external/infraCommons/cmake/toolchains/linux-gnu.cmake"
         },
 
         {
