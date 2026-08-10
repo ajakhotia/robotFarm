@@ -11,6 +11,12 @@ on:
     branches:
       - main
 
+# Superseded runs of the same ref waste the shared build machine, so cancel them for pull
+# requests. Push and tag runs on main are never cancelled mid-flight.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   base-stage:
     runs-on: ubuntu-latest
