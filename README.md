@@ -413,6 +413,25 @@ The allowed values are:
 - SuiteSparseExternalProject
 - VTKExternalProject
 
+### Declaring your project's robotFarm system packages
+
+A consumer project owns the complete list of system packages it needs, including the packages
+required to build its robotFarm subset; nothing is read from robotFarm's generated files when a
+consumer builds its images. To derive a `RobotFarmDependencies` group for your project's
+`systemDependencies.json`:
+
+1. Expand your requested build list to its transitive closure. Each recipe in
+   [`externalProjects/`](externalProjects) `include()`s the recipes it depends on, so follow
+   those includes; for example, `Eigen3ExternalProject` pulls in `SuiteSparseExternalProject`.
+2. Union the groups named after each project in the closure from robotFarm's own
+   [`systemDependencies.json`](systemDependencies.json). A project without a group needs no
+   system packages and contributes nothing.
+
+robotFarm's `systemDependencies.json` serves robotFarm itself and doubles as the reference for
+this derivation. The `systemDependencies.txt` that a configure emits is the same computation
+performed for the configured build list, so it makes a convenient cross-check for a
+hand-derived group.
+
 ## 🧑‍💻 Developer notes
 
 ### Python 3
