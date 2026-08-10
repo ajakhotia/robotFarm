@@ -43,7 +43,9 @@ set(ROBOT_FARM_LIST_SEPARATOR "|")
     composes it (CMAKE_PREFIX_PATH gains the install prefix so children resolve packages
     installed by their siblings). Everything the user hands this configure (raw -D
     definitions, a preset's cacheVariables, a toolchain file) is forwarded by the helper
-    automatically and needs no listing here. ]]
+    automatically and needs no listing here, except names in this super build's own
+    ROBOT_FARM_ namespace: those are its interface, consumed at this level, and are excluded
+    from forwarding. ]]
 set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
 set(CMAKE_EXPORT_PACKAGE_REGISTRY OFF)
 set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
@@ -59,6 +61,7 @@ compose_forwarded_cache_args(
   OUTPUT_VARIABLE ROBOT_FARM_FORWARDED_CMAKE_ARGS
   LIST_SEPARATOR ${ROBOT_FARM_LIST_SEPARATOR}
   USER_ENTRIES ${ROBOT_FARM_USER_CACHE_ENTRIES}
+  EXCLUDE_PREFIXES ROBOT_FARM_
   FORWARD_VARIABLES
     BUILD_SHARED_LIBS
     BUILD_TESTING
