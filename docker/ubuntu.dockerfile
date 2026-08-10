@@ -9,6 +9,11 @@ ENV APT_VAR_CACHE_ID=robotfarm-apt-var-cache-${OS_BASE}
 ENV APT_LIST_CACHE_ID=robotfarm-apt-list-cache-${OS_BASE}
 ENV DEBIAN_FRONTEND=noninteractive
 
+# The CUDA toolkit installs outside the default search paths. Put it on PATH so that builds
+# resolve nvcc by default, mirroring how update-alternatives resolves the host compilers
+# further down.
+ENV PATH=/usr/local/cuda/bin:${PATH}
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN printf '%s\n'                                                                                  \
@@ -47,7 +52,11 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
     apt-get update &&                                                                               \
-    apt-get install -y --no-install-recommends jq
+    apt-get install -y --no-install-recommends                                                      \
+      ca-certificates curl gnupg jq software-properties-common
+
+RUN --mount=type=bind,src=external/infraCommons/tools/apt/addAptSources.sh,dst=/tmp/tools/apt/addAptSources.sh,ro       \
+    bash /tmp/tools/apt/addAptSources.sh -y
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
@@ -56,24 +65,6 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get update &&                                                                                                   \
     apt-get install -y --no-install-recommends                                                                          \
       $(sh /tmp/tools/extractDependencies.sh Basics /tmp/systemDependencies.json)
-
-RUN --mount=type=bind,src=external/infraCommons/tools/installCMake.sh,dst=/tmp/tools/installCMake.sh,ro                 \
-    bash /tmp/tools/installCMake.sh
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
-    --mount=type=bind,src=external/infraCommons/tools/apt/addGNUSources.sh,dst=/tmp/tools/apt/addGNUSources.sh,ro       \
-    bash /tmp/tools/apt/addGNUSources.sh -y
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
-    --mount=type=bind,src=external/infraCommons/tools/apt/addLLVMSources.sh,dst=/tmp/tools/apt/addLLVMSources.sh,ro     \
-    bash /tmp/tools/apt/addLLVMSources.sh -y
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
-    --mount=type=bind,src=external/infraCommons/tools/apt/addNvidiaSources.sh,dst=/tmp/tools/apt/addNvidiaSources.sh,ro \
-    bash /tmp/tools/apt/addNvidiaSources.sh -y
 
 # Install the compiler toolchains together with the per-external-project
 # system dependencies for every project compiled inside this image. Groups
@@ -113,5 +104,19 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
 # time. We pick libomp-22-dev (matches clang-22's resource dir natively)
 # and expose its omp.h to clang-21. The runtime libomp.so comes from
 # /usr/lib/llvm-22 via linker flags in linux-clang-21.cmake.
+# Register the newest installed GNU compilers as the defaults for the unversioned names.
+RUN gnu=$(ls /usr/bin | grep -E '^gcc-[0-9]+$' | sort -V | tail -n 1 | cut -d- -f2) &&              \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${gnu} 100                          \
+      --slave /usr/bin/g++ g++ /usr/bin/g++-${gnu}                                                  \
+      --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${gnu} &&                                \
+    update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100 &&                                \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
+
+# Register the newest installed LLVM compilers as the defaults for the unversioned clang names.
+RUN llvm=$(ls /usr/bin | grep -E '^clang-[0-9]+$' | sort -V | tail -n 1 | cut -d- -f2) &&           \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${llvm} 100                   \
+      --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${llvm}                                     \
+      --slave /usr/bin/flang flang /usr/bin/flang-${llvm}
+
 RUN ln -s /usr/lib/llvm-22/lib/clang/22/include/omp.h                                                                   \
           /usr/lib/llvm-21/lib/clang/21/include/omp.h

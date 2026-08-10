@@ -86,11 +86,11 @@ quickly, pick one of the options below.
 
 Every tagged release (`v*`) attaches a set of zstd-compressed install archives to the GitHub release
 page — one archive for each combination of OS version and
-[CMake preset](#cmake-presets). Download the archive that matches your OS and toolchain, then
+[CMake preset](#cmake-presets). Download the archive that matches your OS and preset, then
 extract it under `/opt`:
 
 ```shell
-tar --zstd -C /opt -xf robotFarm-ubuntu-24-04-gnu-15-shared-<version>.tar.zst
+tar --zstd -C /opt -xf robotFarm-ubuntu-24-04-gnu-shared-<version>.tar.zst
 ```
 
 The archive also contains a `systemDependencies.txt` file at the install root. It lists the system
@@ -245,32 +245,33 @@ git -C ${SOURCE_TREE} submodule update --init
 
 ### 🔧 Install tools
 
-**Mandatory** — install `jq`, a recent `cmake` (>= 3.27), and basic build tools:
+**Mandatory** — install `jq`, a recent `cmake` (>= 3.27), and basic build tools. The `kitware`
+apt source provides the latest `cmake`:
 
 ```shell
 sudo apt update &&                                                                            \
-sudo apt install -y --no-install-recommends jq                                            &&  \
-sudo bash external/infraCommons/tools/installCMake.sh                                     &&  \
+sudo apt install -y --no-install-recommends                                                   \
+  ca-certificates curl gnupg jq software-properties-common                                &&  \
+sudo bash external/infraCommons/tools/apt/addAptSources.sh -y kitware                     &&  \
+sudo apt update                                                                           &&  \
 sudo apt install -y --no-install-recommends                                                   \
   $(sh external/infraCommons/tools/extractDependencies.sh Basics systemDependencies.json)
 ```
 
 **Compilers (your choice)** — robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. How you
 install them is up to you: an apt repository, downloaded tarballs, or any other method that works
-for your environment. One option is to run the helper scripts below. They add apt sources for the
-latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
+for your environment. One option is to register the `gnu`, `llvm`, and `nvidia` apt sources, which
+track the latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
 `systemDependencies.json`:
 
 ```shell
-sudo bash external/infraCommons/tools/apt/addGNUSources.sh    -y &&  \
-sudo bash external/infraCommons/tools/apt/addLLVMSources.sh   -y &&  \
-sudo bash external/infraCommons/tools/apt/addNvidiaSources.sh -y &&  \
-sudo apt update                                                  &&  \
-sudo apt install -y --no-install-recommends                          \
+sudo bash external/infraCommons/tools/apt/addAptSources.sh -y gnu llvm nvidia    &&  \
+sudo apt update                                                                  &&  \
+sudo apt install -y --no-install-recommends                                          \
   $(sh external/infraCommons/tools/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
-Run whichever of these scripts you need — all of them, some of them, or none. The minimum supported
+Run it with whichever of these apt sources you need — all of them, some of them, or none. The minimum supported
 CUDA Toolkit version is 13. Each [toolchain file](#pre-packaged-toolchain-files) has its own rules
 about which host compiler versions it accepts. If your compiler does not match,
 the [Configure step](#configure-step) fails with a clear error message.
@@ -326,23 +327,23 @@ needs root access (for example, `/opt/robotFarm` or `/usr`), run the command abo
 
 ### CMake presets
 
-The repository includes a `CMakePresets.json` file. It covers the combinations of toolchain and
-linkage used by CI:
+The repository includes a `CMakePresets.json` file. It covers the combinations of compiler family
+and linkage used by CI:
 
-- `clang-21-shared`, `clang-21-static`
-- `clang-22-shared`, `clang-22-static`
-- `gnu-14-shared`,   `gnu-14-static`
-- `gnu-15-shared`,   `gnu-15-static`
+- `clang-shared`, `clang-static`
+- `gnu-shared`,   `gnu-static`
 
-These presets exist to make CI runs reproducible. They are not required for end users. If one of
-them matches your environment, use it in place of the [Configure step](#configure-step) command:
+The presets use the default (unversioned) `gcc` / `clang` compilers found on `PATH`, so whatever
+your system resolves those names to is what builds. These presets exist to make CI runs
+reproducible. They are not required for end users. If one of them matches your environment, use it
+in place of the [Configure step](#configure-step) command:
 
 ```shell
-cmake --preset gnu-15-shared -S ${SOURCE_TREE} -B ${BUILD_TREE} \
+cmake --preset gnu-shared -S ${SOURCE_TREE} -B ${BUILD_TREE} \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}
 ```
 
-The preset sets the generator, toolchain file, build type, and linkage for you. The
+The preset sets the generator, compilers, build type, and linkage for you. The
 `-DCMAKE_INSTALL_PREFIX` line overrides the default install location set in the preset. The
 [System dependencies step](#system-dependencies-step) and the [Build step](#build-step) do not
 change.
@@ -355,6 +356,10 @@ gitignored, and CMake merges it with `CMakePresets.json` automatically.
 
 A few ready-to-use options are available through the `infraCommons` submodule:
 
+- [linux-clang.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang.cmake)
+  (default Clang on the system)
+- [linux-gnu.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu.cmake)
+  (default GNU on the system)
 - [linux-clang-21.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-21.cmake)
 - [linux-clang-22.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-22.cmake)
 - [linux-gnu-14.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-14.cmake)

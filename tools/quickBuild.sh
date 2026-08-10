@@ -13,7 +13,7 @@
   # Default values
   VERSION="main"
   INSTALL_PREFIX="/opt/robotFarm"
-  TOOLCHAIN="linux-gnu-default"
+  TOOLCHAIN=""
   BUILD_LIST=""
 
   # Simple argument parsing
@@ -28,7 +28,7 @@
         echo "Options:"
         echo "  -v, --version VERSION      Tag or branch to check out (default: main)"
         echo "  -p, --prefix PREFIX        Install prefix (default: /opt/robotFarm)"
-        echo "  -t, --toolchain TOOLCHAIN  Toolchain to use (default: linux-gnu-default)"
+        echo "  -t, --toolchain TOOLCHAIN  Toolchain to use (default: system default compilers)"
         echo "  -b, --build-list LIST      Semicolon-separated list of libraries to build (default: all)"
         echo "  -h, --help                 Show this help message"
         exit 0
@@ -47,7 +47,8 @@
 
   echo "Installing prerequisites for shallow checkout..."
   apt-get update
-  apt-get install -y --no-install-recommends ca-certificates git jq
+  apt-get install -y --no-install-recommends                                    \
+      ca-certificates curl git gnupg jq software-properties-common
 
   echo "Shallow-cloning robotFarm ${VERSION} from ${GITHUB_REPO}"
   git clone --depth 1 --branch "${VERSION}" "${GITHUB_REPO}.git" "${SOURCE_TREE}"
@@ -58,14 +59,12 @@
 
   echo "Installing basic tools & compilers..."
 
+  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addAptSources.sh" -y
+  apt-get update
+
   sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"        \
       Basics "${SOURCE_TREE}/systemDependencies.json"                           \
       | xargs -r apt-get install -y --no-install-recommends
-
-  bash "${SOURCE_TREE}/external/infraCommons/tools/installCMake.sh"
-  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addGNUSources.sh" -y
-  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addLLVMSources.sh" -y
-  bash "${SOURCE_TREE}/external/infraCommons/tools/apt/addNvidiaSources.sh" -y
 
   sh "${SOURCE_TREE}/external/infraCommons/tools/extractDependencies.sh"        \
       Compilers "${SOURCE_TREE}/systemDependencies.json"                        \
@@ -78,8 +77,9 @@
     -S "${SOURCE_TREE}"                                                                               \
     -B "${BUILD_TREE}"                                                                                \
     -DCMAKE_BUILD_TYPE=Release                                                                        \
+    -DBUILD_SHARED_LIBS:BOOL=ON                                                                       \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                        \
-    -DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake" \
+    ${TOOLCHAIN:+-DCMAKE_TOOLCHAIN_FILE="${SOURCE_TREE}/external/infraCommons/cmake/toolchains/${TOOLCHAIN}.cmake"} \
     ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST=${BUILD_LIST}}
 
   # shellcheck disable=SC2046

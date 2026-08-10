@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.22)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/external/infraCommons/cmake/utilities/forwardedCacheArgs.cmake)
+
+#[[ Record which cache entries the user handed this configure while they are still
+    identifiable: project() and later cache declarations erase the command-line marker from
+    untyped -D entries. The recorded names feed compose_forwarded_cache_args below. ]]
+capture_user_cache_entries(OUTPUT_VARIABLE ROBOT_FARM_USER_CACHE_ENTRIES)
+
 project(robotFarm VERSION 0.1.0.0 LANGUAGES C CXX CUDA Fortran)
 
 # Cmake 3.24.1 improves the behaviour of external project by utilizing the time of
@@ -25,52 +32,44 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Global flag to build shared libraries [Def
 set(BUILD_TESTING OFF CACHE BOOL "Global flag used by CTest [Default: OFF]")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Cmake build type [Default: Release]")
 
-# In-band list separator for values forwarded through ExternalProject_Add. Each
-# call pairs this with LIST_SEPARATOR so that `|` is translated back to `;` in
-# the generated initial-cache file; values that are CMake lists must be escaped
-# with string(REPLACE ";" "|" ...) before being baked into a -D<VAR>:TYPE=...
-# entry to prevent the outer list from splitting them into stray positionals.
+# In-band list separator for values forwarded through ExternalProject_Add. The helper below
+# escapes list values with it, and each ExternalProject_Add call pairs it with LIST_SEPARATOR
+# so that `|` is translated back to `;` in the child's configure.
 set(ROBOT_FARM_LIST_SEPARATOR "|")
 
-set(ROBOT_FARM_FORWARDED_CMAKE_ARGS
-  -DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}
-  -DCMAKE_MAKE_PROGRAM:PATH=${CMAKE_MAKE_PROGRAM}
-  -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY:BOOL=ON
-  -DCMAKE_EXPORT_PACKAGE_REGISTRY:BOOL=OFF
-  -DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF
-  -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
-  -DCMAKE_INSTALL_RPATH:STRING=$ORIGIN
-  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON
-  -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-  -DBUILD_TESTING:BOOL=${BUILD_TESTING})
-
-if(CMAKE_BUILD_TYPE)
-  list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
-endif()
-
-if(CMAKE_C_COMPILER_LAUNCHER)
-  list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS
-    -DCMAKE_C_COMPILER_LAUNCHER:STRING=${CMAKE_C_COMPILER_LAUNCHER})
-endif()
-
-if(CMAKE_CXX_COMPILER_LAUNCHER)
-  list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS
-    -DCMAKE_CXX_COMPILER_LAUNCHER:STRING=${CMAKE_CXX_COMPILER_LAUNCHER})
-endif()
-
-set(PREFIX_PATH "")
+#[[ Policy this super build imposes on every external project, forwarded by effective value
+    through compose_forwarded_cache_args below. A name belongs in FORWARD_VARIABLES only if
+    this super build authors its value (the set() calls below and the defaults above) or
+    composes it (CMAKE_PREFIX_PATH gains the install prefix so children resolve packages
+    installed by their siblings). Everything the user hands this configure (raw -D
+    definitions, a preset's cacheVariables, a toolchain file) is forwarded by the helper
+    automatically and needs no listing here. ]]
+set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
+set(CMAKE_EXPORT_PACKAGE_REGISTRY OFF)
+set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+set(CMAKE_INSTALL_RPATH "$ORIGIN")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 if(CMAKE_INSTALL_PREFIX)
-  list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX})
-  list(APPEND PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+  list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 endif()
 
-if(CMAKE_PREFIX_PATH)
-  list(APPEND PREFIX_PATH ${CMAKE_PREFIX_PATH})
-endif()
-
-string(REPLACE ";" "${ROBOT_FARM_LIST_SEPARATOR}" ROBOT_FARM_PREFIX_PATH_ESCAPED "${PREFIX_PATH}")
-list(APPEND ROBOT_FARM_FORWARDED_CMAKE_ARGS -DCMAKE_PREFIX_PATH:STRING=${ROBOT_FARM_PREFIX_PATH_ESCAPED})
+compose_forwarded_cache_args(
+  OUTPUT_VARIABLE ROBOT_FARM_FORWARDED_CMAKE_ARGS
+  LIST_SEPARATOR ${ROBOT_FARM_LIST_SEPARATOR}
+  USER_ENTRIES ${ROBOT_FARM_USER_CACHE_ENTRIES}
+  FORWARD_VARIABLES
+    BUILD_SHARED_LIBS
+    BUILD_TESTING
+    CMAKE_BUILD_TYPE
+    CMAKE_EXPORT_NO_PACKAGE_REGISTRY
+    CMAKE_EXPORT_PACKAGE_REGISTRY
+    CMAKE_FIND_USE_PACKAGE_REGISTRY
+    CMAKE_INSTALL_RPATH
+    CMAKE_INSTALL_RPATH_USE_LINK_PATH
+    CMAKE_POLICY_VERSION_MINIMUM
+    CMAKE_PREFIX_PATH)
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
   AbseilExternalProject
@@ -122,7 +121,8 @@ foreach(ITEM ${ROBOT_FARM_BUILD_LIST})
   execute_process(
     COMMAND sh external/infraCommons/tools/extractDependencies.sh ${ITEM} systemDependencies.json
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE ITEM_DEPENDENCIES)
+    OUTPUT_VARIABLE ITEM_DEPENDENCIES
+    COMMAND_ERROR_IS_FATAL ANY)
 
   if(ITEM_DEPENDENCIES)
     string(APPEND ROBOT_FARM_SYSTEM_DEPENDENCY_STR " " ${ITEM_DEPENDENCIES})
