@@ -17,7 +17,7 @@ old, when you need CUDA builds, or when every machine on a team should carry the
   ```cmake
   # Configure your project with -DCMAKE_PREFIX_PATH=/opt/robotFarm and use the libraries as usual.
   find_package(OpenCV REQUIRED)
-  target_link_libraries(myApp PRIVATE ${OpenCV_LIBS})
+  target_link_libraries(myApp PRIVATE opencv_core opencv_imgproc)
   ```
 
 - **Hands-off**: inter-library build order resolves automatically, and the system packages each
@@ -25,19 +25,6 @@ old, when you need CUDA builds, or when every machine on a team should carry the
 - **Auditable**: each library's version and feature flags live in one reviewable recipe under
   [externalProjects/](externalProjects).
 
-```mermaid
-%%{init: {"themeVariables": {"edgeLabelBackground": "transparent"}}}%%
-flowchart LR
-  classDef input   fill:#f3e8ff,stroke:#9333ea,stroke-width:1.5px,color:#581c87;
-  classDef farm    fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#7c2d12;
-  classDef output  fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
-  classDef project fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a;
-
-  A["build list<br/>(all libraries by default)"]:::input --> B["robotFarm super build<br/>resolves order, builds, installs"]:::farm
-  B --> C["one install prefix<br/>/opt/robotFarm"]:::output
-  B -. computes .-> D["systemDependencies.txt<br/>apt packages to install"]:::output
-  C --> E["your project<br/>find_package via CMAKE_PREFIX_PATH"]:::project
-```
 
 ## 📚 Supported libraries
 
@@ -109,18 +96,6 @@ release tarballs.
 Three ways in, ordered by effort. Building everything from source takes tens of minutes; the first
 two options skip that.
 
-```mermaid
-%%{init: {"themeVariables": {"edgeLabelBackground": "transparent"}}}%%
-flowchart TD
-  classDef q    fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#7c2d12;
-  classDef path fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#1e3a8a;
-
-  Q{"How do you want<br/>the libraries?"}:::q
-  Q -->|"prebuilt, right now"| T["📦 Option 1<br/>release tarball"]:::path
-  Q -->|"inside containers or CI"| D["🐳 Option 2<br/>base images"]:::path
-  Q -->|"built on this machine,<br/>one command"| S["🧑‍💻 Option 3<br/>quickBuild.sh"]:::path
-  Q -->|"full control over<br/>every knob"| M["🐢 Manual build"]:::path
-```
 
 ### 📦 Option 1: prebuilt release tarballs
 
