@@ -2,18 +2,42 @@
 
 # 🚜 robotFarm
 
-`robotFarm` is a CMake super-build for common AI and robotics libraries. It downloads, builds, and
-installs the libraries from source, handles the dependencies between them, and tells you which
-system packages to install with your OS package manager. Each library is built with the full set of
-supported features so downstream projects can use them without having to rebuild.
+**One command builds the C++ libraries your robotics project needs.**
 
-## 🌱 Why use robotFarm?
+robotFarm is a CMake super build. You pick the libraries. It downloads their sources, builds them
+in dependency order, and installs everything into one prefix. Use it when the apt versions are too
+old, when you need CUDA builds, or when every machine on a team should carry the same stack.
 
-* **Up to date and flexible**: get the latest stable versions, or pick specific versions with CMake
-  command-line options.
-* **Efficient**: build once, install to a prefix, reuse across projects.
-* **Consistent**: every library's configuration is documented, and each build turns on the full set
-  of features so downstream code can rely on them.
+> 🐧 **Linux only.** Needs C, C++, Fortran, and CUDA (13 or newer) compilers. Tested on
+> Ubuntu 22.04, 24.04, and 26.04. [MIT license](LICENSE).
+
+- **No lock-in**: your project stays a plain `find_package` client. Nothing robotFarm-specific
+  enters your CMake:
+
+  ```cmake
+  # Configure your project with -DCMAKE_PREFIX_PATH=/opt/robotFarm and use the libraries as usual.
+  find_package(OpenCV REQUIRED)
+  target_link_libraries(myApp PRIVATE ${OpenCV_LIBS})
+  ```
+
+- **Hands-off**: inter-library build order resolves automatically, and the system packages each
+  library needs are computed for you.
+- **Auditable**: each library's version and feature flags live in one reviewable recipe under
+  [externalProjects/](externalProjects).
+
+```mermaid
+%%{init: {"themeVariables": {"edgeLabelBackground": "transparent"}}}%%
+flowchart LR
+  classDef input   fill:#f3e8ff,stroke:#9333ea,stroke-width:1.5px,color:#581c87;
+  classDef farm    fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#7c2d12;
+  classDef output  fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
+  classDef project fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a;
+
+  A["build list<br/>(all libraries by default)"]:::input --> B["robotFarm super build<br/>resolves order, builds, installs"]:::farm
+  B --> C["one install prefix<br/>/opt/robotFarm"]:::output
+  B -. computes .-> D["systemDependencies.txt<br/>apt packages to install"]:::output
+  C --> E["your project<br/>find_package via CMAKE_PREFIX_PATH"]:::project
+```
 
 ## 📚 Supported libraries
 
@@ -74,63 +98,62 @@ supported features so downstream projects can use them without having to rebuild
 CCOLAMD</code>, <code>CHOLMOD</code>, <code>COLAMD</code>, <code>SPQR</code>, and <code>
 SuiteSparse_config</code>.</sub>
 
+Exact versions and feature flags are pinned per recipe in
+[externalProjects/](externalProjects). One licensing-sensitive gate to know about: OpenCV's
+contrib modules and CUDA features build only with
+`-DROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB:BOOL=ON`, which is off by default and off in the
+release tarballs.
+
 ## ⚡ Quick Start
 
-The full instructions are in the [Slow Start](#-slow-start) section. If you just want to get started
-quickly, pick one of the options below.
+Three ways in, ordered by effort. Building everything from source takes tens of minutes; the first
+two options skip that.
 
-> If you plan to use robotFarm as the base for your own project, or expect to rebuild it often,
-> the [Slow Start](#-slow-start) section is the better place to start.
+```mermaid
+%%{init: {"themeVariables": {"edgeLabelBackground": "transparent"}}}%%
+flowchart TD
+  classDef q    fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#7c2d12;
+  classDef path fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#1e3a8a;
 
-### 📦 Prebuilt release tarballs
-
-Every tagged release (`v*`) attaches a set of zstd-compressed install archives to the GitHub release
-page — one archive for each combination of OS version and
-[CMake preset](#cmake-presets). Download the archive that matches your OS and preset, then
-extract it under `/opt`:
-
-```shell
-tar --zstd -C /opt -xf robotFarm-ubuntu-24-04-gnu-shared-<version>.tar.zst
+  Q{"How do you want<br/>the libraries?"}:::q
+  Q -->|"prebuilt, right now"| T["📦 Option 1<br/>release tarball"]:::path
+  Q -->|"inside containers or CI"| D["🐳 Option 2<br/>base images"]:::path
+  Q -->|"built on this machine,<br/>one command"| S["🧑‍💻 Option 3<br/>quickBuild.sh"]:::path
+  Q -->|"full control over<br/>every knob"| M["🐢 Manual build"]:::path
 ```
 
-The archive also contains a `systemDependencies.txt` file at the install root. It lists the system
-packages the libraries need at runtime. On Ubuntu, pass this file to apt:
+### 📦 Option 1: prebuilt release tarballs
+
+A release is cut by tagging, and each release attaches one install archive per Ubuntu version and
+[CMake preset](#cmake-presets) (`gnu-shared`, `gnu-static`, `clang-shared`, `clang-static`; pick
+`shared` unless you know you need static). Download yours from the
+[releases page](https://github.com/ajakhotia/robotFarm/releases) and extract it under `/opt`:
 
 ```shell
-sudo apt update && sudo apt install -y --no-install-recommends $(cat /opt/robotFarm/systemDependencies.txt)
+tar --zstd -C /opt -xf robotFarm-<os>-<preset>-sha-<commit>.tar.zst
 ```
 
-On other distributions, install the same packages using your package manager.
+The archive ships a `systemDependencies.txt` at its root. It lists the system packages the
+libraries need at runtime. Install them:
 
-Browse available archives on the
-[releases page](https://github.com/ajakhotia/robotFarm/releases).
+```shell
+sudo apt update && sudo apt install -y --no-install-recommends \
+  $(cat /opt/robotFarm/systemDependencies.txt)
+```
 
-### 🐳 Prebuilt base images
+### 🐳 Option 2: prebuilt base images
 
-CI publishes a base image per supported Ubuntu version. Each image has the compilers, apt
-dependencies, and a recent `cmake` already installed. Use it to build robotFarm (or a project that
-depends on it) inside a clean container without installing the toolchain yourself:
+CI publishes a build-environment image per Ubuntu version. Compilers, every build dependency, and
+a recent `cmake` are preinstalled; robotFarm itself is not:
 
 * `ghcr.io/ajakhotia/robotfarm/ubuntu-22-04/base:latest`
 * `ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base:latest`
+* `ghcr.io/ajakhotia/robotfarm/ubuntu-26-04/base:latest`
 
-These images only contain the build environment — robotFarm itself is not installed. Replace
-`latest` with a commit SHA tag to use a specific version.
+Replace `latest` with a `sha-<commit>` tag to pin a version. The recipe is
+[docker/ubuntu.dockerfile](docker/ubuntu.dockerfile).
 
-To build the same image locally, use the command below. `OS_BASE` is the only build argument you
-need (for example, `ubuntu:22.04` or `ubuntu:24.04`):
-
-```shell
-git clone https://github.com/ajakhotia/robotFarm.git /tmp/robotFarm-src && \
-docker buildx build                                         \
-  --tag robotfarm-base                                      \
-  --file /tmp/robotFarm-src/docker/ubuntu.dockerfile        \
-  --build-arg OS_BASE=ubuntu:24.04                          \
-  /tmp/robotFarm-src
-```
-
-To run the build inside a container and copy the finished install-tree to the host, use the command
-below:
+Build robotFarm inside a container and keep the install tree on the host:
 
 ```shell
 git clone https://github.com/ajakhotia/robotFarm.git /tmp/robotFarm-src
@@ -147,38 +170,30 @@ docker run --rm                                                                 
         -DCMAKE_BUILD_TYPE=Release                                                              \
         -DCMAKE_TOOLCHAIN_FILE=/src/external/infraCommons/cmake/toolchains/linux-gnu-15.cmake   \
         -DCMAKE_INSTALL_PREFIX=/opt/robotFarm
-    apt-get update && apt-get install -y --no-install-recommends                                \
-        $(cat /tmp/build/systemDependencies.txt)
     cmake --build /tmp/build
   '
 ```
 
-The `apt-get install` line inside the container is a no-op when you start from the prebuilt base
-image, because the base image already has every build dependency installed. It is kept explicit so
-that the same command also works when you start from a plain `ubuntu:24.04` image.
-
-`/tmp/robotFarm-install` is only an example. Replace it with any writable path on the host to choose
-where the install-tree ends up.
-
-Before you use the install-tree, be sure to install the system packages the libraries need at
-runtime:
+Replace `/tmp/robotFarm-install` with any writable host path. Before using the install tree,
+install the runtime packages on the host:
 
 ```shell
 sudo apt update && sudo apt install -y --no-install-recommends \
   $(cat /tmp/robotFarm-install/systemDependencies.txt)
 ```
 
-For a more permanent setup, write your own Dockerfile that starts with
-`FROM ghcr.io/ajakhotia/robotfarm/ubuntu-24-04/base` and runs the same steps in a `RUN` layer.
+For CI, bake a derived image once: `FROM` the base image, then either run the same build in a
+`RUN` layer or extract a release tarball into it. Jobs then start with the stack already in
+place.
 
-### 🧑‍💻 Build from source
+### 🧑‍💻 Option 3: quickBuild.sh
 
-Use the [quickBuild.sh](tools/quickBuild.sh) script to build `robotFarm` on your own machine. It
-downloads the source, installs the required dependencies, builds and installs the libraries, and
-then cleans up all temporary files. This is a good option if you want to build and install once and
-not touch it again.
+[quickBuild.sh](tools/quickBuild.sh) builds robotFarm directly on your machine. It clones the
+source, registers the apt sources, installs the dependencies, builds, installs, and cleans up
+after itself. Good for a build-once machine setup.
 
-> [!WARNING] The commands below use `sudo`.
+> [!WARNING]
+> The commands below use `sudo`.
 
 ```shell
 curl -fsSL                                                                                          \
@@ -186,67 +201,58 @@ curl -fsSL                                                                      
   sudo bash
 ```
 
-You can override the version, toolchain, [build list](#selecting-a-subset-of-libraries), and install
-prefix:
+Version, toolchain, install prefix, and [build list](#selecting-a-subset-of-libraries) are
+overridable:
 
 ```shell
 curl -fsSL                                                                                          \
   https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh |       \
   sudo bash -s --                                                                                   \
-    --version v2.0.0                                                                                \
+    --version v2.2.0                                                                                \
     --toolchain linux-clang-22                                                                      \
     --prefix /tmp/robotFarm                                                                         \
-    --build-list "GlogExternalProject;GTestExternalProject;FlatBuffersExternalProject"
+    --build-list "GlogExternalProject;GoogleTestExternalProject;FlatBuffersExternalProject"
 ```
 
-You can see a working example of this in the [nioc](https://github.com/ajakhotia/nioc) project's
-[README.md](https://github.com/ajakhotia/nioc/blob/main/README.md#external-dependencies)
-and [dockerfile](https://github.com/ajakhotia/nioc/blob/5a7c06a541edee78cc013a007467f1200e44ae46/docker/ubuntu.dockerfile#L83).
+[nioc](https://github.com/ajakhotia/nioc) is a real consumer; its
+[README](https://github.com/ajakhotia/nioc/blob/main/README.md#-external-dependencies) shows this
+in use.
 
-## 🐢 Slow Start
+## 🐢 Manual build
 
-The steps below walk through a manual CMake setup for building robotFarm. **They have been tested on
-Ubuntu 22.04 and Ubuntu 24.04. See [docker/ubuntu.dockerfile](docker/ubuntu.dockerfile) for a
-working example.**
+The full manual path. Tested on Ubuntu 22.04, 24.04, and 26.04;
+[docker/ubuntu.dockerfile](docker/ubuntu.dockerfile) is the working reference.
 
-> If you want to pick a specific compiler, linkage mode, or a subset of libraries to build, read
-> the [Build Customization](#-build-customization) section before you start.
+> To pick a compiler, linkage, or a subset of libraries, read
+> [Build Customization](#-build-customization) first.
 
 ### 📂 Clone
 
-Pick three paths and make sure you have read and write permission on each one. The rest of this
-section refers to them using the tokens below. Replace the tokens with your own values.
+Pick three writable paths. The commands below refer to them through environment variables:
 
-| Token          | Purpose                                               | Examples                                                 |
-|----------------|-------------------------------------------------------|----------------------------------------------------------|
-| `SOURCE_TREE`  | Where robotFarm is cloned. Can be temporary.          | `${HOME}/sandbox/robotFarm`, `/tmp/robotFarm`            |
-| `BUILD_TREE`   | Where CMake creates the build-tree. Can be temporary. | `${SOURCE_TREE}/build`, `/tmp/robotFarm-build`           |
-| `INSTALL_TREE` | Where the final artifacts are installed. Keep this.   | `${HOME}/opt/robotFarm`, `/opt/robotFarm` (needs `sudo`) |
+| Variable       | Purpose                                               | Example                  |
+|----------------|-------------------------------------------------------|--------------------------|
+| `SOURCE_TREE`  | Where robotFarm is cloned. Temporary is fine.         | `/tmp/robotFarm`         |
+| `BUILD_TREE`   | Where CMake builds. Temporary is fine.                | `/tmp/robotFarm-build`   |
+| `INSTALL_TREE` | Where the libraries install. Keep this one.           | `${HOME}/opt/robotFarm`  |
 
-If you choose an install path that needs root access (for example, `/opt/robotFarm` or `/usr`), you
-will need `sudo` for the [Build step](#build-step). When possible, pick a path that your user can
-write to.
-
-The commands below use these tokens directly. You can export them as environment variables for
-convenience, but this is optional:
+An install path that needs root (`/opt`, `/usr`) needs `sudo` on the [Build step](#build-step);
+prefer a path your user can write.
 
 ```shell
-export SOURCE_TREE=${HOME}/sandbox/robotFarm
-export BUILD_TREE=${HOME}/sandbox/robotFarm-build
+export SOURCE_TREE=/tmp/robotFarm
+export BUILD_TREE=/tmp/robotFarm-build
 export INSTALL_TREE=${HOME}/opt/robotFarm
-```
 
-Clone the repository and initialize its first-level submodules:
-
-```shell
-git clone git@github.com:ajakhotia/robotFarm.git ${SOURCE_TREE}
+git clone https://github.com/ajakhotia/robotFarm.git ${SOURCE_TREE}
 git -C ${SOURCE_TREE} submodule update --init
+cd ${SOURCE_TREE}
 ```
 
 ### 🔧 Install tools
 
-**Mandatory** — install `jq`, a recent `cmake` (>= 3.27), and basic build tools. The `kitware`
-apt source provides the latest `cmake`:
+**Mandatory**: `jq`, a recent `cmake` (3.27 or newer, provided by the `kitware` apt source), and
+the basic build tools:
 
 ```shell
 sudo apt update &&                                                                            \
@@ -258,11 +264,9 @@ sudo apt install -y --no-install-recommends                                     
   $(sh external/infraCommons/tools/extractDependencies.sh Basics systemDependencies.json)
 ```
 
-**Compilers (your choice)** — robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. How you
-install them is up to you: an apt repository, downloaded tarballs, or any other method that works
-for your environment. One option is to register the `gnu`, `llvm`, and `nvidia` apt sources, which
-track the latest GNU, LLVM, and NVIDIA releases, and then install the `Compilers` group from
-`systemDependencies.json`:
+**Compilers**: robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. Install them any way
+you like. One option is to register the `gnu`, `llvm`, and `nvidia` apt sources and install the
+`Compilers` group:
 
 ```shell
 sudo bash external/infraCommons/tools/apt/addAptSources.sh -y gnu llvm nvidia    &&  \
@@ -271,21 +275,17 @@ sudo apt install -y --no-install-recommends                                     
   $(sh external/infraCommons/tools/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
-Run it with whichever of these apt sources you need — all of them, some of them, or none. The minimum supported
-CUDA Toolkit version is 13. Each [toolchain file](#pre-packaged-toolchain-files) has its own rules
-about which host compiler versions it accepts. If your compiler does not match,
-the [Configure step](#configure-step) fails with a clear error message.
+The minimum supported CUDA Toolkit is 13. Each [toolchain file](#pre-packaged-toolchain-files)
+pins absolute compiler paths (`/usr/bin/gcc-15` and so on); the configure fails if a pinned
+compiler is not installed.
 
 ### 🧑‍💻 Compile
 
-The compile stage has three steps, each one a single command:
-[Configure](#configure-step), [System dependencies](#system-dependencies-step), and
-[Build](#build-step).
+Three steps, one command each.
 
 #### Configure step
 
-This step creates the build-tree and sets the build options (toolchain, install location, and so
-on):
+Creates the build tree and sets the toolchain and install location:
 
 ```shell
 cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}     \
@@ -294,18 +294,12 @@ cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}     \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}
 ```
 
-Replace `<path-to-toolchain-file>` with the toolchain file you want to use. A few ready-to-use ones
-come with robotFarm — see [Pre-packaged toolchain files](#pre-packaged-toolchain-files) for the
-list.
-
-The [Build Customization](#-build-customization) section shows other ways to run this step: with
-a [CMake preset](#cmake-presets),
-or [building only a subset of the libraries](#selecting-a-subset-of-libraries).
+Pick `<path-to-toolchain-file>` from [Pre-packaged toolchain files](#pre-packaged-toolchain-files).
 
 #### System dependencies step
 
-The [Configure step](#configure-step) writes a list of required system packages into
-`${BUILD_TREE}/systemDependencies.txt`. Install them with apt:
+The configure writes the required system packages to `${BUILD_TREE}/systemDependencies.txt`.
+Install them:
 
 ```shell
 sudo apt install -y --no-install-recommends $(cat ${BUILD_TREE}/systemDependencies.txt)
@@ -313,75 +307,50 @@ sudo apt install -y --no-install-recommends $(cat ${BUILD_TREE}/systemDependenci
 
 #### Build step
 
-This step builds every external project and installs each one into `${INSTALL_TREE}`:
+Builds and installs every library into `${INSTALL_TREE}`; no separate `cmake --install` is needed:
 
 ```shell
 cmake --build ${BUILD_TREE}
 ```
 
-robotFarm is a super-build. The command above runs the build and install steps for every external
-project, so no separate `cmake --install` step is needed. If `INSTALL_TREE` points to a path that
-needs root access (for example, `/opt/robotFarm` or `/usr`), run the command above with `sudo`.
-
 ## 🎛️ Build Customization
 
 ### CMake presets
 
-The repository includes a `CMakePresets.json` file. It covers the combinations of compiler family
-and linkage used by CI:
-
-- `clang-shared`, `clang-static`
-- `gnu-shared`,   `gnu-static`
-
-The presets use the default (unversioned) `gcc` / `clang` compilers found on `PATH`, so whatever
-your system resolves those names to is what builds. These presets exist to make CI runs
-reproducible. They are not required for end users. If one of them matches your environment, use it
-in place of the [Configure step](#configure-step) command:
+[CMakePresets.json](CMakePresets.json) covers the compiler-family and linkage combinations CI
+builds: `clang-shared`, `clang-static`, `gnu-shared`, and `gnu-static`. They use the unversioned
+system compilers at `/usr/bin/gcc` and `/usr/bin/clang`, through the `linux-gnu.cmake` and
+`linux-clang.cmake` toolchain files. If one matches your environment, it replaces the
+[Configure step](#configure-step):
 
 ```shell
 cmake --preset gnu-shared -S ${SOURCE_TREE} -B ${BUILD_TREE} \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}
 ```
 
-The preset sets the generator, compilers, build type, and linkage for you. The
-`-DCMAKE_INSTALL_PREFIX` line overrides the default install location set in the preset. The
-[System dependencies step](#system-dependencies-step) and the [Build step](#build-step) do not
-change.
-
-If no preset matches, ignore them — or copy `CMakePresets.json` into your own
-`CMakeUserPresets.json` at the repository root and edit it there. `CMakeUserPresets.json` is
-gitignored, and CMake merges it with `CMakePresets.json` automatically.
+If none matches, ignore them, or copy one into a gitignored `CMakeUserPresets.json` and edit it
+there.
 
 ### Pre-packaged toolchain files
 
-A few ready-to-use options are available through the `infraCommons` submodule:
+Ready-to-use toolchain files ship in the `infraCommons` submodule at
+`${SOURCE_TREE}/external/infraCommons/cmake/toolchains/`:
 
 - [linux-clang.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang.cmake)
-  (default Clang on the system)
-- [linux-gnu.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu.cmake)
-  (default GNU on the system)
-- [linux-clang-21.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-21.cmake)
-- [linux-clang-22.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-22.cmake)
-- [linux-gnu-14.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-14.cmake)
-- [linux-gnu-15.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-15.cmake)
+  and
+  [linux-gnu.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu.cmake):
+  the default compilers on the system
+- [linux-clang-21.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-21.cmake),
+  [linux-clang-22.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang-22.cmake)
+- [linux-gnu-14.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-14.cmake),
+  [linux-gnu-15.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-15.cmake)
 
-After you clone robotFarm, the same files are on your machine at
-`${SOURCE_TREE}/external/infraCommons/cmake/toolchains/`. Use the path of the file you pick as the
-value of `-DCMAKE_TOOLCHAIN_FILE` in the [Configure step](#configure-step). For example, to use
-`linux-gnu-15.cmake`, the configure command becomes:
-
-```shell
-cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}                                                   \
-    -DCMAKE_BUILD_TYPE=Release                                                                      \
-    -DCMAKE_TOOLCHAIN_FILE=${SOURCE_TREE}/external/infraCommons/cmake/toolchains/linux-gnu-15.cmake \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}
-```
+Every file probes for CUDA and wires it in when present. Pass your pick as
+`-DCMAKE_TOOLCHAIN_FILE` in the [Configure step](#configure-step).
 
 ### Selecting a subset of libraries
 
-By default, robotFarm builds every supported library. To build only a subset, add
-`-DROBOT_FARM_REQUESTED_BUILD_LIST` to the [Configure step](#configure-step). For example, to build
-only Eigen3 and OpenCV, the configure command becomes:
+By default robotFarm builds every supported library. To build a subset, name the projects:
 
 ```shell
 cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}                                  \
@@ -391,7 +360,7 @@ cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}                               
     -DROBOT_FARM_REQUESTED_BUILD_LIST="Eigen3ExternalProject;OpenCVExternalProject"
 ```
 
-The allowed values are:
+Dependencies of the requested projects build automatically. The allowed values are:
 
 - AbseilExternalProject
 - BoostExternalProject
@@ -427,25 +396,26 @@ consumer builds its images. To derive a `RobotFarmDependencies` group for your p
    [`systemDependencies.json`](systemDependencies.json). A project without a group needs no
    system packages and contributes nothing.
 
-robotFarm's `systemDependencies.json` serves robotFarm itself and doubles as the reference for
-this derivation. The `systemDependencies.txt` that a configure emits is the same computation
-performed for the configured build list, so it makes a convenient cross-check for a
-hand-derived group.
+The `systemDependencies.txt` that a configure emits is the same computation performed for the
+configured build list, so it makes a convenient cross-check for a hand-derived group.
 
 ## 🧑‍💻 Developer notes
 
 ### Python 3
 
-robotFarm can build Python 3 from source if you need it. By default, it uses the system Python 3 and
-skips the source build. To build Python 3 from source instead, pass
-`-DROBOT_FARM_SKIP_PYTHON3:BOOL=OFF` to CMake in the [Configure step](#configure-step).
+robotFarm uses the system Python 3 by default. To build Python 3 from source instead, pass
+`-DROBOT_FARM_SKIP_Python3ExternalProject:BOOL=OFF` in the [Configure step](#configure-step).
 
 ### OpenCV
 
-- Building OpenCV with CUDA needs the `opencv_contrib` modules, because the CUDA features depend on
-  `cudev`.
-- CUDA codecs are not included in CUDA 10.0 or later, so the build turns off the `cudacodec`
-  module with `-DBUILD_opencv_cudacodec:BOOL=OFF`.
-- The following features are turned off because the required system packages are missing or unclear:
-  - OpenGL support
-  - GtkGlExt (installing `libgtkglext1` and `libgtkglext1-dev` was not enough)
+- Contrib modules and CUDA features are gated behind
+  `-DROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB:BOOL=ON` (off by default): the CUDA features depend
+  on `cudev` from contrib, and contrib carries non-free licensing that you must comply with.
+- CUDA codecs are absent from CUDA 10.0 and later, so the build turns off `cudacodec`.
+- The full flag set is in
+  [externalProjects/OpenCVExternalProject.cmake](externalProjects/OpenCVExternalProject.cmake);
+  read it before assuming a feature is on.
+
+## 📜 License
+
+[MIT](LICENSE).
