@@ -35,6 +35,7 @@ else()
 
   externalproject_add(CeresSolverExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ceressolver
+    GIT_TAG 2.2.0
     GIT_REPOSITORY ${ROBOT_FARM_CERES_SOLVER_URL}
     GIT_SHALLOW TRUE
     DOWNLOAD_NO_PROGRESS ON
