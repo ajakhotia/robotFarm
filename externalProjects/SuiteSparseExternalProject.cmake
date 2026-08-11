@@ -13,7 +13,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST SuiteSparseExternalProject)
 
   set(ROBOT_FARM_SUITE_SPARSE_URL
-    "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.11.0.tar.gz"
+    "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.13.0.tar.gz"
     CACHE STRING
     "URL of the Suite Sparse source archive")
 

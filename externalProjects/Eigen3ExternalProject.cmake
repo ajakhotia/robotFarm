@@ -15,7 +15,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST Eigen3ExternalProject)
 
   set(ROBOT_FARM_EIGEN3_URL
-    "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz"
+    "https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz"
     CACHE STRING
     "URL of the Eigen3 source archive")
 

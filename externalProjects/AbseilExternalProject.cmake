@@ -15,7 +15,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST AbseilExternalProject)
 
   set(ROBOT_FARM_ABSEIL_URL
-    "https://github.com/abseil/abseil-cpp/archive/refs/tags/20250814.0.tar.gz"
+    "https://github.com/abseil/abseil-cpp/archive/refs/tags/20260526.0.tar.gz"
     CACHE STRING
     "URL of the Abseil source archive")
 

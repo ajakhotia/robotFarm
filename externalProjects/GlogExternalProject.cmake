@@ -15,7 +15,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST GlogExternalProject)
 
   set(ROBOT_FARM_GLOG_URL
-    "https://github.com/google/glog/archive/refs/tags/v0.6.0.tar.gz"
+    "https://github.com/google/glog/archive/refs/tags/v0.7.1.tar.gz"
     CACHE STRING
     "URL of the Google Log source archive")
 

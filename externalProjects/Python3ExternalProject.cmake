@@ -13,7 +13,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST Python3ExternalProject)
 
   set(ROBOT_FARM_PYTHON3_URL
-    "https://github.com/python/cpython/archive/refs/tags/v3.10.1.tar.gz"
+    "https://github.com/python/cpython/archive/refs/tags/v3.14.7.tar.gz"
     CACHE STRING
     "URL of the Python3 source archive")
 

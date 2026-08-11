@@ -33,10 +33,16 @@ else()
   make_space_delimited_string(CERES_EXE_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_EXE_LINKER_FLAGS})
   make_space_delimited_string(CERES_SHARED_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_SHARED_LINKER_FLAGS})
 
+  #[[ Ceres' static companion library reflects the shared target's interface through a
+      TARGET_PROPERTY generator expression, which newer CMake rejects as transitively recursive.
+      Until upstream fixes it, patch the reflection into a direct dependency list. ]]
   externalproject_add(CeresSolverExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ceressolver
     GIT_REPOSITORY ${ROBOT_FARM_CERES_SOLVER_URL}
     GIT_SHALLOW TRUE
+    PATCH_COMMAND sed -i
+      "s|INTERFACE ..TARGET_PROPERTY:ceres,INTERFACE_LINK_LIBRARIES.|INTERFACE \${CERES_LIBRARY_PUBLIC_DEPENDENCIES}|"
+      internal/ceres/CMakeLists.txt
     DOWNLOAD_NO_PROGRESS ON
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
     CMAKE_CACHE_ARGS

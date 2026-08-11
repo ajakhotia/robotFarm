@@ -13,7 +13,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST GoogleTestExternalProject)
 
   set(ROBOT_FARM_GOOGLE_TEST_URL
-    "https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz"
+    "https://github.com/google/googletest/archive/refs/tags/v1.18.0.tar.gz"
     CACHE STRING
     "URL of the Google Test source archive")
 
