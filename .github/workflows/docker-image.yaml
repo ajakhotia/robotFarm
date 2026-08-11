@@ -25,11 +25,11 @@ jobs:
       matrix:
         os_base:
           - name: ubuntu:22.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:22.04
+            image: ghcr.io/ajakhotia/infracommons/weekly-base/ubuntu-22-04:latest
           - name: ubuntu:24.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:24.04
+            image: ghcr.io/ajakhotia/infracommons/weekly-base/ubuntu-24-04:latest
           - name: ubuntu:26.04
-            image: ghcr.io/ajakhotia/infracommons/weekly/ubuntu:26.04
+            image: ghcr.io/ajakhotia/infracommons/weekly-base/ubuntu-26-04:latest
 
     steps:
       - name: self-checkout
