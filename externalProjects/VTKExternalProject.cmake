@@ -17,8 +17,9 @@ else()
     CACHE STRING
     "URL of the VTK source archive")
 
-  #[[ VTK's bundled hdf5 calls vasprintf, a glibc extension that is declared only under the GNU
-      feature macro; clang's strict C mode on older glibc otherwise rejects the call. ]]
+  #[[ The link-based vasprintf probe in VTK's bundled hdf5 passes even where glibc hides the
+      declaration, and the strict C compile then rejects the call; forcing the probe negative
+      selects hdf5's own fallback implementation. ]]
   externalproject_add(VTKExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/vtk
     URL ${ROBOT_FARM_VTK_URL}
@@ -26,5 +27,5 @@ else()
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
     CMAKE_ARGS
     ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
-    -DCMAKE_C_FLAGS:STRING=-D_GNU_SOURCE)
+    -DH5_HAVE_VASPRINTF:BOOL=OFF)
 endif()
