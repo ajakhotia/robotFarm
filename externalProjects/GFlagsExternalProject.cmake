@@ -13,7 +13,7 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST GFlagsExternalProject)
 
   set(ROBOT_FARM_GFLAGS_URL
-    "https://github.com/gflags/gflags/archive/refs/tags/v2.2.2.tar.gz"
+    "https://github.com/gflags/gflags/archive/refs/tags/v2.3.1.tar.gz"
     CACHE STRING
     "URL of the Google Flags source archive")
 

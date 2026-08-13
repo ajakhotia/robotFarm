@@ -19,7 +19,7 @@ else()
 
   externalproject_add(BoostExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/boost
-    GIT_TAG boost-1.89.0
+    GIT_TAG boost-1.91.0
     GIT_REPOSITORY ${ROBOT_FARM_BOOST_URL}
     GIT_SUBMODULES_RECURSE TRUE
     GIT_SHALLOW TRUE

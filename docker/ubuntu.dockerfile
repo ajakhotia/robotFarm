@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-ARG OS_BASE=ubuntu:22.04
+ARG OS_BASE=ghcr.io/ajakhotia/infracommons/weekly-base/ubuntu-24-04:latest
 
 FROM ${OS_BASE} AS base
 
@@ -16,47 +16,14 @@ ENV PATH=/usr/local/cuda/bin:${PATH}
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN printf '%s\n'                                                                                  \
-    'path-exclude /usr/share/doc/*'                                                                \
-    'path-exclude /usr/share/man/*'                                                                \
-    'path-include /usr/share/locale/locale.alias'                                                  \
-    'path-include /usr/share/locale/en*/*'                                                         \
-    'path-exclude /usr/share/locale/*'                                                             \
-    'path-exclude /usr/share/info/*'                                                               \
-    > /etc/dpkg/dpkg.cfg.d/01_nodoc
-
-RUN printf '%s\n'                                                                                  \
-    'Acquire::http::Pipeline-Depth 0;'                                                             \
-    'Acquire::https::Pipeline-Depth 0;'                                                            \
-    'Acquire::http::No-Cache true;'                                                                \
-    'Acquire::https::No-Cache true;'                                                               \
-    'Acquire::BrokenProxy    true;'                                                                \
-    >> /etc/apt/apt.conf.d/90fix-hashsum-mismatch
-
-# Make apt resilient to flaky upstreams (e.g., Launchpad PPA hosting under stress):
-# 5 retries with short per-request timeouts so each failed attempt fails fast and
-# we get more shots at reaching a healthy backend behind the load balancer.
-RUN printf '%s\n'                                                                                  \
-    'Acquire::Retries "5";'                                                                        \
-    'Acquire::http::Timeout "30";'                                                                 \
-    'Acquire::https::Timeout "30";'                                                                \
-    > /etc/apt/apt.conf.d/91retry-and-timeouts
-
-RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                 \
-    --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked            \
-    apt-get update &&                                                                              \
-    apt-get full-upgrade -y --no-install-recommends &&                                             \
-    apt-get autoremove -y --no-install-recommends &&                                               \
-    apt-get autoclean -y --no-install-recommends
-
+# The base image already ships the vendor apt sources and the bootstrap package set. jq and
+# gettext-base are the two extra tools extractDependencies.sh needs: jq parses
+# systemDependencies.json, and envsubst from gettext-base expands --expand variables.
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                  \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked             \
     apt-get update &&                                                                               \
     apt-get install -y --no-install-recommends                                                      \
-      ca-certificates curl gnupg jq software-properties-common
-
-RUN --mount=type=bind,src=external/infraCommons/tools/apt/addAptSources.sh,dst=/tmp/tools/apt/addAptSources.sh,ro       \
-    bash /tmp/tools/apt/addAptSources.sh -y
+      gettext-base jq
 
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
