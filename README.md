@@ -183,7 +183,7 @@ overridable:
 curl -fsSL                                                                                          \
   https://raw.githubusercontent.com/ajakhotia/robotFarm/refs/heads/main/tools/quickBuild.sh |       \
   sudo bash -s --                                                                                   \
-    --version v2.2.0                                                                                \
+    --version v2.3.1                                                                                \
     --toolchain linux-clang-22                                                                      \
     --prefix /tmp/robotFarm                                                                         \
     --build-list "GlogExternalProject;GoogleTestExternalProject;FlatBuffersExternalProject"
