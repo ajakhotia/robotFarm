@@ -28,8 +28,22 @@ else()
     "URL of the Ceres Solver source archive")
 
   find_package(OpenMP REQUIRED)
-  make_space_delimited_string(CERES_C_FLAGS ${OpenMP_C_FLAGS} ${CMAKE_C_FLAGS})
-  make_space_delimited_string(CERES_CXX_FLAGS ${OpenMP_CXX_FLAGS} ${CMAKE_CXX_FLAGS})
+
+  #[[ SuiteSparse built with CUDA hardcodes CHOLMOD_HAS_CUDA into the installed cholmod.h,
+      so every compile that includes it needs the CUDA headers. Ceres finds SuiteSparse
+      through its own module-mode finder, whose cholmod_metis probe (the Partition
+      component gate) knows nothing of that coupling; feed the CUDA include directories
+      through the compiler flags so the probe and the library build both see them. ]]
+  find_package(CUDAToolkit)
+  set(CERES_CUDA_INCLUDE_FLAGS "")
+  if(CUDAToolkit_FOUND)
+    foreach(CERES_CUDA_INCLUDE_DIR ${CUDAToolkit_INCLUDE_DIRS})
+      string(APPEND CERES_CUDA_INCLUDE_FLAGS " -isystem ${CERES_CUDA_INCLUDE_DIR}")
+    endforeach()
+  endif()
+
+  make_space_delimited_string(CERES_C_FLAGS ${OpenMP_C_FLAGS} ${CMAKE_C_FLAGS} ${CERES_CUDA_INCLUDE_FLAGS})
+  make_space_delimited_string(CERES_CXX_FLAGS ${OpenMP_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${CERES_CUDA_INCLUDE_FLAGS})
   make_space_delimited_string(CERES_EXE_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_EXE_LINKER_FLAGS})
   make_space_delimited_string(CERES_SHARED_LINKER_FLAGS ${OMP_LINK_LIBS} ${CMAKE_SHARED_LINKER_FLAGS})
 
@@ -48,6 +62,9 @@ else()
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
     CMAKE_CACHE_ARGS
     ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
+    # Upstream defaults WITH_SUITESPARSE to OFF; without it Ceres silently drops the
+    # CHOLMOD/SPQR sparse solvers, CHOLMOD partitioning and single-precision factorization.
+    -DWITH_SUITESPARSE:BOOL=ON
     -DCMAKE_C_FLAGS:STRING=${CERES_C_FLAGS}
     -DCMAKE_CXX_FLAGS:STRING=${CERES_CXX_FLAGS}
     -DCMAKE_EXE_LINKER_FLAGS:STRING=${CERES_EXE_LINKER_FLAGS}
