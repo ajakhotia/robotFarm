@@ -231,10 +231,29 @@ else()
   endif()
 
   if(ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+    #[[ The 5.0.0 viz module relies on VTK headers to transitively provide <iostream>,
+        which stops holding with VTK 9.6 and GCC 15. Same fix as vcpkg's
+        0019-contrib-cout.diff; drop once a release carries it. The patch is valid only
+        for the pinned archive, so a user-overridden URL builds unpatched. ]]
+    if(ROBOT_FARM_OPENCV_CONTRIB_URL MATCHES "opencv_contrib/archive/refs/tags/5\\.0\\.0\\.tar\\.gz$")
+      set(ROBOT_FARM_OPENCV_CONTRIB_PATCH_COMMAND
+        PATCH_COMMAND sed -i
+          "1i #include <iostream>"
+          modules/viz/src/vtk/vtkVizInteractorStyle.cpp
+          modules/viz/src/widget.cpp
+        COMMAND sed -i
+          -e "s|    cout|    std::cout|"
+          -e "s|<< endl|<< std::endl|"
+          modules/viz/src/vtk/vtkVizInteractorStyle.cpp)
+    else()
+      set(ROBOT_FARM_OPENCV_CONTRIB_PATCH_COMMAND "")
+    endif()
+
     externalproject_add(OpenCVContribExternalProject
       PREFIX ${CMAKE_CURRENT_BINARY_DIR}/opencv-contrib
       URL ${ROBOT_FARM_OPENCV_CONTRIB_URL}
       DOWNLOAD_NO_PROGRESS ON
+      ${ROBOT_FARM_OPENCV_CONTRIB_PATCH_COMMAND}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND "")

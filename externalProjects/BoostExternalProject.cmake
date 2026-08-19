@@ -14,15 +14,12 @@ else()
   list(APPEND ROBOT_FARM_BUILD_LIST BoostExternalProject)
 
   set(ROBOT_FARM_BOOST_URL
-    "https://github.com/boostorg/boost.git"
+    "https://github.com/boostorg/boost/releases/download/boost-1.91.0-1/boost-1.91.0-1-cmake.tar.gz"
     CACHE STRING "URL of the Boost source archive")
 
   externalproject_add(BoostExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/boost
-    GIT_TAG boost-1.91.0
-    GIT_REPOSITORY ${ROBOT_FARM_BOOST_URL}
-    GIT_SUBMODULES_RECURSE TRUE
-    GIT_SHALLOW TRUE
+    URL ${ROBOT_FARM_BOOST_URL}
     DOWNLOAD_NO_PROGRESS ON
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
     CMAKE_ARGS ${ROBOT_FARM_FORWARDED_CMAKE_ARGS})
