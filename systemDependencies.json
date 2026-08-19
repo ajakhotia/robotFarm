@@ -38,6 +38,13 @@
       "tag": "all"
     },
     {
+      "group": "GlogExternalProject",
+      "ubuntu:22.04": "libunwind-dev",
+      "ubuntu:24.04": "libunwind-dev",
+      "ubuntu:26.04": "libunwind-dev",
+      "tag": "all"
+    },
+    {
       "group": "GzCmakeExternalProject",
       "ubuntu:24.04": "pkg-config",
       "ubuntu:26.04": "pkg-config",
