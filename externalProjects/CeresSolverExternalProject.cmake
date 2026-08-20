@@ -5,6 +5,7 @@ endif()
 
 include(ExternalProject)
 include(${CMAKE_CURRENT_LIST_DIR}/AbseilExternalProject.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/CudssExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/Eigen3ExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/GFlagsExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/GlogExternalProject.cmake)
@@ -73,6 +74,7 @@ endif()
 
 add_dependencies(CeresSolverExternalProject
   AbseilExternalProject
+  CudssExternalProject
   Eigen3ExternalProject
   GFlagsExternalProject
   GlogExternalProject
