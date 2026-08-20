@@ -79,11 +79,28 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
   BoostExternalProject
   CapnprotoExternalProject
   CeresSolverExternalProject
+  CudssExternalProject
   Eigen3ExternalProject
   FlatBuffersExternalProject
   GFlagsExternalProject
+  GazeboExternalProject
   GlogExternalProject
   GoogleTestExternalProject
+  GzCmakeExternalProject
+  GzCommonExternalProject
+  GzFuelToolsExternalProject
+  GzGuiExternalProject
+  GzLaunchExternalProject
+  GzMathExternalProject
+  GzMsgsExternalProject
+  GzPhysicsExternalProject
+  GzPluginExternalProject
+  GzRenderingExternalProject
+  GzSensorsExternalProject
+  GzSimExternalProject
+  GzToolsExternalProject
+  GzTransportExternalProject
+  GzUtilsExternalProject
   NlohmannJsonExternalProject
   OatppExternalProject
   OatppWebSocketExternalProject
@@ -91,9 +108,12 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
   OpenCVExternalProject
   ProtobufExternalProject
   Python3ExternalProject
+  SdformatExternalProject
   SpdLogExternalProject
   SuiteSparseExternalProject
   VTKExternalProject
+  ZenohCExternalProject
+  ZenohCppExternalProject
   CACHE STRING
   "Semi-colon separated list of projects requested by the user. Default includes all")
 

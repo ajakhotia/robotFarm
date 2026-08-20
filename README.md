@@ -143,7 +143,6 @@ docker run --rm                                                                 
     set -euo pipefail
     cmake -G Ninja -S /src -B /tmp/build                                                        \
         -DCMAKE_BUILD_TYPE=Release                                                              \
-        -DCMAKE_TOOLCHAIN_FILE=/src/external/infraCommons/cmake/toolchains/linux-gnu-15.cmake   \
         -DCMAKE_INSTALL_PREFIX=/opt/robotFarm
     cmake --build /tmp/build
   '
@@ -239,7 +238,9 @@ sudo apt install -y --no-install-recommends                                     
   $(sh external/infraCommons/tools/extractDependencies.sh Basics systemDependencies.json)
 ```
 
-**Compilers**: robotFarm needs C, C++, CUDA, and Fortran compilers on `PATH`. Install them any way
+**Compilers**: robotFarm needs C, C++, CUDA, and Fortran compilers. The C, C++, and Fortran
+compilers must be reachable through their unversioned names (`gcc`, `clang`, `gfortran`); CUDA's
+`nvcc` is handed to CMake by path in the [Configure step](#configure-step). Install them any way
 you like. One option is to register the `gnu`, `llvm`, and `nvidia` apt sources and install the
 `Compilers` group:
 
@@ -250,9 +251,32 @@ sudo apt install -y --no-install-recommends                                     
   $(sh external/infraCommons/tools/extractDependencies.sh Compilers systemDependencies.json)
 ```
 
-The minimum supported CUDA Toolkit is 13. Each [toolchain file](#pre-packaged-toolchain-files)
-pins absolute compiler paths (`/usr/bin/gcc-15` and so on); the configure fails if a pinned
-compiler is not installed.
+The minimum supported CUDA Toolkit is 13. The packages above install versioned names only
+(`gcc-15`, `clang-22`, and so on), so register them as the defaults for the unversioned names:
+
+```shell
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-15 100          \
+  --slave /usr/bin/g++ g++ /usr/bin/g++-15                                       \
+  --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-15                    &&  \
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 100    \
+  --slave /usr/bin/clang++ clang++ /usr/bin/clang++-22                           \
+  --slave /usr/bin/flang flang /usr/bin/flang-22
+```
+
+The CUDA toolkit installs under `/usr/local/cuda`, outside the default search paths. No `PATH`
+change is needed: the [Configure step](#configure-step) hands `nvcc`'s location to CMake as a
+cache entry, and every cache entry handed to the top-level configure forwards into each
+library's own configure.
+
+> [!WARNING]
+> Do not symlink `nvcc` into `/usr/bin`, by hand or through `update-alternatives`. `nvcc`
+> locates its toolkit through the literal path it is invoked as, without resolving symlinks,
+> and CMake prefers an `nvcc` that sits next to the C++ compiler over the ones on `PATH`. Such
+> a symlink therefore breaks CUDA toolkit detection even when `/usr/local/cuda/bin` is on
+> `PATH`.
+
+[docker/ubuntu.dockerfile](docker/ubuntu.dockerfile) performs the same registration when baking
+the [base images](#-option-2-prebuilt-base-images).
 
 ### 🧑‍💻 Compile
 
@@ -260,16 +284,31 @@ Three steps, one command each.
 
 #### Configure step
 
-Creates the build tree and sets the toolchain and install location:
+Creates the build tree and sets the install location. The default compilers on `PATH`, the ones
+registered in [Install tools](#-install-tools), do the compiling. The `CMAKE_CUDA_COMPILER`
+entry points at `nvcc` through the alternatives-managed `/usr/local/cuda` symlink, so a CUDA
+upgrade needs no edit:
 
 ```shell
-cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}     \
-    -DCMAKE_BUILD_TYPE=Release                        \
-    -DCMAKE_TOOLCHAIN_FILE=<path-to-toolchain-file>   \
+cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}       \
+    -DCMAKE_BUILD_TYPE=Release                          \
+    -DBUILD_SHARED_LIBS=ON                              \
+    -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc      \
+    -DCMAKE_CUDA_ARCHITECTURES=all-major                \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}
 ```
 
-Pick `<path-to-toolchain-file>` from [Pre-packaged toolchain files](#pre-packaged-toolchain-files).
+`BUILD_SHARED_LIBS=ON` selects shared libraries, the recommended and best-tested mode;
+robotFarm defaults to static archives when the flag is omitted.
+
+`all-major` compiles device code for every major GPU architecture the CUDA toolkit supports, so
+the install tree runs on any of them. To shorten the build for a single known machine, replace
+it with that GPU's architecture (`nvidia-smi --query-gpu=compute_cap --format=csv,noheader`,
+dot removed, e.g. `120`), or with `native` to let CMake detect the GPU present at build time.
+
+To pin a compiler family or version explicitly instead, add
+`-DCMAKE_TOOLCHAIN_FILE=<path-to-toolchain-file>` from
+[Pre-packaged toolchain files](#pre-packaged-toolchain-files).
 
 #### System dependencies step
 
@@ -308,8 +347,9 @@ there.
 
 ### Pre-packaged toolchain files
 
-Ready-to-use toolchain files ship in the `infraCommons` submodule at
-`${SOURCE_TREE}/external/infraCommons/cmake/toolchains/`:
+A toolchain file pins the compiler family and version explicitly, overriding the defaults
+registered in [Install tools](#-install-tools). Ready-to-use files ship in the `infraCommons`
+submodule at `${SOURCE_TREE}/external/infraCommons/cmake/toolchains/`:
 
 - [linux-clang.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-clang.cmake)
   and
@@ -320,8 +360,10 @@ Ready-to-use toolchain files ship in the `infraCommons` submodule at
 - [linux-gnu-14.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-14.cmake),
   [linux-gnu-15.cmake](https://github.com/ajakhotia/infraCommons/blob/main/cmake/toolchains/linux-gnu-15.cmake)
 
-Every file probes for CUDA and wires it in when present. Pass your pick as
-`-DCMAKE_TOOLCHAIN_FILE` in the [Configure step](#configure-step).
+Every file probes for CUDA and wires it in when present. The versioned files pin absolute
+compiler paths (`/usr/bin/gcc-15` and so on), and the configure fails if a pinned compiler is
+not installed. Pass your pick as `-DCMAKE_TOOLCHAIN_FILE` in the
+[Configure step](#configure-step).
 
 ### Selecting a subset of libraries
 
@@ -330,7 +372,9 @@ By default robotFarm builds every supported library. To build a subset, name the
 ```shell
 cmake -G Ninja -S ${SOURCE_TREE} -B ${BUILD_TREE}                                  \
     -DCMAKE_BUILD_TYPE=Release                                                     \
-    -DCMAKE_TOOLCHAIN_FILE=<path-to-toolchain-file>                                \
+    -DBUILD_SHARED_LIBS=ON                                                         \
+    -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc                                 \
+    -DCMAKE_CUDA_ARCHITECTURES=all-major                                           \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TREE}                                         \
     -DROBOT_FARM_REQUESTED_BUILD_LIST="Eigen3ExternalProject;OpenCVExternalProject"
 ```

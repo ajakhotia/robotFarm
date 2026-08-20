@@ -25,9 +25,9 @@
     },
     {
       "group": "BoostExternalProject",
-      "ubuntu:22.04": "python3-dev python-is-python3",
-      "ubuntu:24.04": "python3-dev python-is-python3",
-      "ubuntu:26.04": "python3-dev python-is-python3",
+      "ubuntu:22.04": "mpi-default-dev python3-dev python3-numpy python-is-python3",
+      "ubuntu:24.04": "mpi-default-dev python3-dev python3-numpy python-is-python3",
+      "ubuntu:26.04": "mpi-default-dev python3-dev python3-numpy python-is-python3",
       "tag": "all"
     },
     {
@@ -38,17 +38,102 @@
       "tag": "all"
     },
     {
+      "group": "GlogExternalProject",
+      "ubuntu:22.04": "libunwind-dev",
+      "ubuntu:24.04": "libunwind-dev",
+      "ubuntu:26.04": "libunwind-dev",
+      "tag": "all"
+    },
+    {
+      "group": "GzCmakeExternalProject",
+      "ubuntu:24.04": "pkg-config",
+      "ubuntu:26.04": "pkg-config",
+      "tag": "skip"
+    },
+    {
+      "group": "GzCommonExternalProject",
+      "ubuntu:24.04": "libassimp-dev libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev libgdal-dev libswscale-dev libtinyxml2-dev uuid-dev",
+      "ubuntu:26.04": "libassimp-dev libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev libgdal-dev libswscale-dev libtinyxml2-dev uuid-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzFuelToolsExternalProject",
+      "ubuntu:24.04": "libcurl4-openssl-dev libjsoncpp-dev libtinyxml2-dev libyaml-dev libzip-dev",
+      "ubuntu:26.04": "libcurl4-openssl-dev libjsoncpp-dev libtinyxml2-dev libyaml-dev libzip-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzGuiExternalProject",
+      "ubuntu:24.04": "libqt6svg6 libtinyxml2-dev qml6-module-qt-labs-folderlistmodel qml6-module-qt-labs-platform qml6-module-qt-labs-settings qml6-module-qt5compat-graphicaleffects qml6-module-qtcharts qml6-module-qtcore qml6-module-qtpositioning qml6-module-qtqml qml6-module-qtqml-models qml6-module-qtqml-workerscript qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-dialogs qml6-module-qtquick-layouts qml6-module-qtquick-templates qml6-module-qtquick-window qt6-5compat-dev qt6-base-dev qt6-base-private-dev qt6-declarative-dev qt6-declarative-private-dev",
+      "ubuntu:26.04": "libqt6svg6 libtinyxml2-dev qml6-module-qt-labs-folderlistmodel qml6-module-qt-labs-platform qml6-module-qt-labs-settings qml6-module-qt5compat-graphicaleffects qml6-module-qtcharts qml6-module-qtcore qml6-module-qtpositioning qml6-module-qtqml qml6-module-qtqml-models qml6-module-qtqml-workerscript qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-dialogs qml6-module-qtquick-layouts qml6-module-qtquick-templates qml6-module-qtquick-window qt6-5compat-dev qt6-base-dev qt6-base-private-dev qt6-declarative-dev qt6-declarative-private-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzLaunchExternalProject",
+      "ubuntu:24.04": "binutils binutils-dev libtinyxml2-dev libwebsockets-dev libxi-dev libxmu-dev libyaml-dev uuid-dev",
+      "ubuntu:26.04": "binutils binutils-dev libtinyxml2-dev libwebsockets-dev libxi-dev libxmu-dev libyaml-dev uuid-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzMathExternalProject",
+      "ubuntu:24.04": "pybind11-dev python3-dev ruby-dev swig",
+      "ubuntu:26.04": "pybind11-dev python3-dev ruby-dev swig",
+      "tag": "skip"
+    },
+    {
+      "group": "GzMsgsExternalProject",
+      "ubuntu:24.04": "libtinyxml2-dev python3-protobuf",
+      "ubuntu:26.04": "libtinyxml2-dev python3-protobuf",
+      "tag": "skip"
+    },
+    {
+      "group": "GzPhysicsExternalProject",
+      "ubuntu:24.04": "libbenchmark-dev libbullet-dev libdart-collision-bullet-dev libdart-collision-ode-dev libdart-dev libdart-external-ikfast-dev libdart-external-odelcpsolver-dev libdart-utils-dev libdart-utils-urdf-dev",
+      "ubuntu:26.04": "libbenchmark-dev libbullet-dev libdart-collision-bullet-dev libdart-collision-ode-dev libdart-dev libdart-external-ikfast-dev libdart-external-odelcpsolver-dev libdart-utils-dev libdart-utils-urdf-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzRenderingExternalProject",
+      "ubuntu:24.04": "freeglut3-dev libfreeimage-dev libgl-dev libglew-dev libglu1-mesa-dev libogre-next-dev libvulkan-dev libxi-dev libxmu-dev uuid-dev",
+      "ubuntu:26.04": "freeglut3-dev libfreeimage-dev libgl-dev libglew-dev libglu1-mesa-dev libogre-next-dev libvulkan-dev libxi-dev libxmu-dev uuid-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzSimExternalProject",
+      "ubuntu:24.04": "binutils binutils-dev freeglut3-dev libbenchmark-dev libdw-dev libdwarf-dev libfreeimage-dev libglew-dev libtinyxml2-dev libwebsockets-dev libxi-dev libxmu-dev pybind11-dev python3-dev qml6-module-qt-labs-folderlistmodel qml6-module-qt-labs-settings qml6-module-qt5compat-graphicaleffects qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-dialogs qml6-module-qtquick-layouts qt6-5compat-dev qt6-base-dev qt6-base-private-dev qt6-declarative-dev uuid-dev",
+      "ubuntu:26.04": "binutils binutils-dev freeglut3-dev libbenchmark-dev libdw-dev libdwarf-dev libfreeimage-dev libglew-dev libtinyxml2-dev libwebsockets-dev libxi-dev libxmu-dev pybind11-dev python3-dev qml6-module-qt-labs-folderlistmodel qml6-module-qt-labs-settings qml6-module-qt5compat-graphicaleffects qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-dialogs qml6-module-qtquick-layouts qt6-5compat-dev qt6-base-dev qt6-base-private-dev qt6-declarative-dev uuid-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzToolsExternalProject",
+      "ubuntu:24.04": "ruby",
+      "ubuntu:26.04": "ruby",
+      "tag": "skip"
+    },
+    {
+      "group": "GzTransportExternalProject",
+      "ubuntu:24.04": "cppzmq-dev libsqlite3-dev libzmq3-dev pybind11-dev python3-dev python3-psutil uuid-dev",
+      "ubuntu:26.04": "cppzmq-dev libsqlite3-dev libzmq3-dev pybind11-dev python3-dev python3-psutil uuid-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "GzUtilsExternalProject",
+      "ubuntu:24.04": "libcli11-dev",
+      "ubuntu:26.04": "libcli11-dev",
+      "tag": "skip"
+    },
+    {
       "group": "OgreExternalProject",
-      "ubuntu:22.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype6-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
-      "ubuntu:24.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
-      "ubuntu:26.04": "freeglut3-dev libcppunit-dev libfreeimage-dev libfreetype-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit zlib1g-dev",
+      "ubuntu:22.04": "freeglut3-dev glslang-dev libcppunit-dev libfreeimage-dev libfreetype6-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libvulkan-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit swig zlib1g-dev",
+      "ubuntu:24.04": "freeglut3-dev glslang-dev libcppunit-dev libfreeimage-dev libfreetype-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libvulkan-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit swig zlib1g-dev",
+      "ubuntu:26.04": "freeglut3-dev glslang-dev libcppunit-dev libfreeimage-dev libfreetype-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libpng-dev libpoco-dev libpugixml-dev libsdl2-dev libtbb-dev libvulkan-dev libxaw7-dev libxrandr-dev libxt-dev libzzip-dev nvidia-cg-toolkit swig zlib1g-dev",
       "tag": "all"
     },
     {
       "group": "OpenCVExternalProject",
-      "ubuntu:22.04": "liblapacke-dev libgtk-3-dev ffmpeg libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libgstreamer1.0-dev libpng-dev libjpeg-dev libtiff-dev libhdf5-dev libgstreamer-plugins-base1.0-dev",
-      "ubuntu:24.04": "libavcodec-dev libavformat-dev libdc1394-dev libavutil-dev libgdal-dev libgphoto2-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libgtk-3-dev libjpeg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libswresample-dev libswscale-dev libtbb-dev libtiff-dev libv4l-dev libwebp-dev python3-dev python3-numpy qtbase5-dev v4l-utils",
-      "ubuntu:26.04": "libavcodec-dev libavformat-dev libdc1394-dev libavutil-dev libgdal-dev libgphoto2-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libgtk-3-dev libjpeg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libswresample-dev libswscale-dev libtbb-dev libtiff-dev libv4l-dev libwebp-dev python3-dev python3-numpy qtbase5-dev v4l-utils",
+      "ubuntu:22.04": "libcudnn9-dev-cuda-13 libavcodec-dev libavformat-dev libavif-dev libavutil-dev libdc1394-dev libgdal-dev libgphoto2-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libhdf5-dev libjpeg-dev liblapacke-dev libopenexr-dev libopenjp2-7-dev libpng-dev libswresample-dev libswscale-dev libtbb-dev libtesseract-dev libtiff-dev libv4l-dev libwebp-dev python3-dev python3-numpy qt6-base-dev v4l-utils",
+      "ubuntu:24.04": "libcudnn9-dev-cuda-13 libavcodec-dev libavformat-dev libavif-dev libavutil-dev libdc1394-dev libgdal-dev libgphoto2-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libhdf5-dev libjpeg-dev libjxl-dev liblapacke-dev libopenexr-dev libopenjp2-7-dev libpng-dev libswresample-dev libswscale-dev libtbb-dev libtesseract-dev libtiff-dev libv4l-dev libwebp-dev python3-dev python3-numpy qt6-base-dev v4l-utils",
+      "ubuntu:26.04": "libcudnn9-dev-cuda-13 libavcodec-dev libavformat-dev libavif-dev libavutil-dev libdc1394-dev libgdal-dev libgphoto2-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libhdf5-dev libjpeg-dev libjxl-dev liblapacke-dev libopenexr-dev libopenjp2-7-dev libpng-dev libswresample-dev libswscale-dev libtbb-dev libtesseract-dev libtiff-dev libv4l-dev libwebp-dev python3-dev python3-numpy qt6-base-dev v4l-utils",
       "tag": "all"
     },
     {
@@ -56,6 +141,12 @@
       "ubuntu:22.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev libmpdec-dev",
       "ubuntu:24.04": "libssl-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev",
       "ubuntu:26.04": "libssl-dev zlib1g-dev libncurses-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libffi-dev uuid-dev tk tk-dev linux-headers-generic tcl-dev",
+      "tag": "skip"
+    },
+    {
+      "group": "SdformatExternalProject",
+      "ubuntu:24.04": "libtinyxml2-dev liburdfdom-dev pybind11-dev python3-dev",
+      "ubuntu:26.04": "libtinyxml2-dev liburdfdom-dev pybind11-dev python3-dev",
       "tag": "skip"
     },
     {
@@ -67,10 +158,16 @@
     },
     {
       "group": "VTKExternalProject",
-      "ubuntu:22.04": "libgl1-mesa-dev libxt-dev",
-      "ubuntu:24.04": "libgl1-mesa-dev libxt-dev",
-      "ubuntu:26.04": "libgl1-mesa-dev libxt-dev",
+      "ubuntu:22.04": "libavcodec-dev libavformat-dev libavutil-dev libgdal-dev libgl1-mesa-dev libswresample-dev libswscale-dev libtbb-dev libxt-dev mpi-default-dev python3-dev qt6-base-dev",
+      "ubuntu:24.04": "libavcodec-dev libavformat-dev libavutil-dev libgdal-dev libgl1-mesa-dev libswresample-dev libswscale-dev libtbb-dev libxt-dev mpi-default-dev python3-dev qt6-base-dev",
+      "ubuntu:26.04": "libavcodec-dev libavformat-dev libavutil-dev libgdal-dev libgl1-mesa-dev libswresample-dev libswscale-dev libtbb-dev libxt-dev mpi-default-dev python3-dev qt6-base-dev",
       "tag": "all"
+    },
+    {
+      "group": "ZenohCExternalProject",
+      "ubuntu:24.04": "cargo-1.91 rustc-1.91",
+      "ubuntu:26.04": "cargo rustc",
+      "tag": "skip"
     }
   ]
 }

@@ -36,35 +36,59 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
 # Install the compiler toolchains together with the per-external-project
 # system dependencies for every project compiled inside this image. Groups
 # without an entry in systemDependencies.json are silently skipped by the
-# script, so listing every externalProjects/*.cmake entry is safe.
+# script, so listing every externalProjects/*.cmake entry is safe. A group
+# that exists but omits the current OS key is a hard error, so the Gazebo,
+# sdformat, and zenoh groups, which carry no ubuntu 22.04 entries because
+# those projects are not buildable there, are queried only on the other
+# bases.
 RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=locked                                      \
     --mount=type=cache,target=/var/lib/apt/lists,id=${APT_LIST_CACHE_ID},sharing=locked                                 \
     --mount=type=bind,src=external/infraCommons/tools/extractDependencies.sh,dst=/tmp/tools/extractDependencies.sh,ro   \
     --mount=type=bind,src=systemDependencies.json,dst=/tmp/systemDependencies.json,ro                                   \
     apt-get update &&                                                                                                   \
+    DEP_GROUPS="Compilers                                                                                               \
+                AbseilExternalProject                                                                                   \
+                BoostExternalProject                                                                                    \
+                CapnprotoExternalProject                                                                                \
+                CeresSolverExternalProject                                                                              \
+                Eigen3ExternalProject                                                                                   \
+                FlatBuffersExternalProject                                                                              \
+                GFlagsExternalProject                                                                                   \
+                GlogExternalProject                                                                                     \
+                GoogleTestExternalProject                                                                               \
+                NlohmannJsonExternalProject                                                                             \
+                OatppExternalProject                                                                                    \
+                OatppWebSocketExternalProject                                                                           \
+                OgreExternalProject                                                                                     \
+                OpenCVExternalProject                                                                                   \
+                ProtobufExternalProject                                                                                 \
+                Python3ExternalProject                                                                                  \
+                SpdLogExternalProject                                                                                   \
+                SuiteSparseExternalProject                                                                              \
+                VTKExternalProject" &&                                                                                  \
+    if [[ "${OS_BASE}" != *ubuntu-22-04* ]]; then                                                                       \
+      DEP_GROUPS+=" GazeboExternalProject                                                                               \
+                    GzCmakeExternalProject                                                                              \
+                    GzCommonExternalProject                                                                             \
+                    GzFuelToolsExternalProject                                                                          \
+                    GzGuiExternalProject                                                                                \
+                    GzLaunchExternalProject                                                                             \
+                    GzMathExternalProject                                                                               \
+                    GzMsgsExternalProject                                                                               \
+                    GzPhysicsExternalProject                                                                            \
+                    GzPluginExternalProject                                                                             \
+                    GzRenderingExternalProject                                                                          \
+                    GzSensorsExternalProject                                                                            \
+                    GzSimExternalProject                                                                                \
+                    GzToolsExternalProject                                                                              \
+                    GzTransportExternalProject                                                                          \
+                    GzUtilsExternalProject                                                                              \
+                    SdformatExternalProject                                                                             \
+                    ZenohCExternalProject                                                                               \
+                    ZenohCppExternalProject";                                                                           \
+    fi &&                                                                                                               \
     apt-get install -y --no-install-recommends                                                                          \
-      $(sh /tmp/tools/extractDependencies.sh                                                                            \
-          "Compilers                                                                                                    \
-           AbseilExternalProject                                                                                        \
-           BoostExternalProject                                                                                         \
-           CapnprotoExternalProject                                                                                     \
-           CeresSolverExternalProject                                                                                   \
-           Eigen3ExternalProject                                                                                        \
-           FlatBuffersExternalProject                                                                                   \
-           GFlagsExternalProject                                                                                        \
-           GlogExternalProject                                                                                          \
-           GoogleTestExternalProject                                                                                    \
-           NlohmannJsonExternalProject                                                                                  \
-           OatppExternalProject                                                                                         \
-           OatppWebSocketExternalProject                                                                                \
-           OgreExternalProject                                                                                          \
-           OpenCVExternalProject                                                                                        \
-           ProtobufExternalProject                                                                                      \
-           Python3ExternalProject                                                                                       \
-           SpdLogExternalProject                                                                                        \
-           SuiteSparseExternalProject                                                                                   \
-           VTKExternalProject"                                                                                          \
-          /tmp/systemDependencies.json)
+      $(sh /tmp/tools/extractDependencies.sh "${DEP_GROUPS}" /tmp/systemDependencies.json)
 
 # apt.llvm.org's libomp-N-dev packages all Provide and Conflict on the
 # virtual package libomp-x.y-dev, so only one major can be installed at a
@@ -84,6 +108,18 @@ RUN llvm=$(ls /usr/bin | grep -E '^clang-[0-9]+$' | sort -V | tail -n 1 | cut -d
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${llvm} 100                   \
       --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${llvm}                                     \
       --slave /usr/bin/flang flang /usr/bin/flang-${llvm}
+
+# zenoh-c's build drives the system cargo. Where the distro's unversioned rust is too old for
+# zenoh's crate graph, systemDependencies.json installs a versioned toolchain instead (ubuntu
+# 24.04: cargo-1.91/rustc-1.91, since its rust 1.75 predates the edition2024 crates zenoh pulls
+# in). Register the newest versioned rust, when one is installed, as the default for the
+# unversioned names; bases whose unversioned rust is current install no versioned one and skip
+# this.
+RUN rust=$(ls /usr/bin | grep -E '^rustc-1\.[0-9]+$' | sort -V | tail -n 1 | cut -d- -f2 || true) && \
+    if [ -n "${rust}" ]; then                                                                       \
+      update-alternatives --install /usr/bin/rustc rustc /usr/bin/rustc-${rust} 100 &&              \
+      update-alternatives --install /usr/bin/cargo cargo /usr/bin/cargo-${rust} 100;                \
+    fi
 
 RUN ln -s /usr/lib/llvm-22/lib/clang/22/include/omp.h                                                                   \
           /usr/lib/llvm-21/lib/clang/21/include/omp.h

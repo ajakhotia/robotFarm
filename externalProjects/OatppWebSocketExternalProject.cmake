@@ -18,12 +18,16 @@ else()
     CACHE STRING
     "URL of the oatpp-websocket source archive")
 
+  #[[ oatpp-websocket gates its tests behind OATPP_BUILD_TESTS (default ON) rather than
+      BUILD_TESTING, so the forwarded BUILD_TESTING=OFF alone leaves them building. ]]
   externalproject_add(OatppWebSocketExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/oatpp-websocket
     URL ${ROBOT_FARM_OATPP_WEBSOCKET_URL}
     DOWNLOAD_NO_PROGRESS ON
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
-    CMAKE_ARGS ${ROBOT_FARM_FORWARDED_CMAKE_ARGS})
+    CMAKE_ARGS
+    ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
+    -DOATPP_BUILD_TESTS:BOOL=OFF)
 endif()
 
 add_dependencies(OatppWebSocketExternalProject
