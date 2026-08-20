@@ -158,9 +158,9 @@
     },
     {
       "group": "VTKExternalProject",
-      "ubuntu:22.04": "libgl1-mesa-dev libxt-dev",
-      "ubuntu:24.04": "libgl1-mesa-dev libxt-dev",
-      "ubuntu:26.04": "libgl1-mesa-dev libxt-dev",
+      "ubuntu:22.04": "libavcodec-dev libavformat-dev libavutil-dev libgdal-dev libgl1-mesa-dev libswresample-dev libswscale-dev libtbb-dev libxt-dev mpi-default-dev python3-dev qt6-base-dev",
+      "ubuntu:24.04": "libavcodec-dev libavformat-dev libavutil-dev libgdal-dev libgl1-mesa-dev libswresample-dev libswscale-dev libtbb-dev libxt-dev mpi-default-dev python3-dev qt6-base-dev",
+      "ubuntu:26.04": "libavcodec-dev libavformat-dev libavutil-dev libgdal-dev libgl1-mesa-dev libswresample-dev libswscale-dev libtbb-dev libxt-dev mpi-default-dev python3-dev qt6-base-dev",
       "tag": "all"
     },
     {
