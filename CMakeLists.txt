@@ -79,6 +79,7 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
   BoostExternalProject
   CapnprotoExternalProject
   CeresSolverExternalProject
+  CudssExternalProject
   Eigen3ExternalProject
   FlatBuffersExternalProject
   GFlagsExternalProject
