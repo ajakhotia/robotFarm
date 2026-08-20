@@ -165,7 +165,7 @@
     },
     {
       "group": "ZenohCExternalProject",
-      "ubuntu:24.04": "cargo rustc",
+      "ubuntu:24.04": "cargo-1.91 rustc-1.91",
       "ubuntu:26.04": "cargo rustc",
       "tag": "skip"
     }

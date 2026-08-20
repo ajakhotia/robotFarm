@@ -100,13 +100,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # build-list overrides ROBOT_FARM_REQUESTED_BUILD_LIST for bases that cannot build
+        # the full default set; empty means the default (everything). The Gazebo, sdformat,
+        # and zenoh projects are not buildable on ubuntu 22.04, and their groups in
+        # systemDependencies.json deliberately carry no ubuntu:22.04 entries.
         os_base:
           - name: ubuntu:22.04
             slug: ubuntu-22-04
+            build-list: "AbseilExternalProject;BoostExternalProject;CapnprotoExternalProject;CeresSolverExternalProject;Eigen3ExternalProject;FlatBuffersExternalProject;GFlagsExternalProject;GlogExternalProject;GoogleTestExternalProject;NlohmannJsonExternalProject;OatppExternalProject;OatppWebSocketExternalProject;OgreExternalProject;OpenCVExternalProject;ProtobufExternalProject;Python3ExternalProject;SpdLogExternalProject;SuiteSparseExternalProject;VTKExternalProject"
           - name: ubuntu:24.04
             slug: ubuntu-24-04
+            build-list: ""
           - name: ubuntu:26.04
             slug: ubuntu-26-04
+            build-list: ""
         preset:
           - clang-shared
           - clang-static
@@ -163,16 +170,18 @@ jobs:
             --volume "${RUNNER_TEMP}/archive":/archive                                                    \
             --env CCACHE_DIR=/ccache                                                                      \
             --env CCACHE_MAXSIZE=20G                                                                      \
+            --env BUILD_LIST="${{ matrix.os_base.build-list }}"                                           \
             "${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}"      \
             bash -c '
               set -euo pipefail
 
               ccache --zero-stats
 
-              cmake -S /tmp/robotFarm-src                                       \
-                    -B /tmp/robotFarm-build                                     \
-                    --preset ${{ matrix.preset }}                               \
-                    -DCMAKE_C_COMPILER_LAUNCHER=ccache                          \
+              cmake -S /tmp/robotFarm-src                                                        \
+                    -B /tmp/robotFarm-build                                                      \
+                    --preset ${{ matrix.preset }}                                                \
+                    ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST="${BUILD_LIST}"}             \
+                    -DCMAKE_C_COMPILER_LAUNCHER=ccache                                           \
                     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
               cmake --build   /tmp/robotFarm-build

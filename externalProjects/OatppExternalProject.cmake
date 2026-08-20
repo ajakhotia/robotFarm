@@ -17,10 +17,14 @@ else()
     CACHE STRING
     "URL of the oatpp source archive")
 
+  #[[ oatpp gates its tests behind its own OATPP_BUILD_TESTS (default ON) rather than
+      BUILD_TESTING, so the forwarded BUILD_TESTING=OFF alone leaves them building. ]]
   externalproject_add(OatppExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/oatpp
     URL ${ROBOT_FARM_OATPP_URL}
     DOWNLOAD_NO_PROGRESS ON
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
-    CMAKE_ARGS ${ROBOT_FARM_FORWARDED_CMAKE_ARGS})
+    CMAKE_ARGS
+    ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
+    -DOATPP_BUILD_TESTS:BOOL=OFF)
 endif()
