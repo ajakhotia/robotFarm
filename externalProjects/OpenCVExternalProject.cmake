@@ -20,8 +20,12 @@ if(ROBOT_FARM_SKIP_OpenCVExternalProject)
 else()
   list(APPEND ROBOT_FARM_BUILD_LIST OpenCVExternalProject)
 
+  option(ROBOT_FARM_OPENCV_WITH_CONTRIB
+    "Build OpenCV with the contrib modules (Apache-2 licensed; also the gate for the CUDA modules, which live in contrib)"
+    ON)
+
   option(ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB
-    "Build OpenCV with non-free contrib modules. Please be sure to comply with the licensing"
+    "Additionally enable the non-free algorithms inside contrib. Please be sure to comply with the licensing"
     OFF)
 
   set(ROBOT_FARM_OPENCV_CONTRIB_URL
@@ -37,6 +41,11 @@ else()
   set(ROBOT_FARM_OPENCV_CMAKE_ARGS
     ${ROBOT_FARM_FORWARDED_CMAKE_ARGS}
 
+    #[[ contrib's sfm bundles libmv, which includes <glog/logging.h> through a legacy
+        find module instead of the glog::glog target; glog 0.7 refuses such includes
+        unless the consumer defines GLOG_USE_GLOG_EXPORT. ]]
+    -DCMAKE_CXX_FLAGS:STRING=-DGLOG_USE_GLOG_EXPORT
+
     -DANDROID_EXAMPLES_WITH_LIBS:BOOL=OFF
     -DBUILD_ANDROID_EXAMPLES:BOOL=OFF
     -DBUILD_ANDROID_PROJECTS:BOOL=OFF
@@ -45,7 +54,7 @@ else()
     -DBUILD_DOCS:BOOL=OFF
     -DBUILD_EXAMPLES:BOOL=OFF
     -DBUILD_FAT_JAVA_LIB:BOOL=OFF
-    -DBUILD_IPP_IW:BOOL=OFF
+    -DBUILD_IPP_IW:BOOL=ON
     -DBUILD_ITT:BOOL=OFF
     -DBUILD_JASPER:BOOL=OFF
     -DBUILD_JAVA:BOOL=OFF
@@ -59,7 +68,6 @@ else()
     -DBUILD_PACKAGE:BOOL=OFF
     -DBUILD_PERF_TESTS:BOOL=OFF
     -DBUILD_PNG:BOOL=OFF
-    -DBUILD_SHARED_LIBS:BOOL=OFF
     -DBUILD_TBB:BOOL=OFF
     -DBUILD_TESTS:BOOL=OFF
     -DBUILD_TIFF:BOOL=OFF
@@ -70,7 +78,9 @@ else()
     -DBUILD_ZLIB:BOOL=OFF
 
     -DCV_DISABLE_OPTIMIZATION:BOOL=OFF
-    -DCV_ENABLE_INTRINSICS:BOOL=OFF
+    # SIMD: baseline SSE3 with runtime dispatch up to AVX-512; OFF compiles zero
+    # dispatched files and forfeits every vectorized kernel.
+    -DCV_ENABLE_INTRINSICS:BOOL=ON
     -DCV_TRACE:BOOL=OFF
 
     -DENABLE_BUILD_HARDENING:BOOL=OFF
@@ -116,12 +126,12 @@ else()
     -DOPENCV_SEMIHOSTING:BOOL=OFF
     -DOPENCV_WARNINGS_ARE_ERRORS:BOOL=OFF
 
-    -DWITH_1394:BOOL=OFF
+    -DWITH_1394:BOOL=ON
     -DWITH_ANDROID_MEDIANDK:BOOL=OFF
     -DWITH_ANDROID_NATIVE_CAMERA:BOOL=OFF
     -DWITH_ARAVIS:BOOL=OFF
     -DWITH_AVFOUNDATION:BOOL=OFF
-    -DWITH_AVIF:BOOL=OFF
+    -DWITH_AVIF:BOOL=ON
     -DWITH_CANN:BOOL=OFF
     -DWITH_CAP_IOS:BOOL=OFF
     -DWITH_CAROTENE:BOOL=OFF
@@ -134,17 +144,19 @@ else()
     -DWITH_DIRECTML:BOOL=OFF
     -DWITH_DIRECTX:BOOL=OFF
     -DWITH_DSHOW:BOOL=OFF
-    -DWITH_EIGEN:BOOL=OFF
+    -DWITH_EIGEN:BOOL=ON
     -DWITH_FASTCV:BOOL=OFF
     -DWITH_FFMPEG:BOOL=ON
     -DWITH_FLATBUFFERS:BOOL=OFF
     -DWITH_FRAMEBUFFER:BOOL=OFF
     -DWITH_FRAMEBUFFER_XVFB:BOOL=OFF
-    -DWITH_GDAL:BOOL=OFF
+    -DWITH_GDAL:BOOL=ON
     -DWITH_GDCM:BOOL=OFF
-    -DWITH_GPHOTO2:BOOL=OFF
+    -DWITH_GPHOTO2:BOOL=ON
     -DWITH_GSTREAMER:BOOL=ON
-    -DWITH_GTK:BOOL=ON
+    # highgui takes exactly one GUI backend; Qt6 supersedes GTK3 (overlay, zoom,
+    # window persistence) and Qt6 is already a prefix-wide dependency via VTK.
+    -DWITH_GTK:BOOL=OFF
     -DWITH_GTK_2_X:BOOL=OFF
     -DWITH_HAL_RVV:BOOL=OFF
     -DWITH_HALIDE:BOOL=OFF
@@ -157,10 +169,10 @@ else()
     -DWITH_IPP:BOOL=ON
     -DWITH_ITT:BOOL=OFF
     -DWITH_JASPER:BOOL=OFF
-    -DWITH_JPEG:BOOL=OFF
-    -DWITH_JPEGXL:BOOL=OFF
+    -DWITH_JPEG:BOOL=ON
+    -DWITH_JPEGXL:BOOL=ON
     -DWITH_KLEIDICV:BOOL=OFF
-    -DWITH_LAPACK:BOOL=OFF
+    -DWITH_LAPACK:BOOL=ON
     -DWITH_LIBREALSENSE:BOOL=OFF
     -DWITH_MFX:BOOL=OFF
     -DWITH_MSMF:BOOL=OFF
@@ -175,9 +187,9 @@ else()
     -DWITH_OPENCL_SVM:BOOL=OFF
     -DWITH_OPENCLAMDBLAS:BOOL=ON
     -DWITH_OPENCLAMDFFT:BOOL=ON
-    -DWITH_OPENEXR:BOOL=OFF
+    -DWITH_OPENEXR:BOOL=ON
     -DWITH_OPENGL:BOOL=ON
-    -DWITH_OPENJPEG:BOOL=OFF
+    -DWITH_OPENJPEG:BOOL=ON
     -DWITH_OPENMP:BOOL=ON
     -DWITH_OPENNI:BOOL=OFF
     -DWITH_OPENNI2:BOOL=OFF
@@ -187,11 +199,11 @@ else()
     -DWITH_PROTOBUF:BOOL=ON
     -DWITH_PTHREADS_PF:BOOL=OFF
     -DWITH_PVAPI:BOOL=OFF
-    -DWITH_QT:BOOL=OFF
+    -DWITH_QT:BOOL=ON
     -DWITH_QUIRC:BOOL=OFF
     -DWITH_SPNG:BOOL=OFF
     -DWITH_TBB:BOOL=ON
-    -DWITH_TIFF:BOOL=OFF
+    -DWITH_TIFF:BOOL=ON
     -DWITH_TIMVX:BOOL=OFF
     -DWITH_UEYE:BOOL=OFF
     -DWITH_V4L:BOOL=ON
@@ -201,7 +213,7 @@ else()
     -DWITH_VULKAN:BOOL=ON
     -DWITH_WAYLAND:BOOL=OFF
     -DWITH_WEBNN:BOOL=OFF
-    -DWITH_WEBP:BOOL=OFF
+    -DWITH_WEBP:BOOL=ON
     -DWITH_WIN32UI:BOOL=OFF
     -DWITH_XIMEA:BOOL=OFF
     -DWITH_XINE:BOOL=OFF
@@ -210,11 +222,16 @@ else()
 
   find_package(CUDAToolkit)
 
-  if(CUDAToolkit_FOUND AND ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+  #[[ The CUDA modules live in opencv_contrib (Apache-2, same as the core), so contrib is
+      the gate for CUDA rather than the non-free option, which only unlocks the patented
+      algorithms inside contrib. ]]
+  if(CUDAToolkit_FOUND AND ROBOT_FARM_OPENCV_WITH_CONTRIB)
     message(STATUS "Turning on CUDA options for OpenCV")
     list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
       -DWITH_CUDA:BOOL=ON
       -DWITH_CUBLAS:BOOL=ON
+      -DWITH_CUDNN:BOOL=ON
+      -DWITH_CUFFT:BOOL=ON
       -DCUDA_FAST_MATH=1
       -DWITH_NVCUVID:BOOL=ON
       -DBUILD_opencv_cudacodec:BOOL=OFF
@@ -224,13 +241,14 @@ else()
     list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
       -DWITH_CUDA:BOOL=OFF
       -DWITH_CUBLAS:BOOL=OFF
+      -DWITH_CUDNN:BOOL=OFF
       -DCUDA_FAST_MATH=0
       -DWITH_NVCUVID:BOOL=OFF
       -DBUILD_opencv_cudacodec:BOOL=OFF
       -DBUILD_opencv_world:BOOL=OFF)
   endif()
 
-  if(ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+  if(ROBOT_FARM_OPENCV_WITH_CONTRIB)
     #[[ The 5.0.0 viz module relies on VTK headers to transitively provide <iostream>,
         which stops holding with VTK 9.6 and GCC 15. Same fix as vcpkg's
         0019-contrib-cout.diff; drop once a release carries it. The patch is valid only
@@ -261,8 +279,12 @@ else()
     externalproject_get_property(OpenCVContribExternalProject SOURCE_DIR)
 
     list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
-      -DOPENCV_ENABLE_NONFREE:BOOL=ON
       -DOPENCV_EXTRA_MODULES_PATH:PATH=${SOURCE_DIR}/modules)
+
+    if(ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+      list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
+        -DOPENCV_ENABLE_NONFREE:BOOL=ON)
+    endif()
   endif()
 
   externalproject_add(OpenCVExternalProject
@@ -283,6 +305,6 @@ add_dependencies(OpenCVExternalProject
   CeresSolverExternalProject
   OgreExternalProject)
 
-if(ROBOT_FARM_OPENCV_WITH_NON_FREE_CONTRIB)
+if(ROBOT_FARM_OPENCV_WITH_CONTRIB)
   add_dependencies(OpenCVExternalProject OpenCVContribExternalProject)
 endif()
