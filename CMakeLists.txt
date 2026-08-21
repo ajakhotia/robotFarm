@@ -53,6 +53,10 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
+# Static archives must be position-independent so that the language binding modules, which
+# are shared objects even in static builds, can link them.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 if(CMAKE_INSTALL_PREFIX)
   list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 endif()
@@ -72,6 +76,7 @@ compose_forwarded_cache_args(
     CMAKE_INSTALL_RPATH
     CMAKE_INSTALL_RPATH_USE_LINK_PATH
     CMAKE_POLICY_VERSION_MINIMUM
+    CMAKE_POSITION_INDEPENDENT_CODE
     CMAKE_PREFIX_PATH)
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
