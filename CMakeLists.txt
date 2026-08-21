@@ -79,6 +79,21 @@ compose_forwarded_cache_args(
     CMAKE_POSITION_INDEPENDENT_CODE
     CMAKE_PREFIX_PATH)
 
+#[[ Upstream gz does not support static consumption: gz-rendering fails to export its
+    vendored terra target, and the installed static configs of gz-common and gz-plugin
+    reference TINYXML2::TINYXML2 and DL::DL targets that consumers cannot resolve. Static
+    builds therefore skip the projects that consume those configs; the base gz libraries,
+    gz-transport, and sdformat build statically and stay in. ]]
+if(NOT BUILD_SHARED_LIBS)
+  set(ROBOT_FARM_SKIP_GzFuelToolsExternalProject ON)
+  set(ROBOT_FARM_SKIP_GzGuiExternalProject ON)
+  set(ROBOT_FARM_SKIP_GzLaunchExternalProject ON)
+  set(ROBOT_FARM_SKIP_GzPhysicsExternalProject ON)
+  set(ROBOT_FARM_SKIP_GzRenderingExternalProject ON)
+  set(ROBOT_FARM_SKIP_GzSensorsExternalProject ON)
+  set(ROBOT_FARM_SKIP_GzSimExternalProject ON)
+endif()
+
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
   AbseilExternalProject
   BoostExternalProject
