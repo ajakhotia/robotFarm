@@ -38,7 +38,7 @@ else()
         opencv_contrib's sfm module re-finds Ceres, whose config finds cuDSS again). Guard
         the config with an early return so only the first inclusion creates and promotes. ]]
     PATCH_COMMAND sed -i
-      "1i # robotFarm: return early when already loaded; the IMPORTED_GLOBAL promotion\\n# below fails when a second directory includes this config.\\nif(TARGET cudss)\\n    return()\\nendif()"
+      "1i # robotFarm: return early when already loaded. The IMPORTED_GLOBAL promotion\\n# below fails when a second directory includes this config.\\nif(TARGET cudss)\\n    return()\\nendif()"
       lib/cmake/cudss/cudss-config.cmake
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
