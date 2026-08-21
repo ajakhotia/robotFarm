@@ -170,6 +170,8 @@ jobs:
             --volume "${RUNNER_TEMP}/archive":/archive                                                    \
             --env CCACHE_DIR=/ccache                                                                      \
             --env CCACHE_MAXSIZE=20G                                                                      \
+            --env CMAKE_BUILD_PARALLEL_LEVEL=4                                                            \
+            --env CARGO_BUILD_JOBS=4                                                                      \
             --env BUILD_LIST="${{ matrix.os_base.build-list }}"                                           \
             "${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}"      \
             bash -c '
@@ -184,7 +186,11 @@ jobs:
                     -DCMAKE_C_COMPILER_LAUNCHER=ccache                                           \
                     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-              cmake --build   /tmp/robotFarm-build
+              # The external projects build serially, each capped at 4 compile jobs by the
+              # CMAKE_BUILD_PARALLEL_LEVEL (and CARGO_BUILD_JOBS) environment above, so the
+              # build never exceeds 4 cores and stays within memory. NOTE: this script runs
+              # inside single quotes, so it must never contain an apostrophe.
+              cmake --build   /tmp/robotFarm-build --parallel 1
               cmake --install /tmp/robotFarm-build
 
               ccache --show-stats
