@@ -238,6 +238,10 @@ else()
       -DWITH_CUFFT:BOOL=ON
       -DCUDA_FAST_MATH=1
       -DCUDA_ARCH_BIN:STRING=7.5,8.0
+      # With the static CUDA runtime OpenCV lists bare library names (cublas, cudnn) that
+      # the python binding generator hands to ninja as file dependencies, and the link
+      # fails. The CUDA libraries are system-provided at runtime either way.
+      -DCUDA_USE_STATIC_CUDA_RUNTIME:BOOL=OFF
       -DCUDA_NVCC_FLAGS:STRING=-allow-unsupported-compiler
       -DOPENCV_CUDA_DETECTION_NVCC_FLAGS:STRING=-allow-unsupported-compiler
       -DWITH_NVCUVID:BOOL=ON
