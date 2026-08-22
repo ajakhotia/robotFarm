@@ -227,12 +227,19 @@ else()
       algorithms inside contrib. ]]
   if(CUDAToolkit_FOUND AND ROBOT_FARM_OPENCV_WITH_CONTRIB)
     message(STATUS "Turning on CUDA options for OpenCV")
+    #[[ OpenCV builds CUDA through its legacy FindCUDA path, which probes nvcc itself and
+        never sees the toolchain's CMAKE_CUDA_* settings. The fresh bases carry host
+        compilers newer than nvcc admits (clang 22 on ubuntu 26.04), so hand OpenCV the
+        architecture list and the override flag the toolchain files already use. ]]
     list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
       -DWITH_CUDA:BOOL=ON
       -DWITH_CUBLAS:BOOL=ON
       -DWITH_CUDNN:BOOL=ON
       -DWITH_CUFFT:BOOL=ON
       -DCUDA_FAST_MATH=1
+      -DCUDA_ARCH_BIN:STRING=7.5,8.0
+      -DCUDA_NVCC_FLAGS:STRING=-allow-unsupported-compiler
+      -DOPENCV_CUDA_DETECTION_NVCC_FLAGS:STRING=-allow-unsupported-compiler
       -DWITH_NVCUVID:BOOL=ON
       -DBUILD_opencv_cudacodec:BOOL=OFF
       -DBUILD_opencv_world:BOOL=OFF)
@@ -246,6 +253,15 @@ else()
       -DWITH_NVCUVID:BOOL=OFF
       -DBUILD_opencv_cudacodec:BOOL=OFF
       -DBUILD_opencv_world:BOOL=OFF)
+  endif()
+
+  #[[ In a static build the cv2 python module links every module directly, and OpenCV's
+      legacy CUDA path emits bare linker names (cublas, cudnn) that the binding generator
+      hands to ninja as file dependencies, so the module cannot link. Python consumers use
+      the shared flavors, where the bindings stay enabled. ]]
+  if(NOT BUILD_SHARED_LIBS)
+    list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
+      -DBUILD_opencv_python3:BOOL=OFF)
   endif()
 
   if(ROBOT_FARM_OPENCV_WITH_CONTRIB)
