@@ -1,4 +1,3 @@
-#[[ Cmake guard. ]]
 if(TARGET VTKExternalProject)
   return()
 endif()

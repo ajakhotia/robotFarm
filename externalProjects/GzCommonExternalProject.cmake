@@ -1,4 +1,3 @@
-#[[ Cmake guard. ]]
 if(TARGET GzCommonExternalProject)
   return()
 endif()

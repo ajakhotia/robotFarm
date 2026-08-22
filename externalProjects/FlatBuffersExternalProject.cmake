@@ -1,4 +1,3 @@
-#[[ Cmake guard. ]]
 if(TARGET FlatBuffersExternalProject)
   return()
 endif()

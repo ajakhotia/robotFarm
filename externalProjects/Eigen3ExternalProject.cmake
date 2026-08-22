@@ -1,4 +1,3 @@
-#[[ Cmake guard. ]]
 if(TARGET Eigen3ExternalProject)
   return()
 endif()

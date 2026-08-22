@@ -1,4 +1,3 @@
-#[[ CMake guard. ]]
 if(TARGET NlohmannJsonExternalProject)
   return()
 endif()

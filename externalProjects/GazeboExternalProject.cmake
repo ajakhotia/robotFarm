@@ -1,9 +1,7 @@
-#[[ Cmake guard. ]]
 if(TARGET GazeboExternalProject)
   return()
 endif()
 
-# Aggregate of gazebo sub-projects
 include(${CMAKE_CURRENT_LIST_DIR}/GzCmakeExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/GzCommonExternalProject.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/GzFuelToolsExternalProject.cmake)

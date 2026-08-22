@@ -1,4 +1,3 @@
-#[[ CMake guard. ]]
 if(TARGET Python3ExternalProject)
   return()
 endif()
