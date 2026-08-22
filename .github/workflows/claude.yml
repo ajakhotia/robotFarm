@@ -36,6 +36,10 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
+          # Branch protection requires signed commits, and the runner has no signing key.
+          # Signing through the GitHub API keeps Claude's commits mergeable.
+          use_commit_signing: true
+
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
