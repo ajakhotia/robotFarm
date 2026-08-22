@@ -34,9 +34,8 @@ else()
     URL_HASH ${ROBOT_FARM_CUDSS_URL_HASH}
     DOWNLOAD_NO_PROGRESS ON
     #[[ The shipped config promotes its imported targets to global scope unconditionally,
-        which CMake rejects when a second directory includes the config (seen when
-        opencv_contrib's sfm module re-finds Ceres, whose config finds cuDSS again). Guard
-        the config with an early return so only the first inclusion creates and promotes. ]]
+        which CMake rejects when a second directory includes the config. Guard the config
+        with an early return so only the first inclusion creates and promotes. ]]
     PATCH_COMMAND sed -i
       "1i # robotFarm: return early when already loaded. The IMPORTED_GLOBAL promotion\\n# below fails when a second directory includes this config.\\nif(TARGET cudss)\\n    return()\\nendif()"
       lib/cmake/cudss/cudss-config.cmake
