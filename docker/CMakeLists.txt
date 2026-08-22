@@ -42,22 +42,26 @@ function(robot_farm_add_docker_compile_target)
   cmake_parse_arguments(RF_DC "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   string(REGEX REPLACE "[^a-zA-Z0-9]" "-" RF_DC_VOLUME "robotfarm-ccache-${RF_DC_IMAGE}")
+  string(REGEX REPLACE "[^a-zA-Z0-9]" "-" RF_DC_CARGO_VOLUME "robotfarm-cargo-${RF_DC_IMAGE}")
 
   add_custom_target(${RF_DC_TARGET_NAME}
       COMMAND
         docker run --rm
           --volume ${robotFarm_SOURCE_DIR}:/tmp/robotFarm-src:ro
-          --volume ${RF_DC_VOLUME}:/ccache
-          --env CCACHE_DIR=/ccache
+          --volume ${RF_DC_VOLUME}:/var/cache/ccache
+          --volume ${RF_DC_CARGO_VOLUME}:/var/cache/cargo
+          --env CCACHE_DIR=/var/cache/ccache
           --env CCACHE_MAXSIZE=20G
+          --env CMAKE_C_COMPILER_LAUNCHER=ccache
+          --env CMAKE_CXX_COMPILER_LAUNCHER=ccache
+          --env CMAKE_CUDA_COMPILER_LAUNCHER=ccache
+          --env CARGO_HOME=/var/cache/cargo/home
           ${RF_DC_IMAGE}
           bash -c "set -euo pipefail && \
             ccache --zero-stats && \
             cmake -S /tmp/robotFarm-src \
                   -B /tmp/robotFarm-build \
-                  --preset ${RF_DC_PRESET} \
-                  -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-                  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && \
+                  --preset ${RF_DC_PRESET} && \
             cmake --build   /tmp/robotFarm-build && \
             cmake --install /tmp/robotFarm-build && \
             ccache --show-stats"
