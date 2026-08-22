@@ -164,14 +164,21 @@ jobs:
 
           mkdir -p "${RUNNER_TEMP}/archive"
 
+          # Caching is a CI concern: vanilla builds of the same image see none of it. The
+          # persistent caches mount at /var/cache/<purpose> (FHS) from named volumes, and
+          # every cache knob lives in this one env block. The CUDA launcher matters most:
+          # without it every run recompiles all device code, which dominated the lane time.
           docker run --rm                                                                                 \
             --volume "${GITHUB_WORKSPACE}":/tmp/robotFarm-src:ro                                          \
-            --volume "robotfarm-ccache-${{ matrix.os_base.slug }}":/ccache                                \
+            --volume "robotfarm-ccache-${{ matrix.os_base.slug }}":/var/cache/ccache                      \
+            --volume "robotfarm-cargo-${{ matrix.os_base.slug }}":/var/cache/cargo                        \
             --volume "${RUNNER_TEMP}/archive":/archive                                                    \
-            --env CCACHE_DIR=/ccache                                                                      \
+            --env CCACHE_DIR=/var/cache/ccache                                                            \
             --env CCACHE_MAXSIZE=20G                                                                      \
             --env CMAKE_C_COMPILER_LAUNCHER=ccache                                                        \
             --env CMAKE_CXX_COMPILER_LAUNCHER=ccache                                                      \
+            --env CMAKE_CUDA_COMPILER_LAUNCHER=ccache                                                     \
+            --env CARGO_HOME=/var/cache/cargo/home                                                        \
             --env CMAKE_BUILD_PARALLEL_LEVEL=4                                                            \
             --env CARGO_BUILD_JOBS=4                                                                      \
             --env BUILD_LIST="${{ matrix.os_base.build-list }}"                                           \
