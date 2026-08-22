@@ -1,4 +1,3 @@
-#[[ Cmake guard. ]]
 if(TARGET GlogExternalProject)
   return()
 endif()
