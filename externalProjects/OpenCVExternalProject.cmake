@@ -226,9 +226,6 @@ else()
       algorithms inside contrib. ]]
   if(CUDAToolkit_FOUND AND ROBOT_FARM_OPENCV_WITH_CONTRIB)
     message(STATUS "Turning on CUDA options for OpenCV")
-    #[[ CUDA builds as a first-class language, so the toolchain files supply the
-        architectures, the host compiler, and the new-host-compiler override through the
-        standard CMAKE_CUDA_* machinery. ]]
     list(APPEND ROBOT_FARM_OPENCV_CMAKE_ARGS
       -DWITH_CUDA:BOOL=ON
       -DWITH_CUBLAS:BOOL=ON
