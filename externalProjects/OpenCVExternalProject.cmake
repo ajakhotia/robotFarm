@@ -286,10 +286,24 @@ else()
     endif()
   endif()
 
+  #[[ OpenCV rejects CMake's special CMAKE_CUDA_ARCHITECTURES values (all, all-major,
+      native) instead of consuming the expansion CMake computes during CUDA detection,
+      which breaks the toolchains' "all". The patch resolves the special values from
+      CMAKE_CUDA_ARCHITECTURES_ALL[_MAJOR]/_NATIVE; proposed upstream, drop once a
+      release carries it. Valid only for the pinned archive, so a user-overridden URL
+      builds unpatched. ]]
+  if(ROBOT_FARM_OPENCV_URL MATCHES "opencv/archive/refs/tags/5\\.0\\.0\\.tar\\.gz$")
+    set(ROBOT_FARM_OPENCV_PATCH_COMMAND
+      PATCH_COMMAND patch -p1 -i ${CMAKE_SOURCE_DIR}/patches/opencv.patch)
+  else()
+    set(ROBOT_FARM_OPENCV_PATCH_COMMAND "")
+  endif()
+
   externalproject_add(OpenCVExternalProject
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/opencv
     URL ${ROBOT_FARM_OPENCV_URL}
     DOWNLOAD_NO_PROGRESS ON
+    ${ROBOT_FARM_OPENCV_PATCH_COMMAND}
     LIST_SEPARATOR "${ROBOT_FARM_LIST_SEPARATOR}"
     CMAKE_ARGS ${ROBOT_FARM_OPENCV_CMAKE_ARGS})
 endif()

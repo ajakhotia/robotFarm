@@ -1,0 +1,40 @@
+--- a/cmake/OpenCVDetectCUDAUtils.cmake	2026-06-05 20:50:05.000000000 +0200
++++ b/cmake/OpenCVDetectCUDAUtils.cmake	2026-08-23 15:20:28.950933595 +0200
+@@ -64,8 +64,22 @@
+     return()
+   endif()
+   if(CMAKE_CUDA_ARCHITECTURES STREQUAL "all" OR CMAKE_CUDA_ARCHITECTURES STREQUAL "all-major" OR CMAKE_CUDA_ARCHITECTURES STREQUAL "native")
+-    message(WARNING "CUDA: CMAKE_CUDA_ARCHITECTURES=${CMAKE_CUDA_ARCHITECTURES}, special values all, all-major and native are not supported by OpenCV, specify only CUDA real and/or virtual architectures or use combinations of CUDA_ARCH_BIN and CUDA_ARCH_PTX or specify the CUDA_GENERATION where -DCUDA_GENERATION=Auto is equivalent to native!")
+-    return()
++    # CMake resolves the special values during CUDA compiler detection; consume its
++    # expansion instead of asking the user to restate it numerically. Compilation is
++    # unaffected either way; the numeric list only feeds CUDA_ARCH_BIN/PTX metadata.
++    if(CMAKE_CUDA_ARCHITECTURES STREQUAL "all")
++      set(_cmake_cuda_archs_resolved "${CMAKE_CUDA_ARCHITECTURES_ALL}")
++    elseif(CMAKE_CUDA_ARCHITECTURES STREQUAL "all-major")
++      set(_cmake_cuda_archs_resolved "${CMAKE_CUDA_ARCHITECTURES_ALL_MAJOR}")
++    else()
++      set(_cmake_cuda_archs_resolved "${CMAKE_CUDA_ARCHITECTURES_NATIVE}")
++    endif()
++    if(NOT _cmake_cuda_archs_resolved)
++      message(WARNING "CUDA: CMAKE_CUDA_ARCHITECTURES=${CMAKE_CUDA_ARCHITECTURES} could not be resolved (CMake did not provide the expansion); specify CUDA real and/or virtual architectures or use combinations of CUDA_ARCH_BIN and CUDA_ARCH_PTX or specify the CUDA_GENERATION where -DCUDA_GENERATION=Auto is equivalent to native!")
++      return()
++    endif()
++    message(STATUS "CUDA: CMAKE_CUDA_ARCHITECTURES=${CMAKE_CUDA_ARCHITECTURES} resolved to ${_cmake_cuda_archs_resolved}")
++    set(CMAKE_CUDA_ARCHITECTURES "${_cmake_cuda_archs_resolved}")
+   endif()
+   set(internal_ptx "")
+   set(internal_bin "")
+@@ -89,7 +103,11 @@
+   if(internal_bin)
+     set(CUDA_ARCH_BIN ${internal_bin} CACHE STRING "Specify 'real' GPU architectures to build binaries for, BIN(PTX) format is supported (see https://docs.opencv.org/5.x/d2/dbc/cuda_intro.html)")
+   endif()
+-  set(CMAKE_CUDA_ARCHITECTURES "" PARENT)
++  # "PARENT" (not PARENT_SCOPE) never cleared the caller's variable; the later rebuild
++  # from CUDA_ARCH_BIN/PTX therefore appends to the original value instead of replacing
++  # it, which duplicates numeric entries and leaves a special value like "all" in the
++  # compile flags as the invalid arch compute_all.
++  set(CMAKE_CUDA_ARCHITECTURES "" PARENT_SCOPE)
+   unset(CUDA_GENERATION CACHE)
+ endfunction()
+ 
