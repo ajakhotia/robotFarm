@@ -164,10 +164,6 @@ jobs:
 
           mkdir -p "${RUNNER_TEMP}/archive"
 
-          # Caching is a CI concern: vanilla builds of the same image see none of it. The
-          # persistent caches mount at /var/cache/<purpose> (FHS) from named volumes, and
-          # every cache knob lives in this one env block. The CUDA launcher matters most:
-          # without it every run recompiles all device code, which dominated the lane time.
           docker run --rm                                                                                 \
             --volume "${GITHUB_WORKSPACE}":/tmp/robotFarm-src:ro                                          \
             --volume "robotfarm-ccache-${{ matrix.os_base.slug }}":/var/cache/ccache                      \
