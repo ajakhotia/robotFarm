@@ -48,6 +48,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
     apt-get update &&                                                                                                   \
     DEP_GROUPS="Compilers                                                                                               \
                 AbseilExternalProject                                                                                   \
+                ArduPilotExternalProject                                                                                \
                 BoostExternalProject                                                                                    \
                 CapnprotoExternalProject                                                                                \
                 CeresSolverExternalProject                                                                              \
@@ -56,6 +57,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
                 GFlagsExternalProject                                                                                   \
                 GlogExternalProject                                                                                     \
                 GoogleTestExternalProject                                                                               \
+                GsoapExternalProject                                                                                    \
                 NlohmannJsonExternalProject                                                                             \
                 OatppExternalProject                                                                                    \
                 OatppWebSocketExternalProject                                                                           \
@@ -63,11 +65,13 @@ RUN --mount=type=cache,target=/var/cache/apt,id=${APT_VAR_CACHE_ID},sharing=lock
                 OpenCVExternalProject                                                                                   \
                 ProtobufExternalProject                                                                                 \
                 Python3ExternalProject                                                                                  \
+                SfmlExternalProject                                                                                     \
                 SpdLogExternalProject                                                                                   \
                 SuiteSparseExternalProject                                                                              \
                 VTKExternalProject" &&                                                                                  \
     if [[ "${OS_BASE}" != *ubuntu-22-04* ]]; then                                                                       \
-      DEP_GROUPS+=" GazeboExternalProject                                                                               \
+      DEP_GROUPS+=" ArduPilotGazeboExternalProject                                                                      \
+                    GazeboExternalProject                                                                               \
                     GzCmakeExternalProject                                                                              \
                     GzCommonExternalProject                                                                             \
                     GzFuelToolsExternalProject                                                                          \

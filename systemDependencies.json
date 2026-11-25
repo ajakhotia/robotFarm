@@ -24,6 +24,19 @@
       "tag": "all"
     },
     {
+      "group": "ArduPilotExternalProject",
+      "ubuntu:22.04": "liblttng-ust-dev python3-dev python3-empy python3-lxml python3-pexpect",
+      "ubuntu:24.04": "liblttng-ust-dev python3-dev python3-empy python3-lxml python3-pexpect",
+      "ubuntu:26.04": "liblttng-ust-dev python3-dev python3-empy python3-lxml python3-pexpect",
+      "tag": "all"
+    },
+    {
+      "group": "ArduPilotGazeboExternalProject",
+      "ubuntu:24.04": "libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev rapidjson-dev",
+      "ubuntu:26.04": "libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev rapidjson-dev",
+      "tag": "skip"
+    },
+    {
       "group": "BoostExternalProject",
       "ubuntu:22.04": "mpi-default-dev python3-dev python3-numpy python-is-python3",
       "ubuntu:24.04": "mpi-default-dev python3-dev python3-numpy python-is-python3",
@@ -42,6 +55,13 @@
       "ubuntu:22.04": "libunwind-dev",
       "ubuntu:24.04": "libunwind-dev",
       "ubuntu:26.04": "libunwind-dev",
+      "tag": "all"
+    },
+    {
+      "group": "GsoapExternalProject",
+      "ubuntu:22.04": "bison flex libssl-dev zlib1g-dev",
+      "ubuntu:24.04": "bison flex libssl-dev zlib1g-dev",
+      "ubuntu:26.04": "bison flex libssl-dev zlib1g-dev",
       "tag": "all"
     },
     {
@@ -148,6 +168,13 @@
       "ubuntu:24.04": "libtinyxml2-dev liburdfdom-dev pybind11-dev python3-dev",
       "ubuntu:26.04": "libtinyxml2-dev liburdfdom-dev pybind11-dev python3-dev",
       "tag": "skip"
+    },
+    {
+      "group": "SfmlExternalProject",
+      "ubuntu:22.04": "libflac-dev libfreetype-dev libgl-dev libopenal-dev libudev-dev libvorbis-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev",
+      "ubuntu:24.04": "libflac-dev libfreetype-dev libgl-dev libopenal-dev libudev-dev libvorbis-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev",
+      "ubuntu:26.04": "libflac-dev libfreetype-dev libgl-dev libopenal-dev libudev-dev libvorbis-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev",
+      "tag": "all"
     },
     {
       "group": "SuiteSparseExternalProject",
