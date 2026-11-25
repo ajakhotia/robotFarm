@@ -101,13 +101,14 @@ jobs:
       fail-fast: false
       matrix:
         # build-list overrides ROBOT_FARM_REQUESTED_BUILD_LIST for bases that cannot build
-        # the full default set; empty means the default (everything). The Gazebo, sdformat,
-        # and zenoh projects are not buildable on ubuntu 22.04, and their groups in
-        # systemDependencies.json deliberately carry no ubuntu:22.04 entries.
+        # the full default set; empty means the default (everything). The Gazebo (including
+        # the ArduPilot Gazebo plugin), sdformat, and zenoh projects are not buildable on
+        # ubuntu 22.04, and their groups in systemDependencies.json deliberately carry no
+        # ubuntu:22.04 entries.
         os_base:
           - name: ubuntu:22.04
             slug: ubuntu-22-04
-            build-list: "AbseilExternalProject;BoostExternalProject;CapnprotoExternalProject;CeresSolverExternalProject;Eigen3ExternalProject;FlatBuffersExternalProject;GFlagsExternalProject;GlogExternalProject;GoogleTestExternalProject;NlohmannJsonExternalProject;OatppExternalProject;OatppWebSocketExternalProject;OgreExternalProject;OpenCVExternalProject;ProtobufExternalProject;Python3ExternalProject;SpdLogExternalProject;SuiteSparseExternalProject;VTKExternalProject"
+            build-list: "AbseilExternalProject;ArduPilotExternalProject;BoostExternalProject;CapnprotoExternalProject;CeresSolverExternalProject;Eigen3ExternalProject;FlatBuffersExternalProject;GFlagsExternalProject;GlogExternalProject;GoogleTestExternalProject;GsoapExternalProject;NlohmannJsonExternalProject;OatppExternalProject;OatppWebSocketExternalProject;OgreExternalProject;OpenCVExternalProject;ProtobufExternalProject;Python3ExternalProject;SfmlExternalProject;SpdLogExternalProject;SuiteSparseExternalProject;VTKExternalProject"
           - name: ubuntu:24.04
             slug: ubuntu-24-04
             build-list: ""
@@ -177,6 +178,7 @@ jobs:
             --env CARGO_HOME=/var/cache/cargo/home                                                        \
             --env CMAKE_BUILD_PARALLEL_LEVEL=4                                                            \
             --env CARGO_BUILD_JOBS=4                                                                      \
+            --env JOBS=4                                                                                  \
             --env BUILD_LIST="${{ matrix.os_base.build-list }}"                                           \
             "${{ steps.image-name-base.outputs.name }}:${{ steps.docker-metadata.outputs.version }}"      \
             bash -c '
@@ -190,9 +192,9 @@ jobs:
                     ${BUILD_LIST:+-DROBOT_FARM_REQUESTED_BUILD_LIST="${BUILD_LIST}"}
 
               # The external projects build serially, each capped at 4 compile jobs by the
-              # CMAKE_BUILD_PARALLEL_LEVEL (and CARGO_BUILD_JOBS) environment above, so the
-              # build never exceeds 4 cores and stays within memory. NOTE: this script runs
-              # inside single quotes, so it must never contain an apostrophe.
+              # CMAKE_BUILD_PARALLEL_LEVEL (and CARGO_BUILD_JOBS, and JOBS for waf) environment
+              # above, so the build never exceeds 4 cores and stays within memory. NOTE: this
+              # script runs inside single quotes, so it must never contain an apostrophe.
               cmake --build   /tmp/robotFarm-build --parallel 1
               cmake --install /tmp/robotFarm-build
 

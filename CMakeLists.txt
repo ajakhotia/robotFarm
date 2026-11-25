@@ -82,9 +82,11 @@ compose_forwarded_cache_args(
 #[[ Upstream gz does not support static consumption: gz-rendering fails to export its
     vendored terra target, and the installed static configs of gz-common and gz-plugin
     reference TINYXML2::TINYXML2 and DL::DL targets that consumers cannot resolve. Static
-    builds therefore skip the projects that consume those configs; the base gz libraries,
-    gz-transport, and sdformat build statically and stay in. ]]
+    builds therefore skip the projects that consume those configs, including the ArduPilot
+    Gazebo plugin built on gz-sim; the base gz libraries, gz-transport, and sdformat build
+    statically and stay in. ]]
 if(NOT BUILD_SHARED_LIBS)
+  set(ROBOT_FARM_SKIP_ArduPilotGazeboExternalProject ON)
   set(ROBOT_FARM_SKIP_GzFuelToolsExternalProject ON)
   set(ROBOT_FARM_SKIP_GzGuiExternalProject ON)
   set(ROBOT_FARM_SKIP_GzLaunchExternalProject ON)
@@ -96,6 +98,8 @@ endif()
 
 set(ROBOT_FARM_REQUESTED_BUILD_LIST
   AbseilExternalProject
+  ArduPilotExternalProject
+  ArduPilotGazeboExternalProject
   BoostExternalProject
   CapnprotoExternalProject
   CeresSolverExternalProject
@@ -106,6 +110,7 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
   GazeboExternalProject
   GlogExternalProject
   GoogleTestExternalProject
+  GsoapExternalProject
   GzCmakeExternalProject
   GzCommonExternalProject
   GzFuelToolsExternalProject
@@ -129,6 +134,7 @@ set(ROBOT_FARM_REQUESTED_BUILD_LIST
   ProtobufExternalProject
   Python3ExternalProject
   SdformatExternalProject
+  SfmlExternalProject
   SpdLogExternalProject
   SuiteSparseExternalProject
   VTKExternalProject
